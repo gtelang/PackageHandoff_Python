@@ -1,0 +1,347 @@
+%\usepackage[a4paper, left=2cm, right=2cm, top=2cm]{geometry}
+\usepackage[text={19.0cm,24.5cm}]{geometry}
+\usepackage{marginnote}
+
+% https://stackoverflow.com/a/27243065/505306
+% Making caption font smaller on figures and tables.
+\usepackage{caption}
+\captionsetup{font=footnotesize}
+
+% Forcing line-breaks in url's
+% https://tex.stackexchange.com/questions/3033/forcing-linebreaks-in-url
+\usepackage[hyphens]{url}
+
+
+
+\usepackage{asymptote}
+\usepackage{asypictureB}
+\renewcommand\asydir{asytmp} 
+
+%-------------------------------------------------------------------------------
+%\usepackage[left,pagewise]{lineno}
+%\linenumbers
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{wrapfig}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{amsfonts}
+\usepackage{minted}
+% ------------------------------------------------------------------------------
+\usepackage[toc,page]{appendix}
+
+%-------------------------------------------------------------------------------
+%https://tex.stackexchange.com/a/278199/17858
+% For aligning itemize environments to left
+\usepackage{enumitem}
+\mdfsetup{%
+   middlelinecolor=red,
+   middlelinewidth=0pt,
+   roundcorner=10pt}
+
+\mdfdefinestyle{MyFrame}{%
+    linecolor=black,
+    outerlinewidth=0.1pt,
+    roundcorner=0pt,
+    innertopmargin=14pt,
+    innerbottommargin=4pt,
+    innerrightmargin=4pt,
+    innerleftmargin=4pt,
+        leftmargin = 4pt,
+        rightmargin = 4pt,
+    %backgroundcolor=gray!50!white}
+     }
+     
+%-------------------------------------------------------------------------------
+
+%\usepackage{fourier}  % Another nice font for the main text
+
+% Useful for breaking long lines of text https://tex.stackexchange.com/a/176780
+% in a table
+
+\usepackage{array}
+\usepackage{makecell}
+
+\renewcommand\theadalign{bc}
+\renewcommand\theadfont{\bfseries}
+\renewcommand\theadgape{\Gape[4pt]}
+\renewcommand\cellgape{\Gape[4pt]}
+\usepackage{makecell}
+
+
+\definecolor{theocol}{RGB}{255, 222, 228}
+\newtheorem{theo}{Theorem}
+\newenvironment{ftheo}
+  {\begin{mdframed}[style=MyFrame,nobreak=true, backgroundcolor=theocol]\begin{theo}}
+  {\end{theo}\end{mdframed}}
+
+
+\definecolor{lemcol}{RGB}{226, 255, 220}
+\newtheorem{lem}{Lemma}
+\newenvironment{flem}
+  {\begin{mdframed}[style=MyFrame,nobreak=true, backgroundcolor=lemcol]\begin{lem}}
+  {\end{lem}\end{mdframed}}
+
+\definecolor{corcol}{RGB}{227, 227, 227}
+\newtheorem{cor}{Corollary}
+\newenvironment{fcor}
+  {\begin{mdframed}[style=MyFrame,nobreak=true, backgroundcolor=corcol]\begin{cor}}
+  {\end{cor}\end{mdframed}}
+
+\definecolor{propcol}{RGB}{227, 227, 227}
+\newtheorem{prop}{Proposition}
+\newenvironment{fprop}
+  {\begin{mdframed}[style=MyFrame,nobreak=true, backgroundcolor=propcol]\begin{prop}}
+  {\end{prop}\end{mdframed}}
+
+\definecolor{conjcol}{RGB}{248, 218, 194}
+\newtheorem{conj}{Conjecture}
+\newenvironment{fconj}
+  {\begin{mdframed}[style=MyFrame,nobreak=true, backgroundcolor=conjcol]\begin{conj}}
+  {\end{conj}\end{mdframed}}
+
+
+\definecolor{notecol}{RGB}{255, 152, 149  }
+\newenvironment{note}
+  {\begin{mdframed}[style=MyFrame,nobreak=true, backgroundcolor=notecol]}
+  {\end{mdframed}}
+
+\usepackage{enumitem}
+
+%-------------------------------------------------------------------------------
+% https://tex.stackexchange.com/q/2291/17858
+% if you want to create a new list from scratch
+\newlist{alphalist}{enumerate}{1}
+% in that case, at least label must be specified using \setlist
+\setlist[alphalist,1]{label=\textbf{\Alph*.}}
+
+%--------------------------------------------------------------------------------
+\usepackage[english]{babel}
+%\setlength{\voffset}{-0.75in}
+\setlength{\headsep}{5pt}
+
+%-------------------------------------------------------------------------------
+\usepackage{blindtext}
+\usepackage{lipsum}
+\usepackage{textcomp}
+
+%-------------------------------------------------------------------------------
+\usepackage{filecontents}
+\usepackage{parskip} 
+\usepackage{tocloft}
+\usepackage{graphicx}                             % Include images into pdf document 
+\usepackage{tikz}                                 % Useful for the circled command. Don't remove!
+\usepackage{multicol}                             % For lists in two or more columns
+
+\usepackage[nokwfunc, ruled]{algorithm2e}
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+\SetKwComment{Comment}{$\triangleright$\ }{}
+\usepackage[T1]{fontenc}
+%-------------------------------------------------------------------------------
+\usepackage{needspace}                % So that sections/code-blocks don't straddle two pages 
+\usepackage{mathtools}
+\usepackage{subfig}
+\usepackage{etoolbox}
+\usepackage{color}
+\usepackage{pifont}
+\setlength{\parindent}{20pt}
+% For italicizing quotes: https://tex.stackexchange.com/a/288556/17858
+
+%-------------------------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage{csquotes}
+\renewcommand{\mkbegdispquote}[2]{\itshape}
+
+%-------------------------------------------------------------------------------
+% Convenience commands
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{\node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+\providecommand{\myceil}[1]{\left \lceil #1 \right \rceil }	% Ceil function
+\providecommand{\myfloor}[1]{\left \lfloor #1 \right \rfloor }	% Floor function\renewcommand{\labelitemi}{\tiny$\blacksquare$}	
+\newcommand\given[1][]{\:#1\vert\:}                             % for drawing the conditional probability `|` sign neatly.
+\newcommand\RR{\mathbb{R}}					% Set of reals numbers
+\newcommand\CC{\mathbb{C}}					% Set of complex numbers
+\newcommand\ZZ{\mathbb{Z}}					% Set of integers
+\newcommand\NN{\mathbb{N}}					% Set of naturals
+\newcommand\rarr{\rightarrow}					% Rightarrow
+\newcommand\larr{\leftarrow}					% Leftarrow
+\newcommand\defeq{\coloneqq}					% := symbol
+\renewcommand\tilde{ \: \thicksim \: }				% Sane tildas
+\newmdenv[topline=false, bottomline=false, skipabove=\topsep,skipbelow=\topsep]{siderules}
+%\setlength{\droptitle}{-18em}					% Eliminate the default vertical space
+%\hypersetup{colorlinks=true,linkcolor=blue}
+
+
+%-------------------------------------------------------------------------------
+% Writing the text of a section immediately after section title
+% Vedic and old british style where text immediately follows the 
+% subsection number. https://tex.stackexchange.com/a/99177/17858
+%\usepackage{titlesec}
+%\titlespacing{\section}{0pt}{*0}{*0}
+%\titlespacing{\subsection}{0pt}{*0}{*0}
+%\titlespacing{\subsubsection}{0pt}{*0}{*0}
+\usepackage[compact]{titlesec}
+\titlespacing{\section}{0pt}{2ex}{1ex}
+\titlespacing{\subsection}{0pt}{1ex}{0ex}
+\titlespacing{\subsubsection}{0pt}{0.5ex}{0ex}
+%\setlength{\parskip}{0.1cm} % Paragraph separation
+\setlength{\parindent}{2em}
+
+\titleformat*{\section}{\Huge\bfseries}
+\titleformat{\subsection}[runin]{\normalfont\Large\bfseries}{\thesubsection}{0.5em}{}
+\titleformat*{\subsubsection}{\Large\bfseries}
+%{\normalfont\huge\bfseries}{\sectiontitlename\ \thesection:}{1em}{} 
+%% Custom Literate Proof Commands:
+%\newcommand{\newchunk}[2]{\section{#2}\label{sec:#1}\quad}
+\newcommand{\newchunk}{\subsection{}\quad}
+\newcommand{\refchunk}[1]{\ref{sec:#1}}
+%\newcommand{\sect}[1]{\section{#1}\quad} 
+%-------------------------------------------------------------------------------
+% For centeriing the titile
+% https://tex.stackexchange.com/a/290449/17858
+\usepackage{titling}
+\renewcommand\maketitlehooka{\null\mbox{}\vfill}
+\renewcommand\maketitlehookd{\vfill\null}
+
+%-------------------------------------------------------------------------------
+% To express an idea in a crunchy way.
+\newcommand{\crunchy}[1]{\lbrack{} \large \textit{#1} \normalsize \rbrack} 
+%-------------------------------------------------------------------------------
+\makeatletter
+\def\@makechapterhead#1{%
+  %%%%\vspace*{50\p@}% %%% removed!
+  {\parindent \z@ \raggedright \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+        \huge \bfseries \@chapapp\space \thechapter
+        \par\nobreak
+        \vskip 20\p@
+    \fi
+    \interlinepenalty\@M
+    \Huge \bfseries #1\par\nobreak
+    \vskip 40\p@
+  }}
+\def\@makeschapterhead#1{%
+  %%%%%\vspace*{50\p@}% %%% removed!
+  {\parindent \z@ \raggedright
+    \normalfont
+    \interlinepenalty\@M
+    \Huge \bfseries  #1\par\nobreak
+    \vskip 40\p@
+  }}
+\makeatother
+
+
+\usepackage{fancyhdr}
+\usepackage{datetime}
+
+\fancyhf{}
+\fancyfoot[L]{\today\ \currenttime}
+\pagestyle{fancy}
+
+% https://tex.stackexchange.com/a/458876/17858 rounded
+% pink rectangles around an inline word
+\newcommand{\sticker}[1]{\tikz[baseline=(X.base)]\node [draw=red,fill=pink!60,semithick,rectangle,inner sep=2pt, rounded corners=3pt] (X) { {\footnotesize \color{red} #1}};}
+
+
+\newif\ifshowcode
+\showcodetrue
+\usepackage{latexsym}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{linkcolor}{rgb}{0, 0, 0.7}
+
+\usepackage[%
+backref,%
+raiselinks,%
+pdfhighlight=/O,%
+pagebackref,%
+hyperfigures,%
+breaklinks,%
+colorlinks,%
+pdfpagemode=None,%
+pdfstartview=FitBH,%
+linkcolor={linkcolor},%
+anchorcolor={linkcolor},%
+citecolor={linkcolor},%
+filecolor={linkcolor},%
+menucolor={linkcolor},%
+pagecolor={linkcolor},%
+urlcolor={linkcolor}%
+]{hyperref}
+
+
+% % %-------------------------------------------------------------------------------
+% % %https://tex.stackexchange.com/a/141662/17858
+% % %reset numbering of theorems, lemmas and corollaries every chapter 
+% \usepackage{chngcntr}
+% \counterwithin*{theo}{chapter} 
+% \counterwithin*{lem}{chapter} 
+% \counterwithin*{cor}{chapter} 
+
+
+%% For making lualatex work with asymptote
+%% ripped from https://tex.stackexchange.com/a/376412/17858
+\usepackage{ifluatex}
+\ifluatex
+\makeatletter
+\def\asy@input@graphic{%
+  \ifASYinline
+    \IfFileExists{"\AsyFile.tex"}{%
+      \catcode`:=12\relax
+      \@@input"\AsyFile.tex"\relax
+    }{%
+      \PackageWarning{asymptote}{file `\AsyFile.tex' not found}%
+    }%
+  \else
+    \IfFileExists{"\AsyFile.\AsyExtension"}{%
+      \ifASYattach
+        \ifASYPDF
+          \IfFileExists{"\AsyFile+0.pdf"}{%
+            \setbox\ASYbox=\hbox{\includegraphics[hiresbb]{\AsyFile+0.pdf}}%
+          }{%
+            \setbox\ASYbox=\hbox{\includegraphics[hiresbb]{\AsyFile.pdf}}%
+          }%
+        \else
+          \setbox\ASYbox=\hbox{\includegraphics[hiresbb]{\AsyFile.eps}}%
+        \fi
+        \textattachfile{\AsyFile.\AsyExtension}{\phantom{\copy\ASYbox}}%
+        \vskip-\ht\ASYbox
+        \indent
+        \box\ASYbox
+      \else
+        \ifASYPDF
+          \includegraphics[hiresbb]{\AsyFile.pdf}%
+        \else
+          \includegraphics[hiresbb]{\AsyFile.eps}%
+        \fi
+      \fi
+    }{%
+      \IfFileExists{"\AsyFile.tex"}{%
+        \catcode`:=12
+        \@@input"\AsyFile.tex"\relax
+      }{%
+        \PackageWarning{asymptote}{%
+          file `\AsyFile.\AsyExtension' not found%
+        }%
+      }%
+    }%
+  \fi
+}
+\makeatother
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% for setting program fonts
+%% As recommended by http://nepsweb.co.uk/docs/progfonts.pdf
+%% He recommends bera mono. 
+%%\usepackage[scaled]{beramono}
+%%\usepackage[T1]{fontenc}
+
+%% I liked txtt also. 
+%%\renewcommand{\ttdefault}{txtt}
+\usepackage{listings}
+\usepackage{inconsolata}
+\usepackage[T1]{fontenc}
+\lstset{basicstyle=\normalsize\ttfamily,breaklines=true}
+\lstset{framextopmargin=50pt,frame=bottomline}
+\lstset{language=Python}   
+

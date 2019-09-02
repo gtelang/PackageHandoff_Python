@@ -1,0 +1,52 @@
+\documentclass[12.0pt]{report}
+\input{standard_settings.tex}
+
+%%% Super useful for marking todo notes, ripped from here: 
+%%% https://tex.stackexchange.com/a/178806/17858
+\usepackage{xargs}                      % Use more than one optional parameter in a new commands
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommandx{\UNSURE}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\TODO}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+
+\usepackage{kantlipsum}
+\usepackage{fancyvrb}
+\usepackage{setspace}
+\newenvironment{CVerbatim}
+ {\singlespacing\center\BVerbatim}
+ {\endBVerbatim\endcenter}
+
+\usepackage{tocloft}
+\renewcommand{\cftpartfont}{\LARGE\itshape} % Part title in Huge Italic font
+\usepackage{hyperref}
+\usepackage{etoolbox}
+% Better formatting of backticks in 
+% verbatim environment. 
+\usepackage{upquote}
+
+% page numbering at top right
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+
+\begin{document}
+\begin{titlepage}
+	\centering
+        {\Huge Analyses of Experimental Heuristics for Package-Handoff Type Problems\\}
+        \vspace{20mm}
+        {\Large Gaurish Telang}
+\end{titlepage}
+\pagenumbering{arabic}
+\setcounter{page}{2} 
+\setcounter{tocdepth}{1}
+\tableofcontents
+\addtocontents{toc}{~\hfill\textbf{Page}\par}
+
+@i overview.web
+@i problem-classic-single-pho.web
+
+\begin{appendices}
+@i supporting-code.web
+\end{appendices}
+
+\end{document}

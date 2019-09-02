@@ -1,0 +1,135 @@
+\newcommand{\NWtarget}[2]{\hypertarget{#1}{#2}}
+\newcommand{\NWlink}[2]{\hyperlink{#1}{#2}}
+\newcommand{\NWtxtMacroDefBy}{Fragment defined by}
+\newcommand{\NWtxtMacroRefIn}{Fragment referenced in}
+\newcommand{\NWtxtMacroNoRef}{Fragment never referenced}
+\newcommand{\NWtxtDefBy}{Defined by}
+\newcommand{\NWtxtRefIn}{Referenced in}
+\newcommand{\NWtxtNoRef}{Not referenced}
+\newcommand{\NWtxtFileDefBy}{File defined by}
+\newcommand{\NWtxtIdentsUsed}{Uses:}
+\newcommand{\NWtxtIdentsNotUsed}{Never used}
+\newcommand{\NWtxtIdentsDefed}{Defines:}
+\newcommand{\NWsep}{${\diamond}$}
+\newcommand{\NWnotglobal}{(not defined globally)}
+\newcommand{\NWuseHyperlinks}{}
+\documentclass[12.0pt]{report}
+\input{standard_settings.tex}
+
+%%% Super useful for marking todo notes, ripped from here: 
+%%% https://tex.stackexchange.com/a/178806/17858
+\usepackage{xargs}                      % Use more than one optional parameter in a new commands
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommandx{\UNSURE}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\TODO}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+
+\usepackage{kantlipsum}
+\usepackage{fancyvrb}
+\usepackage{setspace}
+\newenvironment{CVerbatim}
+ {\singlespacing\center\BVerbatim}
+ {\endBVerbatim\endcenter}
+
+\usepackage{tocloft}
+\renewcommand{\cftpartfont}{\LARGE\itshape} % Part title in Huge Italic font
+\usepackage{hyperref}
+\usepackage{etoolbox}
+% Better formatting of backticks in 
+% verbatim environment. 
+\usepackage{upquote}
+
+% page numbering at top right
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+
+\begin{document}
+\begin{titlepage}
+	\centering
+        {\Huge Analyses of Experimental Heuristics for Package-Handoff Type Problems\\}
+        \vspace{20mm}
+        {\Large Gaurish Telang}
+\end{titlepage}
+\pagenumbering{arabic}
+\setcounter{page}{2} 
+\setcounter{tocdepth}{1}
+\tableofcontents
+\addtocontents{toc}{~\hfill\textbf{Page}\par}
+
+\chapter{Overview}
+
+How do you get a package from point $A$ to point $B$ with a fleet of drones each 
+capable of various maximum speeds? This is the question we try to answer in all 
+its various avatars by developing algorithms, heuristics, local optimality heuristics 
+and lower-bounds. 
+
+To be more specific,  we are given as input the positions $P_i$ of $n$ drones in 
+the plane each capable of a maximum speed of $u_i$. Also given is a package present 
+at $S$ that needs to get to $T$. Each drone is capable of picking up the package and 
+flying with speed $u_i$ to some other point to hand it off to another drone. 
+
+\begin{figure}[H]   
+  \centering 
+  \asyinclude{./asy/dummy-example.asy}
+  \caption{An example of the Package Handoff Problem}
+\end{figure}    
+
+The challenge is to figure how to get the drones to cooperate to send 
+the package from $S$ to $T$ in the least possible time. 
+
+To solve the problem we need to be able to do several things
+
+\begin{itemize}
+\item Figure out which subset of the drones are used in the optimal schedule. 
+\item Find the order in which the handoffs happend between the drones used in a schedule. 
+\item Find the ``handoff'' points when drone $k$ rendezvous with drone $k+1$ 
+      to give it the package.  
+\end{itemize}
+
+This category of problems is a generalization of computing shortest paths in $\mathbb{R}^2$ 
+between 
+two points. As far as we know such problems have not been considered before in the 
+operations research literature; it is, however, reminescent of the Weighted Region 
+Problem (\texttt{WRP}) where one needs to figure out how to compute a shortest 
+\textit{weighted} path between two points in the plane
+that has been partitioned into convex polygonal regions, each associated with a constant 
+multiplicative weight for scaling the euclidean distance between two points 
+\textit{within} that region.  
+
+
+The distinctive feature of this problem and its generalizations is figuring out how 
+to make multiple agents of \textit{varying} capabilities  located at different points 
+in $\mathbb{R}^2$ (such as maximum capable speed, battery capacity, tethering constraints 
+etc.) \textit{cooperate} in transporting one or more packages most efficiently 
+from their given sources to their target destinations. 
+
+Each chapter in this document is devoted to developing algorithms for a specific 
+variant of the package handoff problem (henceforth abbreviated as \texttt{PHO}), beginning 
+with the plain-vanilla single package handoff problem described above. 
+For most algorithms we will also be giving implementations in Python described in a 
+literate style. 
+
+You can check out the code from the following online GitHub repository: 
+\url{https://github.com/gtelang/PackageHandoff_Python}
+
+%-----------------------------------------------------
+\chapter{Single Package Handoff}
+\label{chap:single-package-handoff}
+
+
+
+
+
+
+\section{Chapter Index of Fragments}
+None.
+
+\section{Chapter Index of Identifiers}
+ 
+%------------------------------------------------------
+
+\begin{appendices}
+\end{appendices}
+
+\end{document}
