@@ -1,0 +1,10 @@
+@article{mitchell1991weighted,
+  title={The weighted region problem: finding shortest paths through a weighted planar subdivision},
+  author={Mitchell, Joseph SB and Papadimitriou, Christos H},
+  journal={Journal of the ACM (JACM)},
+  volume={38},
+  number={1},
+  pages={18--73},
+  year={1991},
+  publisher={ACM}
+}

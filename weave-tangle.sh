@@ -14,7 +14,7 @@ if [ $# -eq 0 ]; then
 
 	asy ./asytmp/*.asy -o ./asytmp/
 	
-        bibtex $main_tex_file  
+        bibtex packagehandoff-main
         pdflatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file 
         nuweb -r -v $main_web_file 
         pdflatex -interaction=nonstopmode -halt-on-error  -shell-escape $main_tex_file 

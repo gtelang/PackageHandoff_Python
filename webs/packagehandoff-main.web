@@ -45,6 +45,10 @@
 @i overview.web
 @i problem-classic-single-pho.web
 
+
+\bibliography{packagehandoff-main} 
+\bibliographystyle{apalike}
+
 \begin{appendices}
 @i supporting-code.web
 \end{appendices}

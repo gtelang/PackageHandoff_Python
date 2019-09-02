@@ -64,35 +64,37 @@ capable of various maximum speeds? This is the question we try to answer in all
 its various avatars by developing algorithms, heuristics, local optimality heuristics 
 and lower-bounds. 
 
-To be more specific,  we are given as input the positions $P_i$ of $n$ drones in 
-the plane each capable of a maximum speed of $u_i$. Also given is a package present 
+To be more specific,  we are given as input the positions $P_i$ of $n$ drones (labelled 1 to n) 
+in the plane each capable of a maximum speed of $u_i$. Also given is a package present 
 at $S$ that needs to get to $T$. Each drone is capable of picking up the package and 
-flying with speed $u_i$ to some other point to hand it off to another drone. 
+flying with speed $u_i$ to another point to hand the package off to another drone. 
 
-\begin{figure}[H]   
-  \centering 
-  \asyinclude{./asy/dummy-example.asy}
-  \caption{An example of the Package Handoff Problem}
-\end{figure}    
+% \begin{figure}[H]   
+%   \centering 
+%   \asyinclude{./asy/dummy-example.asy}
+%   \caption{An example of the Package Handoff Problem}
+% \end{figure}    
 
 The challenge is to figure how to get the drones to cooperate to send 
-the package from $S$ to $T$ in the least possible time. 
+the package from $S$ to $T$ in the least possible time i.e. minimize the makespan
+of the delivery process. 
 
 To solve the problem we need to be able to do several things
 
 \begin{itemize}
-\item Figure out which subset of the drones are used in the optimal schedule. 
+\item Figure out which subset $S = \{i_1, i_2, \ldots i_k\}$ of the drones are used in the optimal schedule. 
 \item Find the order in which the handoffs happend between the drones used in a schedule. 
-\item Find the ``handoff'' points when drone $k$ rendezvous with drone $k+1$ 
-      to give it the package.  
+\item Find the ``handoff'' points when drone $i_m$ hands over the package to drone $i_{m+1}$ for all $m \leq k-1$ 
+      \footnote{The drone $i_k$ flies with the package to the target site $T$}
 \end{itemize}
 
 This category of problems is a generalization of computing shortest paths in $\mathbb{R}^2$ 
 between 
 two points. As far as we know such problems have not been considered before in the 
-operations research literature; it is, however, reminescent of the Weighted Region 
-Problem (\texttt{WRP}) where one needs to figure out how to compute a shortest 
-\textit{weighted} path between two points in the plane
+operations research or computational geometry literature; it is, however, reminescent of 
+the Weighted Region Problem \cite{mitchell1991weighted} (henceforth abbreviated as 
+\texttt{WRP}) where one needs to figure out how to compute a 
+shortest \textit{weighted} path between two points in the plane
 that has been partitioned into convex polygonal regions, each associated with a constant 
 multiplicative weight for scaling the euclidean distance between two points 
 \textit{within} that region.  
@@ -104,15 +106,23 @@ in $\mathbb{R}^2$ (such as maximum capable speed, battery capacity, tethering co
 etc.) \textit{cooperate} in transporting one or more packages most efficiently 
 from their given sources to their target destinations. 
 
+
 Each chapter in this document is devoted to developing algorithms for a specific 
 variant of the package handoff problem (henceforth abbreviated as \texttt{PHO}), beginning 
 with the plain-vanilla single package handoff problem described above. 
 For most algorithms we will also be giving implementations in Python described in a 
-literate style. 
+literate-programming style \footnote{which essentially means you will see code-snippets interleaved with the actual explanation of the algorithms. 
+The code snippets are then extracted using a literate programming tool (using a so called a ``weaver'' and ``tangler'') into an actual 
+executable Python program} \cite{knuth1984literate} using the NuWeb literate programming tool \cite{briggs2001nuweb}  
+for weaving and tangling the code-snippets. 
 
-You can check out the code from the following online GitHub repository: 
+You can check out the Package Handoff code from the following GitHub repository: 
+
+\begin{center}
 \url{https://github.com/gtelang/PackageHandoff_Python}
+\end{center}
 
+The \texttt{README} file gives instructions on how to run the code and any of the associated experiments. 
 %-----------------------------------------------------
 \chapter{Single Package Handoff}
 \label{chap:single-package-handoff}
@@ -128,6 +138,10 @@ None.
 \section{Chapter Index of Identifiers}
  
 %------------------------------------------------------
+
+
+\bibliography{packagehandoff-main} 
+\bibliographystyle{apalike}
 
 \begin{appendices}
 \end{appendices}
