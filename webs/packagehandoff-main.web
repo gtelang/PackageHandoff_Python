@@ -1,6 +1,9 @@
 \documentclass[12.0pt]{report}
 \input{standard_settings.tex}
 
+\usepackage{harpoon}% <---
+
+
 %%% Super useful for marking todo notes, ripped from here: 
 %%% https://tex.stackexchange.com/a/178806/17858
 \usepackage{xargs}                      % Use more than one optional parameter in a new commands
@@ -46,8 +49,13 @@
 @i problem-classic-single-pho.web
 
 
+
+
+
+
 \bibliography{packagehandoff-main} 
-\bibliographystyle{apalike}
+\bibliographystyle{ieeetr}
+
 
 \begin{appendices}
 @i supporting-code.web

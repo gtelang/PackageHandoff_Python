@@ -1,20 +1,24 @@
 \chapter{Overview}
 
-How do you get a package from point $A$ to point $B$ with a fleet of drones each 
-capable of various maximum speeds? This is the question we try to answer in all 
+How do you get a package from point $A$ to point $B$ with a fleet of carrier drones each 
+capable of various maximum speeds? This is the question we try to answer in some of  
 its various avatars by developing algorithms, heuristics, local optimality heuristics 
 and lower-bounds. 
 
-To be more specific,  we are given as input the positions $P_i$ of $n$ drones (labelled 1 to n) 
+Specifically, we are given as input the positions $P_i$ of $n$ drones (labelled 1 through $n$) 
 in the plane each capable of a maximum speed of $u_i$. Also given is a package present 
 at $S$ that needs to get to $T$. Each drone is capable of picking up the package and 
 flying with speed $u_i$ to another point to hand the package off to another drone. 
 
-% \begin{figure}[H]   
-%   \centering 
-%   \asyinclude{./asy/dummy-example.asy}
-%   \caption{An example of the Package Handoff Problem}
-% \end{figure}    
+\begin{figure}[H]
+    \centering
+    \subfloat[An example of a carrier drone. Image taken from \cite{Franceha10:online}]{{\includegraphics[width=5cm]{images/carrier-drone.jpg} }}%
+    \qquad
+    \subfloat[A fleet of drones such as on the left, coordinating to move a package from $S$ to $T$ in the least time possible.]{{\includegraphics[width=5cm]{example-image-b} }}%
+    \caption{An instance of the Package Handoff problem for a single package}%
+    \label{single-pho-example}%
+\end{figure}
+
 
 The challenge is to figure how to get the drones to cooperate to send 
 the package from $S$ to $T$ in the least possible time i.e. minimize the makespan
@@ -26,7 +30,7 @@ To solve the problem we need to be able to do several things
 \item Figure out which subset $S = \{i_1, i_2, \ldots i_k\}$ of the drones are used in the optimal schedule. 
 \item Find the order in which the handoffs happend between the drones used in a schedule. 
 \item Find the ``handoff'' points when drone $i_m$ hands over the package to drone $i_{m+1}$ for all $m \leq k-1$ 
-      \footnote{The drone $i_k$ flies with the package to the target site $T$}
+      \footnote{The final drone $i_k$ in the schedule flies with the package to the target site $T$}
 \end{itemize}
 
 This category of problems is a generalization of computing shortest paths in $\mathbb{R}^2$ 
@@ -47,13 +51,20 @@ in $\mathbb{R}^2$ (such as maximum capable speed, battery capacity, tethering co
 etc.) \textit{cooperate} in transporting one or more packages most efficiently 
 from their given sources to their target destinations. 
 
+While we are framing these problems in terms of drones, one can also apply this problem 
+in routing a fleet of taxis to get passengers from their pickup to their dropoff locations. 
+Interesting problems might arise in this scenario itself (e.g. what if the sequence of 
+pickup and dropoff locations for passengers happen in an online manner, say when passengers request or cancel rides with their 
+smartphones?) We leave the investigation of these latter fascinating problems for future work. 
+All problems considered in this article are in the offline setting. 
+
 
 Each chapter in this document is devoted to developing algorithms for a specific 
 variant of the package handoff problem (henceforth abbreviated as \texttt{PHO}), beginning 
 with the plain-vanilla single package handoff problem described above. 
 For most algorithms we will also be giving implementations in Python described in a 
-literate-programming style \footnote{which essentially means you will see code-snippets interleaved with the actual explanation of the algorithms. 
-The code snippets are then extracted using a literate programming tool (using a so called a ``weaver'' and ``tangler'') into an actual 
+literate-programming style \footnote{Which essentially means you will see code-snippets interleaved with the actual explanation of the algorithms. 
+The code snippets are then extracted using a literate programming tool (using a so-called a ``weaver'' and ``tangler'') into an 
 executable Python program} \cite{knuth1984literate} using the NuWeb literate programming tool \cite{briggs2001nuweb}  
 for weaving and tangling the code-snippets. 
 

@@ -1,18 +1,31 @@
-\begin{thebibliography}{}
+\begin{thebibliography}{1}
 
-\bibitem[Briggs et~al., 2001]{briggs2001nuweb}
-Briggs, P., Ramsdell, J.~D., and Mengel, M.~W. (2001).
-\newblock Nuweb version 1.0 b1: A simple literate programming tool.
+\bibitem{Franceha10:online}
+``France has started the drone mail carrier | earth chronicles news.''
+  \url{http://earth-chronicles.com/science/france-has-started-the-drone-mail-carrier.html}.
+\newblock (Accessed on 09/01/2019).
 
-\bibitem[Knuth, 1984]{knuth1984literate}
-Knuth, D.~E. (1984).
-\newblock Literate programming.
-\newblock {\em The Computer Journal}, 27(2):97--111.
+\bibitem{mitchell1991weighted}
+J.~S. Mitchell and C.~H. Papadimitriou, ``The weighted region problem: finding
+  shortest paths through a weighted planar subdivision,'' {\em Journal of the
+  ACM (JACM)}, vol.~38, no.~1, pp.~18--73, 1991.
 
-\bibitem[Mitchell and Papadimitriou, 1991]{mitchell1991weighted}
-Mitchell, J.~S. and Papadimitriou, C.~H. (1991).
-\newblock The weighted region problem: finding shortest paths through a
-  weighted planar subdivision.
-\newblock {\em Journal of the ACM (JACM)}, 38(1):18--73.
+\bibitem{knuth1984literate}
+D.~E. Knuth, ``Literate programming,'' {\em The Computer Journal}, vol.~27,
+  no.~2, pp.~97--111, 1984.
+
+\bibitem{briggs2001nuweb}
+P.~Briggs, J.~D. Ramsdell, and M.~W. Mengel, ``Nuweb version 1.0 b1: A simple
+  literate programming tool,'' 2001.
+
+\bibitem{mitchell1996shortest}
+J.~S. Mitchell, ``Shortest paths among obstacles in the plane,'' {\em
+  International Journal of Computational Geometry \& Applications}, vol.~6,
+  no.~03, pp.~309--332, 1996.
+
+\bibitem{diamond2016cvxpy}
+S.~Diamond and S.~Boyd, ``Cvxpy: A python-embedded modeling language for convex
+  optimization,'' {\em The Journal of Machine Learning Research}, vol.~17,
+  no.~1, pp.~2909--2913, 2016.
 
 \end{thebibliography}

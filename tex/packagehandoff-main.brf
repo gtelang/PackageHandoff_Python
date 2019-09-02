@@ -1,3 +1,6 @@
-\backcite {mitchell1991weighted}{{3}{1}{chapter.1}}
-\backcite {knuth1984literate}{{3}{1}{chapter.1}}
-\backcite {briggs2001nuweb}{{3}{1}{chapter.1}}
+\backcite {Franceha10:online}{{3}{1.1a}{subfigure.1.1.1}}
+\backcite {mitchell1991weighted}{{3}{1}{figure.caption.1}}
+\backcite {knuth1984literate}{{4}{1}{figure.caption.1}}
+\backcite {briggs2001nuweb}{{4}{1}{figure.caption.1}}
+\backcite {mitchell1991weighted, mitchell1996shortest}{{5}{2.1}{section.2.1}}
+\backcite {diamond2016cvxpy}{{6}{2.1}{section.2.1}}
