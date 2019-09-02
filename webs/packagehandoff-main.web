@@ -49,13 +49,8 @@
 @i problem-classic-single-pho.web
 
 
-
-
-
-
 \bibliography{packagehandoff-main} 
 \bibliographystyle{ieeetr}
-
 
 \begin{appendices}
 @i supporting-code.web

@@ -252,15 +252,226 @@ None.
 %------------------------------------------------------
 
 
-
-
-
-
 \bibliography{packagehandoff-main} 
 \bibliographystyle{ieeetr}
 
-
 \begin{appendices}
+\chapter{Supporting Code}
+
+
+The following file, contains some common algorithmic utilities 
+
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap1}\raggedright\small
+\NWtarget{nuweb10}{} \verb@"../src/utils_algo.py"@\nobreak\ {\footnotesize {10}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@    @\\
+\mbox{}\verb@ @\\
+\mbox{}\verb@import numpy as np@\\
+\mbox{}\verb@import random@\\
+\mbox{}\verb@from colorama import Fore@\\
+\mbox{}\verb@from colorama import Style@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def vector_chain_from_point_list(pts):@\\
+\mbox{}\verb@    vec_chain = []@\\
+\mbox{}\verb@    for pair in zip(pts, pts[1:]):@\\
+\mbox{}\verb@        tail= np.array (pair[0])@\\
+\mbox{}\verb@        head= np.array (pair[1])@\\
+\mbox{}\verb@        vec_chain.append(head-tail)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    return vec_chain@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def length_polygonal_chain(pts):@\\
+\mbox{}\verb@    vec_chain = vector_chain_from_point_list(pts)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    acc = 0@\\
+\mbox{}\verb@    for vec in vec_chain:@\\
+\mbox{}\verb@        acc = acc + np.linalg.norm(vec)@\\
+\mbox{}\verb@    return acc@\\
+\mbox{}\verb@def pointify_vector (x):@\\
+\mbox{}\verb@    if len(x) % 2 == 0:@\\
+\mbox{}\verb@        pts = []@\\
+\mbox{}\verb@        for i in range(len(x))[::2]:@\\
+\mbox{}\verb@            pts.append( [x[i],x[i+1]] )@\\
+\mbox{}\verb@        return pts@\\
+\mbox{}\verb@    else :@\\
+\mbox{}\verb@        sys.exit('List of items does not have an even length to be able to be pointifyed')@\\
+\mbox{}\verb@def flatten_list_of_lists(l):@\\
+\mbox{}\verb@       return [item for sublist in l for item in sublist]@\\
+\mbox{}\verb@def print_list(xs):@\\
+\mbox{}\verb@    for x in xs:@\\
+\mbox{}\verb@        print x@\\
+\mbox{}\verb@def partial_sums( xs ):@\\
+\mbox{}\verb@    psum = 0@\\
+\mbox{}\verb@    acc = []@\\
+\mbox{}\verb@    for x in xs:@\\
+\mbox{}\verb@        psum = psum+x@\\
+\mbox{}\verb@        acc.append( psum )@\\
+\mbox{}\verb@    return acc@\\
+\mbox{}\verb@def are_site_orderings_equal(sites1, sites2):@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    for (x1,y1), (x2,y2) in zip(sites1, sites2): @\\
+\mbox{}\verb@        if (x1-x2)**2 + (y1-y2)**2 > 1e-8:@\\
+\mbox{}\verb@            return False@\\
+\mbox{}\verb@    return True@\\
+\mbox{}\verb@def bunch_of_non_uniform_random_points(numpts):@\\
+\mbox{}\verb@    cluster_size = int(np.sqrt(numpts)) @\\
+\mbox{}\verb@    numcenters   = cluster_size@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    import scipy@\\
+\mbox{}\verb@    import random@\\
+\mbox{}\verb@    centers = scipy.rand(numcenters,2).tolist()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    scale, points = 4.0, []@\\
+\mbox{}\verb@    for c in centers:@\\
+\mbox{}\verb@        cx, cy = c[0], c[1]@\\
+\mbox{}\verb@        # For current center $c$ of this loop, generate \verb|cluster_size| points uniformly in a square centered at it@\\
+\mbox{}\verb@           @\\
+\mbox{}\verb@        sq_size      = min(cx,1-cx,cy, 1-cy)@\\
+\mbox{}\verb@        loc_pts_x    = np.random.uniform(low=cx-sq_size/scale, high=cx+sq_size/scale, size=(cluster_size,))@\\
+\mbox{}\verb@        loc_pts_y    = np.random.uniform(low=cy-sq_size/scale, high=cy+sq_size/scale, size=(cluster_size,))@\\
+\mbox{}\verb@        points.extend(zip(loc_pts_x, loc_pts_y))@\\
+\mbox{}\verb@        @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Whatever number of points are left to be generated, generate them uniformly inside the unit-square@\\
+\mbox{}\verb@       @\\
+\mbox{}\verb@    num_remaining_pts = numpts - cluster_size * numcenters@\\
+\mbox{}\verb@    remaining_pts = scipy.rand(num_remaining_pts, 2).tolist()@\\
+\mbox{}\verb@    points.extend(remaining_pts)@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    return points@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@def write_to_yaml_file(data, dir_name, file_name):@\\
+\mbox{}\verb@   import yaml@\\
+\mbox{}\verb@   with open(dir_name + '/' + file_name, 'w') as outfile:@\\
+\mbox{}\verb@     yaml.dump( data, outfile, default_flow_style = False)@\\
+\mbox{}\verb@ @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap2}\raggedright\small
+\NWtarget{nuweb11}{} \verb@"../src/utils_graphics.py"@\nobreak\ {\footnotesize {11}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@    @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@from matplotlib import rc@\\
+\mbox{}\verb@from colorama import Fore@\\
+\mbox{}\verb@from colorama import Style@\\
+\mbox{}\verb@from scipy.optimize import minimize@\\
+\mbox{}\verb@from sklearn.cluster import KMeans@\\
+\mbox{}\verb@import argparse@\\
+\mbox{}\verb@import itertools@\\
+\mbox{}\verb@import math@\\
+\mbox{}\verb@import matplotlib as mpl@\\
+\mbox{}\verb@import matplotlib.pyplot as plt@\\
+\mbox{}\verb@import numpy as np@\\
+\mbox{}\verb@import os@\\
+\mbox{}\verb@import pprint as pp@\\
+\mbox{}\verb@import randomcolor @\\
+\mbox{}\verb@import sys@\\
+\mbox{}\verb@import time@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@xlim, ylim = [0,1], [0,1]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def applyAxCorrection(ax):@\\
+\mbox{}\verb@      ax.set_xlim([xlim[0], xlim[1]])@\\
+\mbox{}\verb@      ax.set_ylim([ylim[0], ylim[1]])@\\
+\mbox{}\verb@      ax.set_aspect(1.0)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def clearPatches(ax):@\\
+\mbox{}\verb@    # Get indices cooresponding to the polygon patches@\\
+\mbox{}\verb@    for index , patch in zip(range(len(ax.patches)), ax.patches):@\\
+\mbox{}\verb@        if isinstance(patch, mpl.patches.Polygon) == True:@\\
+\mbox{}\verb@            patch.remove()@\\
+\mbox{}\verb@    ax.lines[:]=[]@\\
+\mbox{}\verb@    applyAxCorrection(ax)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def clearAxPolygonPatches(ax):@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Get indices cooresponding to the polygon patches@\\
+\mbox{}\verb@    for index , patch in zip(range(len(ax.patches)), ax.patches):@\\
+\mbox{}\verb@        if isinstance(patch, mpl.patches.Polygon) == True:@\\
+\mbox{}\verb@            patch.remove()@\\
+\mbox{}\verb@    ax.lines[:]=[]@\\
+\mbox{}\verb@    applyAxCorrection(ax)@\\
+\mbox{}\verb@def wrapperEnterRunPoints(fig, ax, run):@\\
+\mbox{}\verb@    def _enterPoints(event):@\\
+\mbox{}\verb@        if event.name      == 'button_press_event'          and \@\\
+\mbox{}\verb@           (event.button   == 1 or event.button == 3)       and \@\\
+\mbox{}\verb@            event.dblclick == True and event.xdata  != None and event.ydata  != None:@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@             if event.button == 1:  @\\
+\mbox{}\verb@                 # Insert blue circle representing a site@\\
+\mbox{}\verb@                   @\\
+\mbox{}\verb@                 newPoint = (event.xdata, event.ydata)@\\
+\mbox{}\verb@                 run.sites.append( newPoint  )@\\
+\mbox{}\verb@                 patchSize  = (xlim[1]-xlim[0])/140.0@\\
+\mbox{}\verb@                    @\\
+\mbox{}\verb@                 ax.add_patch( mpl.patches.Circle( newPoint, radius = patchSize,@\\
+\mbox{}\verb@                                                   facecolor='blue', edgecolor='black'  ))@\\
+\mbox{}\verb@                 ax.set_title('Points Inserted: ' + str(len(run.sites)), \@\\
+\mbox{}\verb@                              fontdict={'fontsize':40})@\\
+\mbox{}\verb@                 @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@             elif event.button == 3:  @\\
+\mbox{}\verb@                 # Insert big red circle representing initial position of horse and fly@\\
+\mbox{}\verb@                  @\\
+\mbox{}\verb@                 inithorseposn     = (event.xdata, event.ydata)@\\
+\mbox{}\verb@                 run.inithorseposn = inithorseposn  @\\
+\mbox{}\verb@                 patchSize         = (xlim[1]-xlim[0])/100.0@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                 ax.add_patch( mpl.patches.Circle( inithorseposn,radius = patchSize,@\\
+\mbox{}\verb@                                                   facecolor= '#D13131', edgecolor='black' ))@\\
+\mbox{}\verb@                 @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@             # Clear polygon patches and set up last minute \verb|ax| tweaks@\\
+\mbox{}\verb@                @\\
+\mbox{}\verb@             clearAxPolygonPatches(ax)@\\
+\mbox{}\verb@             applyAxCorrection(ax)@\\
+\mbox{}\verb@             fig.canvas.draw()@\\
+\mbox{}\verb@             @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    return _enterPoints@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@# Borrowed from https://stackoverflow.com/a/9701141@\\
+\mbox{}\verb@import numpy as np@\\
+\mbox{}\verb@import colorsys@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def get_colors(num_colors, lightness=0.2):@\\
+\mbox{}\verb@    colors=[]@\\
+\mbox{}\verb@    for i in np.arange(60., 360., 300. / num_colors):@\\
+\mbox{}\verb@        hue        = i/360.0@\\
+\mbox{}\verb@        saturation = 0.95@\\
+\mbox{}\verb@        colors.append(colorsys.hls_to_rgb(hue, lightness, saturation))@\\
+\mbox{}\verb@    return colors@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
 \end{appendices}
 
 \end{document}
