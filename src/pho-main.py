@@ -38,37 +38,13 @@ class Single_PHO_Input:
     def get_tour(self, algo):
            return algo( self.drone_info, self.source, self.target, 
                         animate_tour_p = False,
-                        plot_tour_p    = False)
+                        plot_tour_p    = True)
 
     # Methods for \verb|ReverseHorseflyInput|
     def clearAllStates (self):
           self.drone_info = []
           self.source = None
           self.target = None
-
-
-class DroneWavelet:
-    def __init__(self, startposn, speed, drone_idx,  clock_time):
-          self.center          = startposn
-          self.speed           = speed
-          self.drone_label     = drone_idx
-          self.last_reset_time = clock_time
-
-    def get_center(self):
-          return self.center
-
-    def get_speed(self):
-          return self.speed
-
-    def get_associated_drone(self):
-          return self.drone_label
-
-    def wavelet_size(self, clock_time): # radius of the disk
-           return (clock_time - last_reset_time) * self.speed
-    
-    def reset_wavelet(self, center, clock_time):
-         self.center = center
-         self.last_reset_time = clock_time 
 
 
 # PHO Algorithms
@@ -83,21 +59,13 @@ def algo_odw(drone_info, source, target,
              plot_tour_p    = False):
 
     from scipy.optimize import minimize
-    print Fore.CYAN, "\n==========================================================="
-    print            "Running the one dimensional wavefront algorithm (algo_odw) "
-    print            "===========================================================", Style.RESET_ALL
 
     source = np.asarray(source)
     target = np.asarray(target)
     sthat  = (target-source)/np.linalg.norm(target-source) # unit vector pointing from source to target
 
-    # Intialize wavelets for all drones
     numdrones  = len(drone_info)
     clock_time = 0.0
-
-    drone_wavelets = []
-    for (initposn, speed), idx in zip(drone_info, range(numdrones)):
-         drone_wavelets.append(  DroneWavelet(initposn, speed, idx, clock_time)  )
 
     # Find the drone which can get to the source the quickest
     tmin = np.inf
@@ -106,103 +74,175 @@ def algo_odw(drone_info, source, target,
          initdroneposn = drone_info[idx][0]
          dronespeed    = drone_info[idx][1]
          tmin_idx = time_of_travel(initdroneposn, source, dronespeed)
-    
+
          if tmin_idx < tmin:
              tmin = tmin_idx
              imin = idx 
 
-    # Reset wavelet for the drone which reached the source the fastest
     clock_time = tmin
-    drone_wavelets[imin].reset_wavelet(source, clock_time)
 
     current_package_handler_idx = imin
-    current_package_position = source
+    current_package_position    = source
 
     drone_pool = range(numdrones)
     drone_pool.remove(imin) 
     used_drones = [imin]
 
+    package_trail = [current_package_position]
+
     package_reached_p   = False
     while not(package_reached_p):
-          print "-----------------------------------------------------"
-          print Fore.GREEN, "Clock Time ", clock_time , Style.RESET_ALL
-          print "Drone Pool ", drone_pool, "  Used Drones ", used_drones
-          print "-----------------------------------------------------"
+          #print "-----------------------------------------------------------------------------------"
+          #print Fore.GREEN, "Clock Time ", clock_time , Style.RESET_ALL
+          #print Fore.RED,   "Drone Pool ", drone_pool, "  Used Drones ", used_drones, Style.RESET_ALL
+          #print Fore.CYAN,  "Current Package Position ", current_package_position, Style.RESET_ALL 
+
           time_to_target_without_help =\
               np.linalg.norm((target-current_package_position))/drone_info[current_package_handler_idx][1]
-          tintercept_min     = np.inf
-          idx_intercept_min  = None
 
+          tI_min     = np.inf
+          idx_tI_min = None
           for idx in drone_pool:
-              # Calculate tintercept here via scipy
-              u1 = drone_info[current_package_handler_idx][1]
-              u2 = drone_info[idx][1]
+              
+              us = drone_info[current_package_handler_idx][1]
+              up = drone_info[idx][1]
 
-              if u2 < u1:
-                  continue # there won't be any use of the slower drone u2 in speeding up the package delivery process. 
+              if up <= us: # slower drones are useless, so skip rest of the iteration
+                  continue 
               else: 
-                p1 = np.asarray(drone_info[idx][0])
-                p2 = np.asarray(drone_info[current_package_handler_idx][0]) 
-                print u1, u2, "    ", p1, p2 
+                s = current_package_position 
+                p = np.asarray(drone_info[idx][0]) 
 
-                d  = np.linalg.norm( p1 - p2 )
-    
-                veca  = target-p1
-                vecb  = p2 - p1  
-                costh = np.dot( veca, vecb ) / (np.linalg.norm(veca) * np.linalg.norm(vecb))
+                tI = get_interception_time(s, us, p, up, target, clock_time)
 
-                fun    = lambda t: t[0]
-                cons   = ({'type': 'ineq', 'fun': lambda t:  u2 + d - u1 * costh * (t[0]-clock_time)/t[0] },
-                          {'type': 'ineq', 'fun': lambda t:  u2 - d + u1 * costh * (t[0]-clock_time)/t[0] })
-    
-                res = minimize(fun, [clock_time] , method='SLSQP', bounds=[(clock_time, None)], constraints=cons ) 
+                if tI < tI_min:
+                   tI_min     = tI
+                   idx_tI_min = idx
 
-                if res.success:
-                      print Fore.CYAN, "SLSQP Solver converged in "   , res.nit, " iterations",  Style.RESET_ALL
-
-                else :
-                      print Fore.RED, "Boo! SLSQP Solver did not converge!", Style.RESET_ALL
-                      print res.status
-                      print res.message 
-                
-                tintercept = res.x[0]
-                print res.x
-
-                if tintercept < tintercept_min:
-                   tintercept_min    = tintercept
-                   idx_intercept_min = idx
-
-          if time_to_target_without_help < tintercept_min :
+          if time_to_target_without_help < tI_min :
               package_reached_p = True
+              package_trail.append(target)
+
           else:
-
               package_handler_speed     = drone_info[current_package_handler_idx][1] 
-              current_package_position  = current_package_position + \
-                   package_handler_speed * (tintercept_min - clock_time) *  sthat
+              current_package_position  = current_package_position + package_handler_speed * (tI_min - clock_time) *  sthat
+              package_trail.append(current_package_position)
+    
+              clock_time                  = tI_min 
+              current_package_handler_idx = idx_tI_min
 
-              clock_time = tintercept_min 
-
-              current_package_handler_idx = idx_intercept_min
-              drone_pool.remove(idx_intercept_min)
-              used_drones.append(idx_intercept_min)  
-
-              drone_wavelets[idx_intercept_min].reset_wavelet(current_package_position, clock_time)
-
+              drone_pool.remove(idx_tI_min)
+              used_drones.append(idx_tI_min)  
 
     tour = algo_pho_exact_given_order_of_drones ( [drone_info[idx] for idx in used_drones],source,target )
-
-    print Fore.RED, "Package has been delivered! ", " Ids of the drones used for delivery (in order of handoff) were ", used_drones, Style.RESET_ALL
-
-    print "The tour points are "
-    utils_algo.print_list([ drone_wavelets[idx].center for idx in used_drones ])
+    print Fore.RED, "Package has been delivered! ",\
+          " Ids of the drones used for delivery (in order of handoff) were ", used_drones, Style.RESET_ALL
 
     if plot_tour_p:
-         print Fore.GREEN, "Plotting the computed tour", Style.RESET_ALL
-    
+         plot_tour(source, target, drone_info, used_drones, package_trail)
     if animate_tour_p:
          print Fore.CYAN, "Animating the computed tour", Style.RESET_ALL
-    
     return tour
+
+def get_interception_time(s, us, p, up, t, t0) :
+    
+    t_m = t - s # the _m subscript stands for modify
+    t_m /= np.linalg.norm(t_m) # normalize to unit
+
+    # For rotating a vector clockwise by theta, 
+    # to get the vector t_m into alignment with (1,0)
+    costh = t_m[0]/np.sqrt(t_m[0]**2 + t_m[1]**2)
+    sinth = t_m[1]/np.sqrt(t_m[0]**2 + t_m[1]**2)
+
+    rotmat = np.asarray([[costh, sinth],
+                         [-sinth, costh]])
+    
+    assert np.linalg.norm((rotmat.dot(t_m) - np.asarray([1,0]))) <= 1e-6,\
+           "Rotation matrix did not work properly. t_m should get rotated onto [1,0] after this transformation"
+
+    p_shift  = p - s
+    p_rot    = rotmat.dot(p_shift)
+    [alpha, beta] = p_rot
+
+    # Solve quadratic documented in the snippets above
+    qroots = np.roots([ (1.0/us**2 - 1.0/up**2), 
+               2*t0/us + 2*alpha/up**2 , 
+               t0**2 - alpha**2/up**2 - beta**2/up**2])
+
+    # The quadratic should always a root. 
+    qroots = np.real(qroots) # in case the imaginary parts of the roots are really small, 
+    qroots.sort()
+
+    x = None
+    for root in qroots:
+        if root > 0.0:
+           x = root
+           break
+    assert abs(x/us+t0 - np.sqrt((x-alpha)**2 + beta**2)/up) <= 1e-6 , "Quadratic not solved perfectly"
+
+    tI = x/us + t0
+    return tI
+
+
+def extract_coordinates(points):
+
+    xs, ys = [], []
+    for pt in points:
+        xs.append(pt[0])
+        ys.append(pt[1])
+    return np.asarray(xs), np.asarray(ys)
+
+
+def plot_tour(source, target, drone_info, used_drones, package_trail):
+    fig, ax = plt.subplots()
+    ax.set_aspect(1.0)
+    ax.set_xlim([0.0, 1.0])
+    ax.set_ylim([0.0, 1.0])
+
+    # Draw drone path from initial position to interception point
+    for pt, idx in zip(package_trail, used_drones):
+         initdroneposn = drone_info[idx][0]
+         handoffpoint  = pt
+    
+         xs, ys = extract_coordinates([initdroneposn, handoffpoint])
+         #ax.plot(xs,ys, 'b-', linewidth=4)
+         plt.arrow( xs[0], ys[0], xs[1]-xs[0], ys[1]-ys[0], 
+                    **{'length_includes_head': True, 
+                       'width': 0.005 , 
+                       'head_width':0.02, 
+                       'fc': 'b', 
+                       'ec': 'none'})
+
+    # Draw the package trail
+    xs, ys = extract_coordinates(package_trail)
+    ax.plot(xs,ys, 'ro', markersize=5 )
+    for idx in range(len(xs)-1):
+          plt.arrow( xs[idx], ys[idx], xs[idx+1]-xs[idx], ys[idx+1]-ys[idx], 
+                    **{'length_includes_head': True, 
+                       'width': 0.007 , 
+                       'head_width':0.03, 
+                       'fc': 'r', 
+                       'ec': 'none',
+                       'alpha': 0.8})
+
+    # Draw the source, target, and initial positions of the robots as bold dots
+    xs,ys = extract_coordinates([source, target])
+    ax.plot(xs,ys, 'o', markersize=30, alpha=0.8, ms=10, mec='k', mfc='#F1AB30' )
+    ax.text(source[0], source[1], 'S', fontsize=22, horizontalalignment='center',verticalalignment='center')
+    ax.text(target[0], target[1], 'T', fontsize=22, horizontalalignment='center',verticalalignment='center')
+
+    xs, ys = extract_coordinates( [ drone_info[idx][0] for idx in range(len(drone_info)) ]  )
+    ax.plot(xs,ys, 'o', markersize=26, mec='k', mfc='#b7e8cc' )
+
+    # Draw speed labels
+    for idx in range(len(drone_info)):
+         ax.text( drone_info[idx][0][0], drone_info[idx][0][1], drone_info[idx][1],
+                  fontsize=15, horizontalalignment='center', verticalalignment='center' )
+
+    # A light grid
+    plt.grid(color='0.5', linestyle='--', linewidth=0.5)
+    plt.show()
+
 
 def  algo_pho_exact_given_order_of_drones ( drone_info ,source, target ):
     pass
