@@ -247,7 +247,8 @@ animation and plotting are requested they are done in separate windows each.
 \mbox{}\verb@         @\\
 \mbox{}\verb@    def get_tour(self, algo):@\\
 \mbox{}\verb@           return algo( self.drone_info, self.source, self.target, @\\
-\mbox{}\verb@                        plot_tour_p = True)@\\
+\mbox{}\verb@                        animate_tour_p = False,@\\
+\mbox{}\verb@                        plot_tour_p    = True)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Methods for \verb|ReverseHorseflyInput|@\\
 \mbox{}\verb@    def clearAllStates (self):@\\
@@ -255,17 +256,13 @@ animation and plotting are requested they are done in separate windows each.
 \mbox{}\verb@          self.source = None@\\
 \mbox{}\verb@          self.target = None@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb6}{6}\NWlink{nuweb7a}{, 7a}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb15}{15}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@Single_PHO_Input@\nobreak\ \NWlink{nuweb10}{10}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@Single_PHO_Input@\nobreak\ \NWlink{nuweb13}{13}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -274,75 +271,27 @@ animation and plotting are requested they are done in separate windows each.
 
 \subsection{One-Dimensional Greedy Wavefront} \hspace{10mm}
 
-The followinf data-structure keeps track of a single wavelet expanding at uniform speed around a given center
-starting at a particular clock time. 
+The following function simply calculates the time taken for a drone to move between two points at a given uniform speed. 
+
 
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap2}\raggedright\small
-\NWtarget{nuweb7a}{} $\langle\,${\itshape PHO Data Structures}\nobreak\ {\footnotesize {7a}}$\,\rangle\equiv$
-\vspace{-1ex}
-\begin{list}{}{} \item
-\mbox{}\verb@@\\
-\mbox{}\verb@class DroneWavelet:@\\
-\mbox{}\verb@    def __init__(self, startposn, speed, drone_idx,  clock_time):@\\
-\mbox{}\verb@          self.center          = startposn@\\
-\mbox{}\verb@          self.speed           = speed@\\
-\mbox{}\verb@          self.drone_label     = drone_idx@\\
-\mbox{}\verb@          self.last_reset_time = clock_time@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    def get_center(self):@\\
-\mbox{}\verb@          return self.center@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    def get_speed(self):@\\
-\mbox{}\verb@          return self.speed@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    def get_associated_drone(self):@\\
-\mbox{}\verb@          return self.drone_label@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    def wavelet_size(self, clock_time): # radius of the disk@\\
-\mbox{}\verb@           return (clock_time - last_reset_time) * self.speed@\\
-\mbox{}\verb@    @\\
-\mbox{}\verb@    def reset_wavelet(self, center, clock_time):@\\
-\mbox{}\verb@         self.center = center@\\
-\mbox{}\verb@         self.last_reset_time = clock_time @\\
-\mbox{}\verb@@\\
-\mbox{}\verb@@{\NWsep}
-\end{list}
-\vspace{-1.5ex}
-\footnotesize
-\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb6}{6}\NWlink{nuweb7a}{, 7a}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb15}{15}.
-
-\item{}
-\end{list}
-\end{minipage}\vspace{4ex}
-\end{flushleft}
-%{/python-mode}%
-
-
-The following function simply calculates the time taken for a drone to move between two points at a given uniform speed. 
-
-%{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap3}\raggedright\small
-\NWtarget{nuweb7b}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {7b}}$\,\rangle\equiv$
+\NWtarget{nuweb7a}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {7a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
 \mbox{}\verb@def time_of_travel(start, stop, speed):@\\
 \mbox{}\verb@     start = np.asarray(start)@\\
 \mbox{}\verb@     stop  = np.asarray(stop)@\\
-\mbox{}\verb@    @\\
 \mbox{}\verb@     return np.linalg.norm(stop-start)/speed@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb7b}{7b}\NWlink{nuweb7c}{c}\NWlink{nuweb9}{, 9}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb15}{15}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb9}{, 9}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
 
 \item{}
 \end{list}
@@ -353,8 +302,8 @@ The following function simply calculates the time taken for a drone to move betw
 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap4}\raggedright\small
-\NWtarget{nuweb7c}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {7c}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap3}\raggedright\small
+\NWtarget{nuweb7b}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {7b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -362,24 +311,14 @@ The following function simply calculates the time taken for a drone to move betw
 \mbox{}\verb@             animate_tour_p = False,@\\
 \mbox{}\verb@             plot_tour_p    = False):@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@@\\
 \mbox{}\verb@    from scipy.optimize import minimize@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    print Fore.CYAN, "\n==========================================================="@\\
-\mbox{}\verb@    print            "Running the one dimensional wavefront algorithm (algo_odw) "@\\
-\mbox{}\verb@    print            "===========================================================", Style.RESET_ALL@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    source = np.asarray(source)@\\
 \mbox{}\verb@    target = np.asarray(target)@\\
 \mbox{}\verb@    sthat  = (target-source)/np.linalg.norm(target-source) # unit vector pointing from source to target@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    # Intialize wavelets for all drones@\\
 \mbox{}\verb@    numdrones  = len(drone_info)@\\
 \mbox{}\verb@    clock_time = 0.0@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    drone_wavelets = []@\\
-\mbox{}\verb@    for (initposn, speed), idx in zip(drone_info, range(numdrones)):@\\
-\mbox{}\verb@         drone_wavelets.append(  DroneWavelet(initposn, speed, idx, clock_time)  )@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Find the drone which can get to the source the quickest@\\
 \mbox{}\verb@    tmin = np.inf@\\
@@ -388,136 +327,346 @@ The following function simply calculates the time taken for a drone to move betw
 \mbox{}\verb@         initdroneposn = drone_info[idx][0]@\\
 \mbox{}\verb@         dronespeed    = drone_info[idx][1]@\\
 \mbox{}\verb@         tmin_idx = time_of_travel(initdroneposn, source, dronespeed)@\\
-\mbox{}\verb@    @\\
+\mbox{}\verb@@\\
 \mbox{}\verb@         if tmin_idx < tmin:@\\
 \mbox{}\verb@             tmin = tmin_idx@\\
 \mbox{}\verb@             imin = idx @\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    # Reset wavelet for the drone which reached the source the fastest@\\
 \mbox{}\verb@    clock_time = tmin@\\
-\mbox{}\verb@    drone_wavelets[imin].reset_wavelet(source, clock_time)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    current_package_handler_idx = imin@\\
-\mbox{}\verb@    current_package_position = source@\\
+\mbox{}\verb@    current_package_position    = source@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    drone_pool = range(numdrones)@\\
 \mbox{}\verb@    drone_pool.remove(imin) @\\
-\mbox{}\verb@    used_drones = []@\\
+\mbox{}\verb@    used_drones = [imin]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    package_trail = [current_package_position]@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    package_reached_p   = False@\\
 \mbox{}\verb@    while not(package_reached_p):@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@          time_to_target_without_help =\@\\
 \mbox{}\verb@              np.linalg.norm((target-current_package_position))/drone_info[current_package_handler_idx][1]@\\
-\mbox{}\verb@          tintercept_min     = np.inf@\\
-\mbox{}\verb@          idx_intercept_min  = None@\\
 \mbox{}\verb@@\\
+\mbox{}\verb@          tI_min     = np.inf@\\
+\mbox{}\verb@          idx_tI_min = None@\\
 \mbox{}\verb@          for idx in drone_pool:@\\
-\mbox{}\verb@              # Calculate tintercept here via scipy@\\
-\mbox{}\verb@              u1 = drone_info[current_package_handler_idx][1]@\\
-\mbox{}\verb@              u2 = drone_info[idx][1]@\\
-\mbox{}\verb@    @\\
-\mbox{}\verb@              if u2 < u1:@\\
-\mbox{}\verb@                  continue # there won't be any use of the slower drone u2 in speeding up the package delivery process. @\\
+\mbox{}\verb@              @\\
+\mbox{}\verb@              us = drone_info[current_package_handler_idx][1]@\\
+\mbox{}\verb@              up = drone_info[idx][1]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@              if up <= us: # slower drones are useless, so skip rest of the iteration@\\
+\mbox{}\verb@                  continue @\\
 \mbox{}\verb@              else: @\\
-\mbox{}\verb@                p1 = np.asarray(drone_info[idx][0])@\\
-\mbox{}\verb@                p2 = np.asarray(drone_info[current_package_handler_idx][0]) @\\
-\mbox{}\verb@           @\\
-\mbox{}\verb@                d  = np.linalg.norm( p1 - p2 )@\\
-\mbox{}\verb@    @\\
-\mbox{}\verb@                veca  = target-p1@\\
-\mbox{}\verb@                vecb  = p2 - p1  @\\
-\mbox{}\verb@                costh = np.dot( veca, vecb ) / (np.linalg.norm(veca) * np.linalg.norm(vecb))@\\
+\mbox{}\verb@                s = current_package_position @\\
+\mbox{}\verb@                p = np.asarray(drone_info[idx][0]) @\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                fun    = lambda t: t[0]@\\
-\mbox{}\verb@                cons   = ({'type': 'ineq', 'fun': lambda t:  u2 + d - u1 * costh * (t[0]-clock_time)/t[0] },@\\
-\mbox{}\verb@                          {'type': 'ineq', 'fun': lambda t:  u2 - d + u1 * costh * (t[0]-clock_time)/t[0] })@\\
-\mbox{}\verb@    @\\
-\mbox{}\verb@                res = minimize(fun, [clock_time] , method='SLSQP', bounds=[(clock_time, None)], constraints=cons ) @\\
+\mbox{}\verb@                tI = get_interception_time(s, us, p, up, target, clock_time)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                if res.success:@\\
-\mbox{}\verb@                      print Fore.CYAN, "Yay! Solver converged in "      , res.nit@\\
+\mbox{}\verb@                if tI < tI_min:@\\
+\mbox{}\verb@                   tI_min     = tI@\\
+\mbox{}\verb@                   idx_tI_min = idx@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                else :@\\
-\mbox{}\verb@                      print Fore.RED, "Boo! Solver did not converge!", res.nit, " iterations."@\\
-\mbox{}\verb@                      print res.status@\\
-\mbox{}\verb@                      print res.message @\\
-\mbox{}\verb@                @\\
-\mbox{}\verb@                tintercept = res.x[0]@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@                print res.x, tintercept, tintercept_min@\\
-\mbox{}\verb@                print tintercept < tintercept_min@\\
-\mbox{}\verb@                if tintercept < tintercept_min:@\\
-\mbox{}\verb@                   tintercept_min    = tintercept@\\
-\mbox{}\verb@                   idx_intercept_min = idx@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@          if time_to_target_without_help < tintercept_min :@\\
+\mbox{}\verb@          if time_to_target_without_help < tI_min :@\\
 \mbox{}\verb@              package_reached_p = True@\\
+\mbox{}\verb@              package_trail.append(target)@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@          else:@\\
+\mbox{}\verb@              package_handler_speed    = drone_info[current_package_handler_idx][1] @\\
+\mbox{}\verb@              current_package_position = current_package_position + package_handler_speed * (tI_min - clock_time) *  sthat@\\
+\mbox{}\verb@              package_trail.append(current_package_position)@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@              clock_time                  = tI_min @\\
+\mbox{}\verb@              current_package_handler_idx = idx_tI_min@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@              package_handler_speed     = drone_info[current_package_handler_idx][1] @\\
-\mbox{}\verb@              current_package_position  = current_package_position + \@\\
-\mbox{}\verb@                   package_handler_speed * (tintercept_min - clock_time) *  sthat@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@              clock_time = tintercept_min @\\
-\mbox{}\verb@@\\
-\mbox{}\verb@              current_package_handler_idx = idx_intercept_min@\\
-\mbox{}\verb@              drone_pool.remove(idx_intercept_min)@\\
-\mbox{}\verb@              used_drones.append(idx_intercept_min)  @\\
-\mbox{}\verb@@\\
-\mbox{}\verb@              drone_wavelets[current_package_handler_idx].reset_wavelet(current_package_position, clock_time)@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    tour = algo_pho_exact_given_order_of_drones ( [drone_info[idx] for idx in used_drones],source,target )@\\
+\mbox{}\verb@              drone_pool.remove(idx_tI_min)@\\
+\mbox{}\verb@              used_drones.append(idx_tI_min)  @\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    package_trail_cvx = algo_pho_exact_given_order_of_drones ([drone_info[idx] for idx in used_drones],source,target )@\\
+\mbox{}\verb@    mspan_straight = makespan(drone_info, used_drones, package_trail)@\\
+\mbox{}\verb@    mspan_cvx      = makespan(drone_info, used_drones, package_trail_cvx)@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    #assert (mspan_cvx <= mspan_straight), ""@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    if plot_tour_p:@\\
-\mbox{}\verb@         print Fore.GREEN, "Plotting the computed tour", Style.RESET_ALL@\\
-\mbox{}\verb@    @\\
+\mbox{}\verb@         plot_tour(source, target, drone_info, used_drones, package_trail_cvx)@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@    if animate_tour_p:@\\
 \mbox{}\verb@         print Fore.CYAN, "Animating the computed tour", Style.RESET_ALL@\\
 \mbox{}\verb@    @\\
-\mbox{}\verb@    return tour@\\
+\mbox{}\verb@    return used_drones, package_trail, mspan_straight, mspan_cvx, @\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb7b}{7b}\NWlink{nuweb7c}{c}\NWlink{nuweb9}{, 9}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb15}{15}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb10}{10}.\item \NWtxtIdentsUsed\nobreak\  \verb@algo_pho_exact_given_order_of_drones@\nobreak\ \NWlink{nuweb9}{9}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb9}{, 9}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb13}{13}.
 \item{}
 \end{list}
 \vspace{4ex}
 \end{flushleft}
 %{/python-mode}%
 
-
-
-
-
+ 
 
 %{python-mode}%
 \begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap5}\raggedright\small
+\begin{minipage}{\linewidth}\label{scrap4}\raggedright\small
 \NWtarget{nuweb9}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {9}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
-\mbox{}\verb@def  algo_pho_exact_given_order_of_drones ( drone_info ,source, target ):@\\
-\mbox{}\verb@    pass@\\
 \mbox{}\verb@@\\
+\mbox{}\verb@def extract_coordinates(points):@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    xs, ys = [], []@\\
+\mbox{}\verb@    for pt in points:@\\
+\mbox{}\verb@        xs.append(pt[0])@\\
+\mbox{}\verb@        ys.append(pt[1])@\\
+\mbox{}\verb@    return np.asarray(xs), np.asarray(ys)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def get_interception_time(s, us, p, up, t, t0) :@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    t_m = t - s # the _m subscript stands for modify@\\
+\mbox{}\verb@    t_m /= np.linalg.norm(t_m) # normalize to unit@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # For rotating a vector clockwise by theta, @\\
+\mbox{}\verb@    # to get the vector t_m into alignment with (1,0)@\\
+\mbox{}\verb@    costh = t_m[0]/np.sqrt(t_m[0]**2 + t_m[1]**2)@\\
+\mbox{}\verb@    sinth = t_m[1]/np.sqrt(t_m[0]**2 + t_m[1]**2)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    rotmat = np.asarray([[costh, sinth],@\\
+\mbox{}\verb@                         [-sinth, costh]])@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    assert np.linalg.norm((rotmat.dot(t_m) - np.asarray([1,0]))) <= 1e-6,\@\\
+\mbox{}\verb@           "Rotation matrix did not work properly. t_m should get rotated onto [1,0] after this transformation"@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    p_shift  = p - s@\\
+\mbox{}\verb@    p_rot    = rotmat.dot(p_shift)@\\
+\mbox{}\verb@    [alpha, beta] = p_rot@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Solve quadratic documented in the snippets above@\\
+\mbox{}\verb@    qroots = np.roots([ (1.0/us**2 - 1.0/up**2), @\\
+\mbox{}\verb@               2*t0/us + 2*alpha/up**2 , @\\
+\mbox{}\verb@               t0**2 - alpha**2/up**2 - beta**2/up**2])@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # The quadratic should always a root. @\\
+\mbox{}\verb@    qroots = np.real(qroots) # in case the imaginary parts of the roots are really small, @\\
+\mbox{}\verb@    qroots.sort()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    x = None@\\
+\mbox{}\verb@    for root in qroots:@\\
+\mbox{}\verb@        if root > 0.0:@\\
+\mbox{}\verb@           x = root@\\
+\mbox{}\verb@           break@\\
+\mbox{}\verb@    assert abs(x/us+t0 - np.sqrt((x-alpha)**2 + beta**2)/up) <= 1e-6 , "Quadratic not solved perfectly"@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    tI = x/us + t0@\\
+\mbox{}\verb@    return tI@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb7b}{7b}\NWlink{nuweb7c}{c}\NWlink{nuweb9}{, 9}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb15}{15}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@algo_pho_exact_given_order_of_drones@\nobreak\ \NWlink{nuweb7c}{7c}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb9}{, 9}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
+
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
 \end{flushleft}
 %{/python-mode}%
+
+When the drones involved in the package handoff process, along with the order of handoff is known in advance, we can find the handoff points exactly
+using convex optimization using SOCP. 
+
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap5}\raggedright\small
+\NWtarget{nuweb10}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {10}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@def algo_pho_exact_given_order_of_drones ( drone_info, source, target ):@\\
+\mbox{}\verb@    import cvxpy as cp@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    source = np.asarray(source)@\\
+\mbox{}\verb@    target = np.asarray(target)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    r = len(drone_info) @\\
+\mbox{}\verb@    source = np.asarray(source)@\\
+\mbox{}\verb@    target = np.asarray(target)@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    # Variables for rendezvous points of robot with package@\\
+\mbox{}\verb@    X, t = [], []@\\
+\mbox{}\verb@    for i in range(r):@\\
+\mbox{}\verb@       X.append(cp.Variable(2)) # vector variable@\\
+\mbox{}\verb@       t.append(cp.Variable( )) # scalar variable@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Constraints @\\
+\mbox{}\verb@    constraints_S = [  X[0] == source ]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    constraints_I = [] @\\
+\mbox{}\verb@    for i in range(r):@\\
+\mbox{}\verb@        constraints_I.append( 0.0 <= t[i] )@\\
+\mbox{}\verb@        constraints_I.append( t[i] >= cp.norm( np.asarray(drone_info[i][0]) - X[i]) / drone_info[i][1] )@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    constraints_L = []@\\
+\mbox{}\verb@    for i in range(r-1):@\\
+\mbox{}\verb@         constraints_L.append( t[i] + cp.norm(X[i+1] - X[i])/drone_info[i][1] <= t[i+1] )@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    objective = cp.Minimize(  t[r-1]  + cp.norm( target - X[r-1]  )/drone_info[r-1][1]  )@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    prob = cp.Problem(objective, constraints_S + constraints_I + constraints_L)@\\
+\mbox{}\verb@    print Fore.CYAN@\\
+\mbox{}\verb@    prob.solve(solver=cp.SCS, verbose=True)@\\
+\mbox{}\verb@    print Style.RESET_ALL@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    package_trail = [ np.asarray(X[i].value) for i in range(r) ] + [ target ]@\\
+\mbox{}\verb@    return package_trail@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb9}{, 9}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+We plot the tours onto a separate window if the switch \verb|plot_tour_p| is set to \verb|True| while calling the algorithm. 
+The path of the package is shown in bold red. The paths of the drones from their initial positions to the point where they pick 
+up the package from another drone are shown in blue.
+
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap6}\raggedright\small
+\NWtarget{nuweb11}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {11}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def plot_tour(source, target, drone_info, used_drones, package_trail):@\\
+\mbox{}\verb@    fig, ax = plt.subplots()@\\
+\mbox{}\verb@    ax.set_aspect(1.0)@\\
+\mbox{}\verb@    ax.set_xlim([0.0, 1.0])@\\
+\mbox{}\verb@    ax.set_ylim([0.0, 1.0])@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Draw drone path from initial position to interception point@\\
+\mbox{}\verb@    for pt, idx in zip(package_trail, used_drones):@\\
+\mbox{}\verb@         initdroneposn = drone_info[idx][0]@\\
+\mbox{}\verb@         handoffpoint  = pt@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@         xs, ys = extract_coordinates([initdroneposn, handoffpoint])@\\
+\mbox{}\verb@         plt.arrow( xs[0], ys[0], xs[1]-xs[0], ys[1]-ys[0], @\\
+\mbox{}\verb@                    **{'length_includes_head': True, @\\
+\mbox{}\verb@                       'width': 0.005 , @\\
+\mbox{}\verb@                       'head_width':0.02, @\\
+\mbox{}\verb@                       'fc': 'b', @\\
+\mbox{}\verb@                       'ec': 'none'})@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Draw the package trail@\\
+\mbox{}\verb@    xs, ys = extract_coordinates(package_trail)@\\
+\mbox{}\verb@    ax.plot(xs,ys, 'ro', markersize=5 )@\\
+\mbox{}\verb@    for idx in range(len(xs)-1):@\\
+\mbox{}\verb@          plt.arrow( xs[idx], ys[idx], xs[idx+1]-xs[idx], ys[idx+1]-ys[idx], @\\
+\mbox{}\verb@                    **{'length_includes_head': True, @\\
+\mbox{}\verb@                       'width': 0.007 , @\\
+\mbox{}\verb@                       'head_width':0.03, @\\
+\mbox{}\verb@                       'fc': 'r', @\\
+\mbox{}\verb@                       'ec': 'none',@\\
+\mbox{}\verb@                       'alpha': 0.8})@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Draw the source, target, and initial positions of the robots as bold dots@\\
+\mbox{}\verb@    xs,ys = extract_coordinates([source, target])@\\
+\mbox{}\verb@    ax.plot(xs,ys, 'o', markersize=30, alpha=0.8, ms=10, mec='k', mfc='#F1AB30' )@\\
+\mbox{}\verb@    ax.plot(xs,ys, 'k--', alpha=0.6 ) # light line connecting source and target@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    ax.text(source[0], source[1], 'S', fontsize=22,\@\\
+\mbox{}\verb@            horizontalalignment='center',verticalalignment='center')@\\
+\mbox{}\verb@    ax.text(target[0], target[1], 'T', fontsize=22,\@\\
+\mbox{}\verb@            horizontalalignment='center',verticalalignment='center')@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    xs, ys = extract_coordinates( [ drone_info[idx][0] for idx in range(len(drone_info)) ]  )@\\
+\mbox{}\verb@    ax.plot(xs,ys, 'o', markersize=26, mec='k', mfc='#b7e8cc' )@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Draw speed labels@\\
+\mbox{}\verb@    for idx in range(len(drone_info)):@\\
+\mbox{}\verb@         ax.text( drone_info[idx][0][0], drone_info[idx][0][1], drone_info[idx][1],@\\
+\mbox{}\verb@                  fontsize=15, horizontalalignment='center', verticalalignment='center' )@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    ax.set_title('Makespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=20)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # A light grid@\\
+\mbox{}\verb@    plt.grid(color='0.5', linestyle='--', linewidth=0.5)@\\
+\mbox{}\verb@    plt.show()@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb9}{, 9}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap7}\raggedright\small
+\NWtarget{nuweb12}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {12}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@def makespan(drone_info, used_drones, package_trail):@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    assert len(package_trail) == len(used_drones)+1, ""@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    makespan = 0.0   @\\
+\mbox{}\verb@    counter  = 0    @\\
+\mbox{}\verb@    for idx in used_drones:@\\
+\mbox{}\verb@         dronespeed    = drone_info[idx][1]          @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         makespan += time_of_travel(package_trail[counter],\@\\
+\mbox{}\verb@                                    package_trail[counter+1],@\\
+\mbox{}\verb@                                    dronespeed) @\\
+\mbox{}\verb@         counter += 1@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    return makespan@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb9}{, 9}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+  
 
 
 
@@ -527,16 +676,15 @@ The following function simply calculates the time taken for a drone to move betw
 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap6}\raggedright\small
-\NWtarget{nuweb10}{} $\langle\,${\itshape PHO Run Handlers}\nobreak\ {\footnotesize {10}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap8}\raggedright\small
+\NWtarget{nuweb13}{} $\langle\,${\itshape PHO Run Handlers}\nobreak\ {\footnotesize {13}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
 \mbox{}\verb@def single_pho_run_handler():@\\
-\mbox{}\verb@ @\\
+\mbox{}\verb@    import random@\\
 \mbox{}\verb@    def wrapperEnterRunPoints(fig, ax, run):@\\
 \mbox{}\verb@      def _enterPoints(event):@\\
-\mbox{}\verb@        @\\
 \mbox{}\verb@        if event.name      == 'button_press_event'          and \@\\
 \mbox{}\verb@           (event.button   == 1 or event.button == 3)       and \@\\
 \mbox{}\verb@            event.dblclick == True and event.xdata  != None and event.ydata  != None:@\\
@@ -545,7 +693,7 @@ The following function simply calculates the time taken for a drone to move betw
 \mbox{}\verb@                 # Insert blue circle representing the initial position of a drone@\\
 \mbox{}\verb@                 print Fore.GREEN@\\
 \mbox{}\verb@                 newPoint = (event.xdata, event.ydata)@\\
-\mbox{}\verb@                 speed    = float(raw_input('What speed do you want to set for the drone @{\tt @}\verb@ ' + str(newPoint)) + '\n')@\\
+\mbox{}\verb@                 speed    = float(raw_input('What speed do you want for the drone at '+str(newPoint)))@\\
 \mbox{}\verb@                 run.drone_info.append( (newPoint, speed) ) @\\
 \mbox{}\verb@                 patchSize  = (xlim[1]-xlim[0])/40.0@\\
 \mbox{}\verb@                 print Style.RESET_ALL@\\
@@ -553,35 +701,34 @@ The following function simply calculates the time taken for a drone to move betw
 \mbox{}\verb@                 ax.add_patch( mpl.patches.Circle( newPoint, radius = patchSize,@\\
 \mbox{}\verb@                                                   facecolor='#b7e8cc', edgecolor='black'  ))@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                 ax.text( newPoint[0], newPoint[1], speed, fontsize=15, horizontalalignment='center', verticalalignment='center' )@\\
+\mbox{}\verb@                 ax.text( newPoint[0], newPoint[1], speed, fontsize=15, @\\
+\mbox{}\verb@                          horizontalalignment='center', verticalalignment='center' )@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                 ax.set_title('Number of drones inserted: ' + str(len(run.drone_info)), fontdict={'fontsize':25})@\\
+\mbox{}\verb@                 ax.set_title('Number of drones inserted: ' +\@\\
+\mbox{}\verb@                              str(len(run.drone_info)), fontdict={'fontsize':25})@\\
 \mbox{}\verb@                 @\\
-\mbox{}\verb@@\\
 \mbox{}\verb@             elif event.button == 3:  @\\
 \mbox{}\verb@                 # Insert big red circles representing the source and target points@\\
-\mbox{}\verb@    @\\
 \mbox{}\verb@                 patchSize  = (xlim[1]-xlim[0])/50.0@\\
 \mbox{}\verb@                 if run.source is None:    @\\
 \mbox{}\verb@                      run.source = (event.xdata, event.ydata)  @\\
-\mbox{}\verb@                      ax.add_patch( mpl.patches.Circle( run.source, radius = patchSize, facecolor= '#ffd9d6', edgecolor='black', lw=1.0 ))@\\
-\mbox{}\verb@                      ax.text( run.source[0], run.source[1], 'S', fontsize=15, horizontalalignment='center', verticalalignment='center' )@\\
+\mbox{}\verb@                      ax.add_patch( mpl.patches.Circle( run.source, radius = patchSize, @\\
+\mbox{}\verb@                                                        facecolor= '#ffd9d6', edgecolor='black', lw=1.0 ))@\\
+\mbox{}\verb@                      ax.text( run.source[0], run.source[1], 'S', fontsize=15, @\\
+\mbox{}\verb@                               horizontalalignment='center', verticalalignment='center' )@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@                 elif run.target is None:@\\
 \mbox{}\verb@                      run.target = (event.xdata, event.ydata)  @\\
-\mbox{}\verb@                      ax.add_patch( mpl.patches.Circle( run.target, radius = patchSize, facecolor= '#ffd9d6', edgecolor='black', lw=1.0 ))@\\
-\mbox{}\verb@                      ax.text( run.target[0], run.target[1], 'T', fontsize=15, horizontalalignment='center', verticalalignment='center' )@\\
-\mbox{}\verb@    @\\
+\mbox{}\verb@                      ax.add_patch( mpl.patches.Circle( run.target, radius = patchSize, @\\
+\mbox{}\verb@                                                       facecolor= '#ffd9d6', edgecolor='black', lw=1.0 ))@\\
+\mbox{}\verb@                      ax.text( run.target[0], run.target[1], 'T', fontsize=15, @\\
+\mbox{}\verb@                               horizontalalignment='center', verticalalignment='center' )@\\
 \mbox{}\verb@                 else:@\\
 \mbox{}\verb@                       print Fore.RED, "Source and Target already set", Style.RESET_ALL@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@@\\
 \mbox{}\verb@             # Clear polygon patches and set up last minute \verb|ax| tweaks@\\
 \mbox{}\verb@             clearAxPolygonPatches(ax)@\\
 \mbox{}\verb@             applyAxCorrection(ax)@\\
 \mbox{}\verb@             fig.canvas.draw()@\\
-\mbox{}\verb@             @\\
-\mbox{}\verb@@\\
 \mbox{}\verb@      return _enterPoints@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # The key-stack argument is mutable! I am using this hack to my advantage.@\\
@@ -599,13 +746,11 @@ The following function simply calculates the time taken for a drone to move betw
 \mbox{}\verb@                     @\\
 \mbox{}\verb@                    # Incase there are patches present from the previous clustering, just clear them@\\
 \mbox{}\verb@                    clearAxPolygonPatches(ax)@\\
-\mbox{}\verb@@\\
 \mbox{}\verb@                    if   algo_str == 'odw':@\\
 \mbox{}\verb@                          tour = run.get_tour( algo_odw )@\\
 \mbox{}\verb@                    else:@\\
 \mbox{}\verb@                          print "Unknown option. No horsefly for you! ;-D "@\\
 \mbox{}\verb@                          sys.exit()@\\
-\mbox{}\verb@@\\
 \mbox{}\verb@                    applyAxCorrection(ax)@\\
 \mbox{}\verb@                    fig.canvas.draw()@\\
 \mbox{}\verb@                    @\\
@@ -614,13 +759,12 @@ The following function simply calculates the time taken for a drone to move betw
 \mbox{}\verb@                    run.clearAllStates()@\\
 \mbox{}\verb@                    ax.cla()@\\
 \mbox{}\verb@                                  @\\
-\mbox{}\verb@                    utils_graphics.applyAxCorrection(ax)@\\
+\mbox{}\verb@                    applyAxCorrection(ax)@\\
 \mbox{}\verb@                    ax.set_xticks([])@\\
 \mbox{}\verb@                    ax.set_yticks([])@\\
 \mbox{}\verb@                                     @\\
 \mbox{}\verb@                    fig.texts = []@\\
 \mbox{}\verb@                    fig.canvas.draw()@\\
-\mbox{}\verb@                    @\\
 \mbox{}\verb@           return _keyPressHandler@\\
 \mbox{}\verb@    @\\
 \mbox{}\verb@    # Set up interactive canvas@\\
@@ -639,7 +783,8 @@ The following function simply calculates the time taken for a drone to move betw
 \mbox{}\verb@    ax.set_xticks([])@\\
 \mbox{}\verb@    ax.set_yticks([])@\\
 \mbox{}\verb@          @\\
-\mbox{}\verb@    ax.set_title("Enter drone positions, source and target onto canvas. \n (Enter speeds into the terminal, after inserting a drone at a particular position)")@\\
+\mbox{}\verb@    ax.set_title("Enter drone positions, source and target onto canvas. \n \@\\
+\mbox{}\verb@(Enter speeds into the terminal, after inserting a drone at a particular position)")@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    mouseClick   = wrapperEnterRunPoints (fig,ax, run)@\\
 \mbox{}\verb@    fig.canvas.mpl_connect('button_press_event' , mouseClick)@\\
@@ -648,14 +793,13 @@ The following function simply calculates the time taken for a drone to move betw
 \mbox{}\verb@    fig.canvas.mpl_connect('key_press_event', keyPress   )@\\
 \mbox{}\verb@    @\\
 \mbox{}\verb@    plt.show()@\\
-\mbox{}\verb@    @\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb15}{15}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@single_pho_run_handler@\nobreak\ \NWlink{nuweb15}{15}.\item \NWtxtIdentsUsed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb7c}{7c}, \verb@Single_PHO_Input@\nobreak\ \NWlink{nuweb6}{6}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@single_pho_run_handler@\nobreak\ \NWlink{nuweb18}{18}.\item \NWtxtIdentsUsed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb7b}{7b}, \verb@Single_PHO_Input@\nobreak\ \NWlink{nuweb6}{6}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -668,17 +812,16 @@ The following function simply calculates the time taken for a drone to move betw
 \section{Chapter Index of Fragments}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$PHO Algorithms\nobreak\ {\footnotesize \NWlink{nuweb7b}{7b}\NWlink{nuweb7c}{c}\NWlink{nuweb9}{, 9}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb15}{15}.}
-\item $\langle\,$PHO Data Structures\nobreak\ {\footnotesize \NWlink{nuweb6}{6}\NWlink{nuweb7a}{, 7a}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb15}{15}.}
-\item $\langle\,$PHO Run Handlers\nobreak\ {\footnotesize \NWlink{nuweb10}{10}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb15}{15}.}
+\item $\langle\,$PHO Algorithms\nobreak\ {\footnotesize \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb9}{, 9}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb18}{18}.}
+\item $\langle\,$PHO Data Structures\nobreak\ {\footnotesize \NWlink{nuweb6}{6}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb18}{18}.}
+\item $\langle\,$PHO Run Handlers\nobreak\ {\footnotesize \NWlink{nuweb13}{13}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb18}{18}.}
 \end{list}}
 \section{Chapter Index of Identifiers}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \verb@algo_odw@: \underline{\NWlink{nuweb7c}{7c}}\NWlink{nuweb10}{, 10}.
-\item \verb@algo_pho_exact_given_order_of_drones@: \NWlink{nuweb7c}{7c}, \underline{\NWlink{nuweb9}{9}}.
-\item \verb@Single_PHO_Input@: \underline{\NWlink{nuweb6}{6}}\NWlink{nuweb10}{, 10}.
-\item \verb@single_pho_run_handler@: \underline{\NWlink{nuweb10}{10}}\NWlink{nuweb15}{, 15}.
+\item \verb@algo_odw@: \underline{\NWlink{nuweb7b}{7b}}\NWlink{nuweb13}{, 13}.
+\item \verb@Single_PHO_Input@: \underline{\NWlink{nuweb6}{6}}\NWlink{nuweb13}{, 13}.
+\item \verb@single_pho_run_handler@: \underline{\NWlink{nuweb13}{13}}\NWlink{nuweb18}{, 18}.
 \end{list}} 
 %------------------------------------------------------
 \nocite{*} % include everything in the bibtex file
@@ -693,8 +836,8 @@ The following function simply calculates the time taken for a drone to move betw
 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap7}\raggedright\small
-\NWtarget{nuweb15}{} \verb@"../src/pho-main.py"@\nobreak\ {\footnotesize {15}}$\equiv$
+\begin{flushleft} \small\label{scrap9}\raggedright\small
+\NWtarget{nuweb18}{} \verb@"../src/pho-main.py"@\nobreak\ {\footnotesize {18}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -720,9 +863,9 @@ The following function simply calculates the time taken for a drone to move betw
 \mbox{}\verb@import utils_algo@\\
 \mbox{}\verb@import utils_graphics@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape PHO Data Structures}\nobreak\ {\footnotesize \NWlink{nuweb6}{6}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize \NWlink{nuweb7b}{7b}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape PHO Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb10}{10}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape PHO Data Structures}\nobreak\ {\footnotesize \NWlink{nuweb6}{6}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize \NWlink{nuweb7a}{7a}, \ldots\ }$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape PHO Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb13}{13}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@# Set up logging information relevant to this module@\\
 \mbox{}\verb@logger=logging.getLogger(__name__)@\\
@@ -997,7 +1140,7 @@ The following function simply calculates the time taken for a drone to move betw
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtIdentsUsed\nobreak\  \verb@single_pho_run_handler@\nobreak\ \NWlink{nuweb10}{10}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@single_pho_run_handler@\nobreak\ \NWlink{nuweb13}{13}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -1008,8 +1151,8 @@ The following function simply calculates the time taken for a drone to move betw
 \section{Algorithmic Utilities}
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap8}\raggedright\small
-\NWtarget{nuweb20}{} \verb@"../src/utils_algo.py"@\nobreak\ {\footnotesize {20}}$\equiv$
+\begin{flushleft} \small\label{scrap10}\raggedright\small
+\NWtarget{nuweb23}{} \verb@"../src/utils_algo.py"@\nobreak\ {\footnotesize {23}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
@@ -1113,8 +1256,8 @@ The following function simply calculates the time taken for a drone to move betw
 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap9}\raggedright\small
-\NWtarget{nuweb21}{} \verb@"../src/utils_graphics.py"@\nobreak\ {\footnotesize {21}}$\equiv$
+\begin{flushleft} \small\label{scrap11}\raggedright\small
+\NWtarget{nuweb24}{} \verb@"../src/utils_graphics.py"@\nobreak\ {\footnotesize {24}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
