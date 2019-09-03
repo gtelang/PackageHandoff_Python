@@ -28,4 +28,9 @@ S.~Diamond and S.~Boyd, ``Cvxpy: A python-embedded modeling language for convex
   optimization,'' {\em The Journal of Machine Learning Research}, vol.~17,
   no.~1, pp.~2909--2913, 2016.
 
+\bibitem{lawler1985traveling}
+E.~L. Lawler, J.~K. Lenstra, A.~H. Rinnooy~Kan, and D.~B. Shmoys, ``The
+  traveling salesman problem; a guided tour of combinatorial optimization,''
+  1985.
+
 \end{thebibliography}

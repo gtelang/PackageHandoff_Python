@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.5.20)  1 SEP 2019 23:53
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.9.1)  2 SEP 2019 19:15
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -2105,14 +2105,14 @@ File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 
  [2]
 Chapter 1.
-<images/carrier-drone.jpg, id=56, 1609.01125pt x 894.34125pt>
+<images/carrier-drone.jpg, id=76, 1609.01125pt x 894.34125pt>
 File: images/carrier-drone.jpg Graphic file (type jpg)
 
 <use images/carrier-drone.jpg>
 Package pdftex.def Info: images/carrier-drone.jpg used on input line 77.
 (pdftex.def)             Requested size: 142.26378pt x 79.068pt.
 
-<example-image-b.png, id=59, 401.5pt x 301.125pt>
+<example-image-b.png, id=79, 401.5pt x 301.125pt>
 File: example-image-b.png Graphic file (type png)
  <use example-image-b.png>
 Package pdftex.def Info: example-image-b.png used on input line 79.
@@ -2128,49 +2128,143 @@ ple-image-b.png>] [4]
 Chapter 2.
 Package mdframed Info: mdframed detected package amsthm 
  changed the theorem header of amsthm
-(mdframed)              on input line 166.
+(mdframed)              on input line 165.
 [5
 
-] [6] (./packagehandoff-main.bbl (./packagehandoff-main.brf)
+] [6] [7]
+LaTeX Font Info:    Try loading font information for TS1+zi4 on input line 420.
+
+ (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
+File: ts1zi4.fd 2014/06/22 Fontinst v1.933 font definitions for TS1/zi4.
+)
+[8] [9]
+Overfull \hbox (47.79782pt too wide) in paragraph at lines 556--556
+[][][]                 \T1/zi4/m/n/9 ax.text( newPoint[0], newPoint[1], speed, 
+fontsize=15, horizontalalignment=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 center\TS1/zi4/m
+/n/9 '\T1/zi4/m/n/9 , verticalalignment=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 center\TS
+1/zi4/m/n/9 ' \T1/zi4/m/n/9 )  
+ []
+
+
+Overfull \hbox (76.59787pt too wide) in paragraph at lines 567--567
+[][][]                      \T1/zi4/m/n/9 ax.add_patch( mpl.patches.Circle( run
+.source, radius = patchSize, facecolor= \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 #ffd9d6\T
+S1/zi4/m/n/9 '\T1/zi4/m/n/9 , edgecolor=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 black\TS1
+/zi4/m/n/9 '\T1/zi4/m/n/9 , lw=1.0 ))  
+ []
+
+
+Overfull \hbox (74.79785pt too wide) in paragraph at lines 568--568
+[][][]                      \T1/zi4/m/n/9 ax.text( run.source[0], run.source[1]
+, \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 S\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , fontsize=15, h
+orizontalalignment=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 center\TS1/zi4/m/n/9 '\T1/zi4/
+m/n/9 , verticalalignment=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 center\TS1/zi4/m/n/9 ' 
+\T1/zi4/m/n/9 )  
+ []
+
+
+Overfull \hbox (76.59787pt too wide) in paragraph at lines 572--572
+[][][]                      \T1/zi4/m/n/9 ax.add_patch( mpl.patches.Circle( run
+.target, radius = patchSize, facecolor= \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 #ffd9d6\T
+S1/zi4/m/n/9 '\T1/zi4/m/n/9 , edgecolor=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 black\TS1
+/zi4/m/n/9 '\T1/zi4/m/n/9 , lw=1.0 ))  
+ []
+
+
+Overfull \hbox (74.79785pt too wide) in paragraph at lines 573--573
+[][][]                      \T1/zi4/m/n/9 ax.text( run.target[0], run.target[1]
+, \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 T\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 , fontsize=15, h
+orizontalalignment=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 center\TS1/zi4/m/n/9 '\T1/zi4/
+m/n/9 , verticalalignment=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 center\TS1/zi4/m/n/9 ' 
+\T1/zi4/m/n/9 )  
+ []
+
+[10]
+Overfull \hbox (177.39783pt too wide) in paragraph at lines 642--642
+[][][]    \T1/zi4/m/n/9 ax.set_title("Enter drone positions, source and target 
+onto canvas. \n (Enter speeds into the terminal, after inserting a drone at a p
+articular position)")  
+ []
+
+[11] (./packagehandoff-main.bbl (./packagehandoff-main.brf)
 \tf@brf=\write11
 \openout11 = `packagehandoff-main.brf'.
 
- [7]) [8
+ [12]) [13
 
-]
-[9
+] [14
 
 
 ]
 Appendix A.
-LaTeX Font Info:    Try loading font information for TS1+zi4 on input line 300.
+[15
 
-(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
-File: ts1zi4.fd 2014/06/22 Fontinst v1.933 font definitions for TS1/zi4.
-) [10
+] [16]
+Overfull \hbox (133.29785pt too wide) in paragraph at lines 840--840
+[][][]    \T1/zi4/m/n/9 horses_traj_num_legs      = [len(traj)-1 for traj in ho
+rse_trajectories] # the -1 is because the initial position of the horse is alwa
+ys included.  
+ []
 
-] [11]
-[12] [13]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 477.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 477.
+
+Overfull \hbox (44.1979pt too wide) in paragraph at lines 865--865
+[][][]                \T1/zi4/m/n/9 all_flys_collected_by_horse = [i           
+  for elt in horse_trajectories[hidx] for i in elt[\TS1/zi4/m/n/9 '\T1/zi4/m/n/
+9 fly_idxs_picked_up\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ]]  
+ []
+
+[17]
+Overfull \hbox (10.89789pt too wide) in paragraph at lines 883--883
+[][][]                    \T1/zi4/m/n/9 xcurr, ycurr = htraj[legidx][0], htraj[
+legidx][1] # current position is the zeroth point on the next leg  
+ []
+
+
+Overfull \hbox (261.09784pt too wide) in paragraph at lines 891--891
+[][][]                \T1/zi4/m/n/9 fly_idxs_collected_so_far[hidx] = list(set(
+fly_idxs_collected_so_far[hidx])) ### critical line, to remove duplicate elemen
+ts # https://stackoverflow.com/a/7961390  
+ []
+
+
+Overfull \hbox (10.89789pt too wide) in paragraph at lines 913--913
+[][][]                    \T1/zi4/m/n/9 xcurr, ycurr = ftraj[legidx][0], ftraj[
+legidx][1] # current position is the zeroth point on the next leg  
+ []
+
+
+Overfull \hbox (79.29782pt too wide) in paragraph at lines 935--935
+[][][]            \T1/zi4/m/n/9 horseloc   = Circle((current_horse_posn[0], cur
+rent_horse_posn[1]), 0.015, facecolor = \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 #D13131\T
+S1/zi4/m/n/9 '\T1/zi4/m/n/9 , edgecolor=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 k\TS1/zi4
+/m/n/9 '\T1/zi4/m/n/9 ,  alpha=1.00)  
+ []
+
+[18] [19] [20] [21] [22]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1165.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1165.
  (./packagehandoff-main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 477.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 477.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1165.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1165.
+
 Package rerunfilecheck Info: File `packagehandoff-main.out' has not changed.
-(rerunfilecheck)             Checksum: AC3A4B1C00A529AECE08BA69FF3FBD49;423.
+(rerunfilecheck)             Checksum: E2D60735E0CA146D553E91A437546C9D;701.
 Package rerunfilecheck Info: File `packagehandoff-main.brf' has not changed.
 (rerunfilecheck)             Checksum: B776E13FED08F1A3000828BC31FB053B;357.
  ) 
 Here is how much of TeX's memory you used:
- 35894 strings out of 493029
- 654084 string characters out of 6136234
- 1252083 words of memory out of 5000000
- 38701 multiletter control sequences out of 15000+600000
- 27756 words of font info for 84 fonts, out of 8000000 for 9000
+ 35950 strings out of 493029
+ 654733 string characters out of 6136235
+ 1254080 words of memory out of 5000000
+ 38728 multiletter control sequences out of 15000+600000
+ 30513 words of font info for 88 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  68i,12n,87p,10458b,923s stack positions out of 5000i,500n,10000p,200000b,80000s
-pdfTeX warning (dest): name{Hfootnote.3} has been referenced but does not exi
+pdfTeX warning (dest): name{Hfootnote.4} has been referenced but does not exi
 st, replaced by a fixed one
+
+pdfTeX warning (dest): name{Hfootnote.3} has been referenced but does not exist
+, replaced by a fixed one
 
 pdfTeX warning (dest): name{Hfootnote.2} has been referenced but does not exist
 , replaced by a fixed one
@@ -2178,10 +2272,10 @@ pdfTeX warning (dest): name{Hfootnote.2} has been referenced but does not exist
 pdfTeX warning (dest): name{Hfootnote.1} has been referenced but does not exist
 , replaced by a fixed one
 
-{/usr/share/texlive/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}{/usr/sha
-re/texmf/fonts/enc/dvips/cm-super/cm-super-ts1.enc}{/usr/share/texmf/fonts/enc/
-dvips/cm-super/cm-super-t1.enc}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/i
-nconsolata/i4-t1-0.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/incons
+{/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-t1.enc}{/usr/share/texlive/
+texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}{/usr/share/texlive/texmf-dis
+t/fonts/enc/dvips/inconsolata/i4-t1-0.enc}{/usr/share/texmf/fonts/enc/dvips/cm-
+super/cm-super-ts1.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/incons
 olata/Inconsolata-zi4r.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
 sfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
 /cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmm
@@ -2194,17 +2288,21 @@ xmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist
 /type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/
 public/amsfonts/cm/cmsy9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/
 amsfonts/symbols/msbm10.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1
-000.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx2074.pfb></usr/share/
-texmf/fonts/type1/public/cm-super/sfbx2488.pfb></usr/share/texmf/fonts/type1/pu
-blic/cm-super/sfrm0600.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm07
-00.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm0800.pfb></usr/share/t
-exmf/fonts/type1/public/cm-super/sfrm1000.pfb></usr/share/texmf/fonts/type1/pub
-lic/cm-super/sfrm1440.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm248
-8.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfti1000.pfb>
-Output written on packagehandoff-main.pdf (13 pages, 394928 bytes).
+000.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1440.pfb></usr/share/
+texmf/fonts/type1/public/cm-super/sfbx2074.pfb></usr/share/texmf/fonts/type1/pu
+blic/cm-super/sfbx2488.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm06
+00.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm0700.pfb></usr/share/t
+exmf/fonts/type1/public/cm-super/sfrm0800.pfb></usr/share/texmf/fonts/type1/pub
+lic/cm-super/sfrm0900.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm100
+0.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm1440.pfb></usr/share/te
+xmf/fonts/type1/public/cm-super/sfrm2488.pfb></usr/share/texmf/fonts/type1/publ
+ic/cm-super/sfti0600.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfti0700
+.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfti0900.pfb></usr/share/tex
+mf/fonts/type1/public/cm-super/sfti1000.pfb>
+Output written on packagehandoff-main.pdf (22 pages, 471038 bytes).
 PDF statistics:
- 256 PDF objects out of 1000 (max. 8388607)
- 212 compressed objects within 3 object streams
- 38 named destinations out of 1000 (max. 500000)
- 79 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 397 PDF objects out of 1000 (max. 8388607)
+ 338 compressed objects within 4 object streams
+ 64 named destinations out of 1000 (max. 500000)
+ 111 words of extra memory for PDF output out of 10000 (max. 10000000)
 

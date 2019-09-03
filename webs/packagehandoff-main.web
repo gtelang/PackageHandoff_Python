@@ -48,7 +48,7 @@
 @i overview.web
 @i problem-classic-single-pho.web
 
-
+\nocite{*} % include everything in the bibtex file
 \bibliography{packagehandoff-main} 
 \bibliographystyle{ieeetr}
 

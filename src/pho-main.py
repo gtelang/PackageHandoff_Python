@@ -1,11 +1,4 @@
-\chapter{Supporting Code}
 
-\section{Main File}
-
-
-
-%{python-mode}%
-@O ../src/pho-main.py -cp @{
 # Relevant imports for Package Handoff
 
 from colorama import Fore, Style
@@ -28,9 +21,317 @@ import time
 import utils_algo
 import utils_graphics
 
-@< PHO Data Structures @>
-@< PHO Algorithms @>
-@< PHO Run Handlers@>
+# PHO Data Structures
+
+class Single_PHO_Input:
+    def __init__(self, drone_info = [] , source = None, target=None):
+           self.drone_info = drone_info 
+           self.source     = source
+           self.target     = target
+
+    def get_drone_pis (self):
+           return [self.drone_info[idx][0] for idx in range(len(self.drone_info)) ]
+           
+    def get_drone_uis (self):
+           return [self.drone_info[idx][1] for idx in range(len(self.drone_info)) ]
+         
+    def get_tour(self, algo):
+           return algo( self.drone_info, self.source, self.target, 
+                        animate_tour_p = False,
+                        plot_tour_p    = False)
+
+    # Methods for \verb|ReverseHorseflyInput|
+    def clearAllStates (self):
+          self.drone_info = []
+          self.source = None
+          self.target = None
+
+
+class DroneWavelet:
+    def __init__(self, startposn, speed, drone_idx,  clock_time):
+          self.center          = startposn
+          self.speed           = speed
+          self.drone_label     = drone_idx
+          self.last_reset_time = clock_time
+
+    def get_center(self):
+          return self.center
+
+    def get_speed(self):
+          return self.speed
+
+    def get_associated_drone(self):
+          return self.drone_label
+
+    def wavelet_size(self, clock_time): # radius of the disk
+           return (clock_time - last_reset_time) * self.speed
+    
+    def reset_wavelet(self, center, clock_time):
+         self.center = center
+         self.last_reset_time = clock_time 
+
+
+# PHO Algorithms
+
+def time_of_travel(start, stop, speed):
+     start = np.asarray(start)
+     stop  = np.asarray(stop)
+     return np.linalg.norm(stop-start)/speed
+
+def algo_odw(drone_info, source, target, 
+             animate_tour_p = False,
+             plot_tour_p    = False):
+
+    from scipy.optimize import minimize
+    print Fore.CYAN, "\n==========================================================="
+    print            "Running the one dimensional wavefront algorithm (algo_odw) "
+    print            "===========================================================", Style.RESET_ALL
+
+    source = np.asarray(source)
+    target = np.asarray(target)
+    sthat  = (target-source)/np.linalg.norm(target-source) # unit vector pointing from source to target
+
+    # Intialize wavelets for all drones
+    numdrones  = len(drone_info)
+    clock_time = 0.0
+
+    drone_wavelets = []
+    for (initposn, speed), idx in zip(drone_info, range(numdrones)):
+         drone_wavelets.append(  DroneWavelet(initposn, speed, idx, clock_time)  )
+
+    # Find the drone which can get to the source the quickest
+    tmin = np.inf
+    imin = None
+    for idx in range(numdrones):
+         initdroneposn = drone_info[idx][0]
+         dronespeed    = drone_info[idx][1]
+         tmin_idx = time_of_travel(initdroneposn, source, dronespeed)
+    
+         if tmin_idx < tmin:
+             tmin = tmin_idx
+             imin = idx 
+
+    # Reset wavelet for the drone which reached the source the fastest
+    clock_time = tmin
+    drone_wavelets[imin].reset_wavelet(source, clock_time)
+
+    current_package_handler_idx = imin
+    current_package_position = source
+
+    drone_pool = range(numdrones)
+    drone_pool.remove(imin) 
+    used_drones = [imin]
+
+    package_reached_p   = False
+    while not(package_reached_p):
+          print "-----------------------------------------------------"
+          print Fore.GREEN, "Clock Time ", clock_time , Style.RESET_ALL
+          print "Drone Pool ", drone_pool, "  Used Drones ", used_drones
+          print "-----------------------------------------------------"
+          time_to_target_without_help =\
+              np.linalg.norm((target-current_package_position))/drone_info[current_package_handler_idx][1]
+          tintercept_min     = np.inf
+          idx_intercept_min  = None
+
+          for idx in drone_pool:
+              # Calculate tintercept here via scipy
+              u1 = drone_info[current_package_handler_idx][1]
+              u2 = drone_info[idx][1]
+
+              if u2 < u1:
+                  continue # there won't be any use of the slower drone u2 in speeding up the package delivery process. 
+              else: 
+                p1 = np.asarray(drone_info[idx][0])
+                p2 = np.asarray(drone_info[current_package_handler_idx][0]) 
+                print u1, u2, "    ", p1, p2 
+
+                d  = np.linalg.norm( p1 - p2 )
+    
+                veca  = target-p1
+                vecb  = p2 - p1  
+                costh = np.dot( veca, vecb ) / (np.linalg.norm(veca) * np.linalg.norm(vecb))
+
+                fun    = lambda t: t[0]
+                cons   = ({'type': 'ineq', 'fun': lambda t:  u2 + d - u1 * costh * (t[0]-clock_time)/t[0] },
+                          {'type': 'ineq', 'fun': lambda t:  u2 - d + u1 * costh * (t[0]-clock_time)/t[0] })
+    
+                res = minimize(fun, [clock_time] , method='SLSQP', bounds=[(clock_time, None)], constraints=cons ) 
+
+                if res.success:
+                      print Fore.CYAN, "SLSQP Solver converged in "   , res.nit, " iterations",  Style.RESET_ALL
+
+                else :
+                      print Fore.RED, "Boo! SLSQP Solver did not converge!", Style.RESET_ALL
+                      print res.status
+                      print res.message 
+                
+                tintercept = res.x[0]
+                print res.x
+
+                if tintercept < tintercept_min:
+                   tintercept_min    = tintercept
+                   idx_intercept_min = idx
+
+          if time_to_target_without_help < tintercept_min :
+              package_reached_p = True
+          else:
+
+              package_handler_speed     = drone_info[current_package_handler_idx][1] 
+              current_package_position  = current_package_position + \
+                   package_handler_speed * (tintercept_min - clock_time) *  sthat
+
+              clock_time = tintercept_min 
+
+              current_package_handler_idx = idx_intercept_min
+              drone_pool.remove(idx_intercept_min)
+              used_drones.append(idx_intercept_min)  
+
+              drone_wavelets[idx_intercept_min].reset_wavelet(current_package_position, clock_time)
+
+
+    tour = algo_pho_exact_given_order_of_drones ( [drone_info[idx] for idx in used_drones],source,target )
+
+    print Fore.RED, "Package has been delivered! ", " Ids of the drones used for delivery (in order of handoff) were ", used_drones, Style.RESET_ALL
+
+    print "The tour points are "
+    utils_algo.print_list([ drone_wavelets[idx].center for idx in used_drones ])
+
+    if plot_tour_p:
+         print Fore.GREEN, "Plotting the computed tour", Style.RESET_ALL
+    
+    if animate_tour_p:
+         print Fore.CYAN, "Animating the computed tour", Style.RESET_ALL
+    
+    return tour
+
+def  algo_pho_exact_given_order_of_drones ( drone_info ,source, target ):
+    pass
+
+
+# PHO Run Handlers
+
+def single_pho_run_handler():
+ 
+    import random
+
+    def wrapperEnterRunPoints(fig, ax, run):
+      
+      def _enterPoints(event):
+
+        if event.name      == 'button_press_event'          and \
+           (event.button   == 1 or event.button == 3)       and \
+            event.dblclick == True and event.xdata  != None and event.ydata  != None:
+
+             if event.button == 1:  
+                 # Insert blue circle representing the initial position of a drone
+                 print Fore.GREEN
+                 newPoint = (event.xdata, event.ydata)
+                 speed    = float(random.randint(1,6))
+                 run.drone_info.append( (newPoint, speed) ) 
+                 patchSize  = (xlim[1]-xlim[0])/40.0
+                 print Style.RESET_ALL
+                 
+                 ax.add_patch( mpl.patches.Circle( newPoint, radius = patchSize,
+                                                   facecolor='#b7e8cc', edgecolor='black'  ))
+
+                 ax.text( newPoint[0], newPoint[1], speed, fontsize=15, 
+                          horizontalalignment='center', verticalalignment='center' )
+
+                 ax.set_title('Number of drones inserted: ' + str(len(run.drone_info)), fontdict={'fontsize':25})
+                 
+
+             elif event.button == 3:  
+                 # Insert big red circles representing the source and target points
+    
+                 patchSize  = (xlim[1]-xlim[0])/50.0
+                 if run.source is None:    
+                      run.source = (event.xdata, event.ydata)  
+                      ax.add_patch( mpl.patches.Circle( run.source, radius = patchSize, facecolor= '#ffd9d6', edgecolor='black', lw=1.0 ))
+                      ax.text( run.source[0], run.source[1], 'S', fontsize=15, horizontalalignment='center', verticalalignment='center' )
+
+                 elif run.target is None:
+                      run.target = (event.xdata, event.ydata)  
+                      ax.add_patch( mpl.patches.Circle( run.target, radius = patchSize, facecolor= '#ffd9d6', edgecolor='black', lw=1.0 ))
+                      ax.text( run.target[0], run.target[1], 'T', fontsize=15, horizontalalignment='center', verticalalignment='center' )
+    
+                 else:
+                       print Fore.RED, "Source and Target already set", Style.RESET_ALL
+
+             # Clear polygon patches and set up last minute \verb|ax| tweaks
+             clearAxPolygonPatches(ax)
+             applyAxCorrection(ax)
+             fig.canvas.draw()
+             
+
+      return _enterPoints
+
+    # The key-stack argument is mutable! I am using this hack to my advantage.
+    def wrapperkeyPressHandler(fig, ax, run): 
+           def _keyPressHandler(event):
+               if event.key in ['i', 'I']:  
+
+                    # Select algorithm to execute
+                    #algo_str = raw_input(Fore.YELLOW                                             +\
+                    #        "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
+                    #        " (odw)     One Dimensional Wavefront \n"                            +\
+                    #        Style.RESET_ALL)
+
+                    algo_str='odw'
+                    algo_str = algo_str.lstrip()
+                     
+                    # Incase there are patches present from the previous clustering, just clear them
+                    clearAxPolygonPatches(ax)
+
+                    if   algo_str == 'odw':
+                          tour = run.get_tour( algo_odw )
+                    else:
+                          print "Unknown option. No horsefly for you! ;-D "
+                          sys.exit()
+
+                    applyAxCorrection(ax)
+                    fig.canvas.draw()
+                    
+               elif event.key in ['c', 'C']: 
+                    # Clear canvas and states of all objects
+                    run.clearAllStates()
+                    ax.cla()
+                                  
+                    utils_graphics.applyAxCorrection(ax)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                                     
+                    fig.texts = []
+                    fig.canvas.draw()
+                    
+           return _keyPressHandler
+    
+    # Set up interactive canvas
+    fig, ax =  plt.subplots()
+    run = Single_PHO_Input()
+        
+    from matplotlib import rc
+    
+    # specify the custom font to use
+    plt.rcParams['font.family'] = 'sans-serif'
+    plt.rcParams['font.sans-serif'] = 'Times New Roman'
+
+    ax.set_xlim([xlim[0], xlim[1]])
+    ax.set_ylim([ylim[0], ylim[1]])
+    ax.set_aspect(1.0)
+    ax.set_xticks([])
+    ax.set_yticks([])
+          
+    ax.set_title("Enter drone positions, source and target onto canvas. \n (Enter speeds into the terminal, after inserting a drone at a particular position)")
+
+    mouseClick   = wrapperEnterRunPoints (fig,ax, run)
+    fig.canvas.mpl_connect('button_press_event' , mouseClick)
+          
+    keyPress     = wrapperkeyPressHandler(fig,ax, run)
+    fig.canvas.mpl_connect('key_press_event', keyPress   )
+    
+    plt.show()
+    
+
 
 # Set up logging information relevant to this module
 logger=logging.getLogger(__name__)
@@ -300,136 +601,3 @@ if __name__=="__main__":
      print "Running Package Handoff"
      single_pho_run_handler()
 
-@|  @}
-%{/python-mode}%
-
-
-\section{Algorithmic Utilities}
-
-%{python-mode}%
-@O ../src/utils_algo.py -cp @{    
- 
-import numpy as np
-import random
-from colorama import Fore
-from colorama import Style
-
-def vector_chain_from_point_list(pts):
-    vec_chain = []
-    for pair in zip(pts, pts[1:]):
-        tail= np.array (pair[0])
-        head= np.array (pair[1])
-        vec_chain.append(head-tail)
-
-    return vec_chain
-
-def length_polygonal_chain(pts):
-    vec_chain = vector_chain_from_point_list(pts)
-
-    acc = 0
-    for vec in vec_chain:
-        acc = acc + np.linalg.norm(vec)
-    return acc
-def pointify_vector (x):
-    if len(x) % 2 == 0:
-        pts = []
-        for i in range(len(x))[::2]:
-            pts.append( [x[i],x[i+1]] )
-        return pts
-    else :
-        sys.exit('List of items does not have an even length to be able to be pointifyed')
-def flatten_list_of_lists(l):
-       return [item for sublist in l for item in sublist]
-def print_list(xs):
-    for x in xs:
-        print x
-def partial_sums( xs ):
-    psum = 0
-    acc = []
-    for x in xs:
-        psum = psum+x
-        acc.append( psum )
-    return acc
-def are_site_orderings_equal(sites1, sites2):
-
-    for (x1,y1), (x2,y2) in zip(sites1, sites2): 
-        if (x1-x2)**2 + (y1-y2)**2 > 1e-8:
-            return False
-    return True
-def bunch_of_non_uniform_random_points(numpts):
-    cluster_size = int(np.sqrt(numpts)) 
-    numcenters   = cluster_size
-    
-    import scipy
-    import random
-    centers = scipy.rand(numcenters,2).tolist()
-
-    scale, points = 4.0, []
-    for c in centers:
-        cx, cy = c[0], c[1]
-        # For current center $c$ of this loop, generate \verb|cluster_size| points uniformly in a square centered at it
-           
-        sq_size      = min(cx,1-cx,cy, 1-cy)
-        loc_pts_x    = np.random.uniform(low=cx-sq_size/scale, high=cx+sq_size/scale, size=(cluster_size,))
-        loc_pts_y    = np.random.uniform(low=cy-sq_size/scale, high=cy+sq_size/scale, size=(cluster_size,))
-        points.extend(zip(loc_pts_x, loc_pts_y))
-        
-
-    # Whatever number of points are left to be generated, generate them uniformly inside the unit-square
-       
-    num_remaining_pts = numpts - cluster_size * numcenters
-    remaining_pts = scipy.rand(num_remaining_pts, 2).tolist()
-    points.extend(remaining_pts)
-    
-
-    return points
-    
-def write_to_yaml_file(data, dir_name, file_name):
-   import yaml
-   with open(dir_name + '/' + file_name, 'w') as outfile:
-     yaml.dump( data, outfile, default_flow_style = False)
- 
-
-@|  @}
-%{/python-mode}%
-
-
-
-\section{Graphical Utilities}
-
-
-%{python-mode}%
-@O ../src/utils_graphics.py -cp @{    
-
-from matplotlib import rc
-from colorama import Fore
-from colorama import Style
-from scipy.optimize import minimize
-from sklearn.cluster import KMeans
-import argparse
-import itertools
-import math
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import numpy as np
-import os
-import pprint as pp
-import randomcolor 
-import sys
-import time
-
-xlim, ylim = [0,1], [0,1]
-
-# Borrowed from https://stackoverflow.com/a/9701141
-import numpy as np
-import colorsys
-
-def get_colors(num_colors, lightness=0.2):
-    colors=[]
-    for i in np.arange(60., 360., 300. / num_colors):
-        hue        = i/360.0
-        saturation = 0.95
-        colors.append(colorsys.hls_to_rgb(hue, lightness, saturation))
-    return colors
-@|  @}
-%{/python-mode}%

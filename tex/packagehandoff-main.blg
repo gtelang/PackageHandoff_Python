@@ -3,36 +3,37 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: packagehandoff-main.aux
 The style file: ieeetr.bst
 Database file #1: packagehandoff-main.bib
-You've used 6 entries,
+Warning--empty journal in lawler1985traveling
+You've used 7 entries,
             1876 wiz_defined-function locations,
-            519 strings with 4531 characters,
-and the built_in function-call counts, 1549 in all, are:
-= -- 169
-> -- 36
+            524 strings with 4741 characters,
+and the built_in function-call counts, 1723 in all, are:
+= -- 180
+> -- 50
 < -- 0
-+ -- 15
-- -- 9
-* -- 101
-:= -- 209
-add.period$ -- 7
-call.type$ -- 6
-change.case$ -- 6
++ -- 20
+- -- 13
+* -- 115
+:= -- 239
+add.period$ -- 8
+call.type$ -- 7
+change.case$ -- 7
 chr.to.int$ -- 0
-cite$ -- 6
-duplicate$ -- 74
-empty$ -- 155
-format.name$ -- 9
-if$ -- 386
+cite$ -- 8
+duplicate$ -- 83
+empty$ -- 172
+format.name$ -- 13
+if$ -- 424
 int.to.chr$ -- 0
-int.to.str$ -- 6
-missing$ -- 4
-newline$ -- 22
-num.names$ -- 5
-pop$ -- 19
+int.to.str$ -- 7
+missing$ -- 5
+newline$ -- 25
+num.names$ -- 6
+pop$ -- 25
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 62
+skip$ -- 63
 stack$ -- 0
 substring$ -- 123
 swap$ -- 34
@@ -40,7 +41,8 @@ text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
-warning$ -- 0
-while$ -- 17
-width$ -- 7
-write$ -- 61
+warning$ -- 1
+while$ -- 18
+width$ -- 8
+write$ -- 68
+(There was 1 warning)

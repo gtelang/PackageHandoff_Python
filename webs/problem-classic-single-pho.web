@@ -1,4 +1,3 @@
-@s
 %-----------------------------------------------------
 \chapter{Single Package Handoff}
 \label{chap:single-package-handoff}
@@ -27,51 +26,45 @@ However, the following observations are crucial for the development of algorithm
 
 \begin{flem}
 
-\begin{itemize}
+\begin{enumerate}
 
    \item  For the single delivery package handoff problem,  a slower drone, 
           always hands off the package to a faster drone, in any optimal schedule. 
+          Thus, once we \textit{know} which drones participate in the schedule, the order in which they participate in the handoff
+          from start to finish is determined according to their speeds, sorted from lowest to highest. 
+\footnote{This property is unfortunately 
+not true when there are multiple packages to be delivered to their respective desitinations, even for the case where the sources
+and targets for all the packages are the same. Examples where this happens are given in the next chapter.}
    
-    \item All drones involved in the optimal schedule start moving at time $t=0$. The drone not involved 
+    \item All drones involved in the optimal schedule start moving at time $t=0$ at full speed along a straight line towards a handoff point . The drones not involved 
           can remain stationary since they don't participate in the package transport. 
-     
+    
     \item No drone waits on any other drone at the rendezvous points in any optimal schedule. i.e. if two drones rendezvous at some 
           point $H$, they arrive at $H$ are precisely the same time on the clock. 
 
-    \item The path of the package is a monotonic polygonal curve with respect to the direction $\overrightharp{ST}$
-          no matter what the intial positions $P_i$ or speeds $u_i$ of the drones. 
-\end{itemize}  
+    \item The path of the package is a monotonic piecewise straight polygonal curve with respect to the direction $\overrightharp{ST}$
+          no matter what the intial positions $P_i$ or speeds $u_i$ of the drones. \footnote{We conjecture this property to be true 
+          even for the case of multiple packages i.e. the path of travel of each package is monotonic with respect to the vectors $S_i T_i$'s}
+\end{enumerate}
 
 
  \end{flem}
 
-Thus, once we \textit{know} which drones participate in the schedule, the order in which they participate in the handoff
-from start to finish is determined according to their speeds, sorted from lowest to highest. \footnote{This property is unfortunately 
-not true when there are multiple packages to be delivered to their respective desitinations, even for the case where the sources
-and targets for all the packages are the same. Examples where this happens are given in the next chapter.}
 
 Before proceeding, we first fix some notation: 
 
 \begin{itemize}
 \item $(P_i, u_i)$ for $1 \leq i \leq n$ where $P_i \in \RR^2$ and $u_i \geq 0$, $S,T \in \RR^2$ respectively stand for the initial positions, speed, and source and target points for a package. 
-\item $(S=H_{i_0}), H_{i_1} \ldots H_{i_k}$ for $0 \leq i_0, \ldots i_k \leq n$ stand for points where the drones with labels $i_0, \ldots i_k$ handle the package in that oder. More precisely 
+\item $(S=H_{i_0}), H_{i_1} \ldots H_{i_k}$ for $0 \leq i_0, \ldots i_k \leq n$ stand for points where the drones with labels $i_0, \ldots i_k$ handle the package in that order. More precisely 
       $H_{i_j}$ is the point where drone $i_{j-1}$ hands off the package to drone $i_j$ for $1 \leq j \leq k$.  
 \end{itemize}
 
 
 
-
-
-\section{Propagating Wavefront Algorithms}
-
-
-
-
+\section{Wavefront Algorithms}
 The algorithms in this section are inspired by the Continuous Dijkstra paradigm used in computing shortest paths for the Weighted Region Problem
 and for computing euclidean shortest paths in the presence of polygonal obstacles \cite{mitchell1991weighted, mitchell1996shortest}. 
 The approximation and locality properties of these heuristics are considered later in the chapter. 
-
-
 
 
 The general idea is simple: consider expanding circular wavelets centered at the positions $P_i$, each expanding with speed $u_i$. The drones invovled in the schedule
@@ -84,31 +77,374 @@ to figure out \textit{exactly} the handoff points for the drones involved in tra
 Precise details follow in the subsections below.
 
 
-\begin{algorithm}[H]
-\SetAlgoLined
-\KwData{$(P_i, u_i)$ for $1 \leq i \leq n$ where $P_i \in \RR^2$ and $u_i \geq 0$, $S,T \in \RR^2$  }
-\KwResult{ A polygonal path $(S=H_{i_0}), H_{i_1} \ldots H_{i_k}, T$  representing the path travelled by the package. }
-      
-initialization\;
-\While{not at end of this document}{
-read current\;
-\eIf{understand}{
-go to next section\;
-current section becomes this one\;
-}{
-go back to the beginning of current section\;
-}
-}
-\caption{How to write algorithms}
-\end{algorithm}
+\subsection{Preliminary Data Structures} \hspace{10mm}
+
+Before proceeding, lets design some housekeeping data-structures to 
+represent the problem. The following data-structure simply maintains the 
+information about the drones, the source and target used as input to the 
+problem. To get a PHO tour for the package, algorithms are passed as 
+first class values to the method \verb|get_tour| of this class. 
+
+Note that each algorithm does its own plotting and animation in a separate matplotlib window 
+if so requested via the boolean flags \verb|plot_tour_p| , and \verb|animate_tour_p|. If both 
+animation and plotting are requested they are done in separate windows each. 
+
+%{python-mode}%
+@D PHO Data Structures @{
+class Single_PHO_Input:
+    def __init__(self, drone_info = [] , source = None, target=None):
+           self.drone_info = drone_info 
+           self.source     = source
+           self.target     = target
+
+    def get_drone_pis (self):
+           return [self.drone_info[idx][0] for idx in range(len(self.drone_info)) ]
+           
+    def get_drone_uis (self):
+           return [self.drone_info[idx][1] for idx in range(len(self.drone_info)) ]
+         
+    def get_tour(self, algo):
+           return algo( self.drone_info, self.source, self.target, 
+                        animate_tour_p = False,
+                        plot_tour_p    = False)
+
+    # Methods for \verb|ReverseHorseflyInput|
+    def clearAllStates (self):
+          self.drone_info = []
+          self.source = None
+          self.target = None
+
+@| Single_PHO_Input @}
+%{/python-mode}%
+
+\subsection{One-Dimensional Greedy Wavefront} \hspace{10mm}
+
+The followinf data-structure keeps track of a single wavelet expanding at uniform speed around a given center
+starting at a particular clock time. 
+
+%{python-mode}%
+@d PHO Data Structures @{
+class DroneWavelet:
+    def __init__(self, startposn, speed, drone_idx,  clock_time):
+          self.center          = startposn
+          self.speed           = speed
+          self.drone_label     = drone_idx
+          self.last_reset_time = clock_time
+
+    def get_center(self):
+          return self.center
+
+    def get_speed(self):
+          return self.speed
+
+    def get_associated_drone(self):
+          return self.drone_label
+
+    def wavelet_size(self, clock_time): # radius of the disk
+           return (clock_time - last_reset_time) * self.speed
+    
+    def reset_wavelet(self, center, clock_time):
+         self.center = center
+         self.last_reset_time = clock_time 
+
+@| @}
+%{/python-mode}%
+
+
+The following function simply calculates the time taken for a drone to move between two points at a given uniform speed. 
+
+%{python-mode}%
+@d PHO Algorithms @{
+def time_of_travel(start, stop, speed):
+     start = np.asarray(start)
+     stop  = np.asarray(stop)
+     return np.linalg.norm(stop-start)/speed
+@| @}
+%{/python-mode}%
+
+
+
+%{python-mode}%
+@D PHO Algorithms @{
+def algo_odw(drone_info, source, target, 
+             animate_tour_p = False,
+             plot_tour_p    = False):
+
+    from scipy.optimize import minimize
+    print Fore.CYAN, "\n==========================================================="
+    print            "Running the one dimensional wavefront algorithm (algo_odw) "
+    print            "===========================================================", Style.RESET_ALL
+
+    source = np.asarray(source)
+    target = np.asarray(target)
+    sthat  = (target-source)/np.linalg.norm(target-source) # unit vector pointing from source to target
+
+    # Intialize wavelets for all drones
+    numdrones  = len(drone_info)
+    clock_time = 0.0
+
+    drone_wavelets = []
+    for (initposn, speed), idx in zip(drone_info, range(numdrones)):
+         drone_wavelets.append(  DroneWavelet(initposn, speed, idx, clock_time)  )
+
+    # Find the drone which can get to the source the quickest
+    tmin = np.inf
+    imin = None
+    for idx in range(numdrones):
+         initdroneposn = drone_info[idx][0]
+         dronespeed    = drone_info[idx][1]
+         tmin_idx = time_of_travel(initdroneposn, source, dronespeed)
+    
+         if tmin_idx < tmin:
+             tmin = tmin_idx
+             imin = idx 
+
+    # Reset wavelet for the drone which reached the source the fastest
+    clock_time = tmin
+    drone_wavelets[imin].reset_wavelet(source, clock_time)
+
+    current_package_handler_idx = imin
+    current_package_position = source
+
+    drone_pool = range(numdrones)
+    drone_pool.remove(imin) 
+    used_drones = [imin]
+
+    package_reached_p   = False
+    while not(package_reached_p):
+          print "-----------------------------------------------------"
+          print Fore.GREEN, "Clock Time ", clock_time , Style.RESET_ALL
+          print "Drone Pool ", drone_pool, "  Used Drones ", used_drones
+          print "-----------------------------------------------------"
+          time_to_target_without_help =\
+              np.linalg.norm((target-current_package_position))/drone_info[current_package_handler_idx][1]
+          tintercept_min     = np.inf
+          idx_intercept_min  = None
+
+          for idx in drone_pool:
+              # Calculate tintercept here via scipy
+              u1 = drone_info[current_package_handler_idx][1]
+              u2 = drone_info[idx][1]
+
+              if u2 < u1:
+                  continue # there won't be any use of the slower drone u2 in speeding up the package delivery process. 
+              else: 
+                p1 = np.asarray(drone_info[idx][0])
+                p2 = np.asarray(drone_info[current_package_handler_idx][0]) 
+                print u1, u2, "    ", p1, p2 
+
+                d  = np.linalg.norm( p1 - p2 )
+    
+                veca  = target-p1
+                vecb  = p2 - p1  
+                costh = np.dot( veca, vecb ) / (np.linalg.norm(veca) * np.linalg.norm(vecb))
+
+                fun    = lambda t: t[0]
+                cons   = ({'type': 'ineq', 'fun': lambda t:  u2 + d - u1 * costh * (t[0]-clock_time)/t[0] },
+                          {'type': 'ineq', 'fun': lambda t:  u2 - d + u1 * costh * (t[0]-clock_time)/t[0] })
+    
+                res = minimize(fun, [clock_time] , method='SLSQP', bounds=[(clock_time, None)], constraints=cons ) 
+
+                if res.success:
+                      print Fore.CYAN, "SLSQP Solver converged in "   , res.nit, " iterations",  Style.RESET_ALL
+
+                else :
+                      print Fore.RED, "Boo! SLSQP Solver did not converge!", Style.RESET_ALL
+                      print res.status
+                      print res.message 
+                
+                tintercept = res.x[0]
+                print res.x
+
+                if tintercept < tintercept_min:
+                   tintercept_min    = tintercept
+                   idx_intercept_min = idx
+
+          if time_to_target_without_help < tintercept_min :
+              package_reached_p = True
+          else:
+
+              package_handler_speed     = drone_info[current_package_handler_idx][1] 
+              current_package_position  = current_package_position + \
+                   package_handler_speed * (tintercept_min - clock_time) *  sthat
+
+              clock_time = tintercept_min 
+
+              current_package_handler_idx = idx_intercept_min
+              drone_pool.remove(idx_intercept_min)
+              used_drones.append(idx_intercept_min)  
+
+              drone_wavelets[idx_intercept_min].reset_wavelet(current_package_position, clock_time)
+
+
+    tour = algo_pho_exact_given_order_of_drones ( [drone_info[idx] for idx in used_drones],source,target )
+
+    print Fore.RED, "Package has been delivered! ", " Ids of the drones used for delivery (in order of handoff) were ", used_drones, Style.RESET_ALL
+
+    print "The tour points are "
+    utils_algo.print_list([ drone_wavelets[idx].center for idx in used_drones ])
+
+    if plot_tour_p:
+         print Fore.GREEN, "Plotting the computed tour", Style.RESET_ALL
+    
+    if animate_tour_p:
+         print Fore.CYAN, "Animating the computed tour", Style.RESET_ALL
+    
+    return tour
+@| algo_odw @}
+%{/python-mode}%
+
+
+
+
+
+
+%{python-mode}%
+@d PHO Algorithms  @{
+def  algo_pho_exact_given_order_of_drones ( drone_info ,source, target ):
+    pass
+
+@| algo_pho_exact_given_order_of_drones @}
+%{/python-mode}%
 
 
 
 
 \newpage
+\section{Run Handler associated with this Chapter}
+
+
+%{python-mode}%
+@D  PHO Run Handlers @{
+def single_pho_run_handler():
+ 
+    import random
+
+    def wrapperEnterRunPoints(fig, ax, run):
+      
+      def _enterPoints(event):
+
+        if event.name      == 'button_press_event'          and \
+           (event.button   == 1 or event.button == 3)       and \
+            event.dblclick == True and event.xdata  != None and event.ydata  != None:
+
+             if event.button == 1:  
+                 # Insert blue circle representing the initial position of a drone
+                 print Fore.GREEN
+                 newPoint = (event.xdata, event.ydata)
+                 speed    = float(random.randint(1,6))
+                 run.drone_info.append( (newPoint, speed) ) 
+                 patchSize  = (xlim[1]-xlim[0])/40.0
+                 print Style.RESET_ALL
+                 
+                 ax.add_patch( mpl.patches.Circle( newPoint, radius = patchSize,
+                                                   facecolor='#b7e8cc', edgecolor='black'  ))
+
+                 ax.text( newPoint[0], newPoint[1], speed, fontsize=15, 
+                          horizontalalignment='center', verticalalignment='center' )
+
+                 ax.set_title('Number of drones inserted: ' + str(len(run.drone_info)), fontdict={'fontsize':25})
+                 
+
+             elif event.button == 3:  
+                 # Insert big red circles representing the source and target points
+    
+                 patchSize  = (xlim[1]-xlim[0])/50.0
+                 if run.source is None:    
+                      run.source = (event.xdata, event.ydata)  
+                      ax.add_patch( mpl.patches.Circle( run.source, radius = patchSize, facecolor= '#ffd9d6', edgecolor='black', lw=1.0 ))
+                      ax.text( run.source[0], run.source[1], 'S', fontsize=15, horizontalalignment='center', verticalalignment='center' )
+
+                 elif run.target is None:
+                      run.target = (event.xdata, event.ydata)  
+                      ax.add_patch( mpl.patches.Circle( run.target, radius = patchSize, facecolor= '#ffd9d6', edgecolor='black', lw=1.0 ))
+                      ax.text( run.target[0], run.target[1], 'T', fontsize=15, horizontalalignment='center', verticalalignment='center' )
+    
+                 else:
+                       print Fore.RED, "Source and Target already set", Style.RESET_ALL
+
+             # Clear polygon patches and set up last minute \verb|ax| tweaks
+             clearAxPolygonPatches(ax)
+             applyAxCorrection(ax)
+             fig.canvas.draw()
+             
+
+      return _enterPoints
+
+    # The key-stack argument is mutable! I am using this hack to my advantage.
+    def wrapperkeyPressHandler(fig, ax, run): 
+           def _keyPressHandler(event):
+               if event.key in ['i', 'I']:  
+
+                    # Select algorithm to execute
+                    #algo_str = raw_input(Fore.YELLOW                                             +\
+                    #        "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
+                    #        " (odw)     One Dimensional Wavefront \n"                            +\
+                    #        Style.RESET_ALL)
+
+                    algo_str='odw'
+                    algo_str = algo_str.lstrip()
+                     
+                    # Incase there are patches present from the previous clustering, just clear them
+                    clearAxPolygonPatches(ax)
+
+                    if   algo_str == 'odw':
+                          tour = run.get_tour( algo_odw )
+                    else:
+                          print "Unknown option. No horsefly for you! ;-D "
+                          sys.exit()
+
+                    applyAxCorrection(ax)
+                    fig.canvas.draw()
+                    
+               elif event.key in ['c', 'C']: 
+                    # Clear canvas and states of all objects
+                    run.clearAllStates()
+                    ax.cla()
+                                  
+                    utils_graphics.applyAxCorrection(ax)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                                     
+                    fig.texts = []
+                    fig.canvas.draw()
+                    
+           return _keyPressHandler
+    
+    # Set up interactive canvas
+    fig, ax =  plt.subplots()
+    run = Single_PHO_Input()
+        
+    from matplotlib import rc
+    
+    # specify the custom font to use
+    plt.rcParams['font.family'] = 'sans-serif'
+    plt.rcParams['font.sans-serif'] = 'Times New Roman'
+
+    ax.set_xlim([xlim[0], xlim[1]])
+    ax.set_ylim([ylim[0], ylim[1]])
+    ax.set_aspect(1.0)
+    ax.set_xticks([])
+    ax.set_yticks([])
+          
+    ax.set_title("Enter drone positions, source and target onto canvas. \n (Enter speeds into the terminal, after inserting a drone at a particular position)")
+
+    mouseClick   = wrapperEnterRunPoints (fig,ax, run)
+    fig.canvas.mpl_connect('button_press_event' , mouseClick)
+          
+    keyPress     = wrapperkeyPressHandler(fig,ax, run)
+    fig.canvas.mpl_connect('key_press_event', keyPress   )
+    
+    plt.show()
+    
+@| single_pho_run_handler @}
+%{/python-mode}%
+
+
+
+
 \section{Chapter Index of Fragments}
 @m
 \section{Chapter Index of Identifiers}
 @u 
 %------------------------------------------------------
-@S
