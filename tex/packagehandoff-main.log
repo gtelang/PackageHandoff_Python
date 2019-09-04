@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.5.20)  3 SEP 2019 10:25
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.9.1)  3 SEP 2019 23:04
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -1961,7 +1961,7 @@ Package csquotes Info: Redefining alias 'default' -> 'english'.
 
 
 LaTeX Warning: Unused global option(s):
-    [12.0pt].
+    [10.0pt].
 
 (./packagehandoff-main.aux)
 \openout1 = `packagehandoff-main.aux'.
@@ -2105,14 +2105,14 @@ File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 
  [2]
 Chapter 1.
-<images/carrier-drone.jpg, id=76, 1609.01125pt x 894.34125pt>
+<images/carrier-drone.jpg, id=86, 1609.01125pt x 894.34125pt>
 File: images/carrier-drone.jpg Graphic file (type jpg)
 
 <use images/carrier-drone.jpg>
 Package pdftex.def Info: images/carrier-drone.jpg used on input line 77.
 (pdftex.def)             Requested size: 142.26378pt x 79.068pt.
 
-<example-image-b.png, id=79, 401.5pt x 301.125pt>
+<example-image-b.png, id=89, 401.5pt x 301.125pt>
 File: example-image-b.png Graphic file (type png)
  <use example-image-b.png>
 Package pdftex.def Info: example-image-b.png used on input line 79.
@@ -2131,100 +2131,130 @@ Package mdframed Info: mdframed detected package amsthm
 (mdframed)              on input line 165.
 [5
 
-] [6] [7]
-Overfull \hbox (10.89783pt too wide) in paragraph at lines 377--377
+]
+<images/circular_wavelets_intersect_along_st.pdf, id=151, 840.59344pt x 749.251
+04pt>
+File: images/circular_wavelets_intersect_along_st.pdf Graphic file (type pdf)
+ <use images/circular_wavelets_intersect_along_st.pdf>
+Package pdftex.def Info: images/circular_wavelets_intersect_along_st.pdf used o
+n input line 277.
+(pdftex.def)             Requested size: 398.33858pt x 355.06335pt.
+ [6] [7 <./images/circular_wavelets_intersect_along_st.pdf>]
+Overfull \hbox (10.89783pt too wide) in paragraph at lines 385--385
 [][][]              \T1/zi4/m/n/9 current_package_position = current_package_po
 sition + package_handler_speed * (tI_min - clock_time) *  sthat  
  []
 
-
-Overfull \hbox (4.59775pt too wide) in paragraph at lines 386--386
+[8]
+Overfull \hbox (4.59775pt too wide) in paragraph at lines 394--394
 [][][]    \T1/zi4/m/n/9 package_trail_cvx = algo_pho_exact_given_order_of_drone
 s ([drone_info[idx] for idx in used_drones],source,target )  
  []
 
-[8] [9]
-LaTeX Font Info:    Try loading font information for TS1+zi4 on input line 573.
 
- (/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
+Overfull \hbox (81.9978pt too wide) in paragraph at lines 405--405
+[][][]         \T1/zi4/m/n/9 plot_tour(fig1, ax1, "ODE: Straight Line, Post Con
+vex Optimization", source, target, drone_info, used_drones, package_trail_cvx) 
+ 
+ []
+
+[9] <images/pho-cvx.pdf, id=213, 593.7218pt x 471.68246pt>
+File: images/pho-cvx.pdf Graphic file (type pdf)
+
+<use images/pho-cvx.pdf>
+Package pdftex.def Info: images/pho-cvx.pdf used on input line 504.
+(pdftex.def)             Requested size: 284.52756pt x 226.03795pt.
+ [10]
+Overfull \hbox (6.79999pt too wide) in paragraph at lines 516--533
+[] 
+ []
+
+[11 <./images/pho-cvx.pdf>]
+<images/pho_example_plot.pdf, id=232, 487.8225pt x 495.8525pt>
+File: images/pho_example_plot.pdf Graphic file (type pdf)
+
+<use images/pho_example_plot.pdf>
+Package pdftex.def Info: images/pho_example_plot.pdf used on input line 606.
+(pdftex.def)             Requested size: 227.62204pt x 231.37103pt.
+ [12 <./images/pho_example_plot.pdf>]
+LaTeX Font Info:    Try loading font information for TS1+zi4 on input line 630.
+
+
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
 File: ts1zi4.fd 2014/06/22 Fontinst v1.933 font definitions for TS1/zi4.
-)
-[10]
-Overfull \vbox (5.47235pt too high) has occurred while \output is active []
-
-
-[11] [12] [13] [14] (./packagehandoff-main.bbl (./packagehandoff-main.brf)
+) [13] [14]
+[15] [16] (./packagehandoff-main.bbl (./packagehandoff-main.brf)
 \tf@brf=\write11
 \openout11 = `packagehandoff-main.brf'.
 
+ [17]) [18
 
-[15]) [16
-
-] [17
+]
+[19
 
 
 ]
 Appendix A.
-[18
+[20
 
-] [19]
-Overfull \hbox (133.29785pt too wide) in paragraph at lines 983--983
+] [21]
+Overfull \hbox (133.29785pt too wide) in paragraph at lines 1043--1043
 [][][]    \T1/zi4/m/n/9 horses_traj_num_legs      = [len(traj)-1 for traj in ho
 rse_trajectories] # the -1 is because the initial position of the horse is alwa
 ys included.  
  []
 
 
-Overfull \hbox (44.1979pt too wide) in paragraph at lines 1008--1008
+Overfull \hbox (44.1979pt too wide) in paragraph at lines 1068--1068
 [][][]                \T1/zi4/m/n/9 all_flys_collected_by_horse = [i           
   for elt in horse_trajectories[hidx] for i in elt[\TS1/zi4/m/n/9 '\T1/zi4/m/n/
 9 fly_idxs_picked_up\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ]]  
  []
 
-[20]
-Overfull \hbox (10.89789pt too wide) in paragraph at lines 1026--1026
+[22]
+Overfull \hbox (10.89789pt too wide) in paragraph at lines 1086--1086
 [][][]                    \T1/zi4/m/n/9 xcurr, ycurr = htraj[legidx][0], htraj[
 legidx][1] # current position is the zeroth point on the next leg  
  []
 
 
-Overfull \hbox (261.09784pt too wide) in paragraph at lines 1034--1034
+Overfull \hbox (261.09784pt too wide) in paragraph at lines 1094--1094
 [][][]                \T1/zi4/m/n/9 fly_idxs_collected_so_far[hidx] = list(set(
 fly_idxs_collected_so_far[hidx])) ### critical line, to remove duplicate elemen
 ts # https://stackoverflow.com/a/7961390  
  []
 
 
-Overfull \hbox (10.89789pt too wide) in paragraph at lines 1056--1056
+Overfull \hbox (10.89789pt too wide) in paragraph at lines 1116--1116
 [][][]                    \T1/zi4/m/n/9 xcurr, ycurr = ftraj[legidx][0], ftraj[
 legidx][1] # current position is the zeroth point on the next leg  
  []
 
 
-Overfull \hbox (79.29782pt too wide) in paragraph at lines 1078--1078
+Overfull \hbox (79.29782pt too wide) in paragraph at lines 1138--1138
 [][][]            \T1/zi4/m/n/9 horseloc   = Circle((current_horse_posn[0], cur
 rent_horse_posn[1]), 0.015, facecolor = \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 #D13131\T
 S1/zi4/m/n/9 '\T1/zi4/m/n/9 , edgecolor=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 k\TS1/zi4
 /m/n/9 '\T1/zi4/m/n/9 ,  alpha=1.00)  
  []
 
-[21] [22] [23] [24] [25]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1308.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1308.
+[23] [24] [25] [26] [27]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1368.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1368.
  (./packagehandoff-main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1308.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1308.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1368.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1368.
 
 Package rerunfilecheck Info: File `packagehandoff-main.out' has not changed.
-(rerunfilecheck)             Checksum: E2D60735E0CA146D553E91A437546C9D;701.
+(rerunfilecheck)             Checksum: 4BBADF213895FCBD9D2893A5795CC2D3;832.
 Package rerunfilecheck Info: File `packagehandoff-main.brf' has not changed.
 (rerunfilecheck)             Checksum: B776E13FED08F1A3000828BC31FB053B;357.
  ) 
 Here is how much of TeX's memory you used:
- 35957 strings out of 493029
- 654786 string characters out of 6136234
- 1258083 words of memory out of 5000000
- 38730 multiletter control sequences out of 15000+600000
+ 35981 strings out of 493029
+ 655393 string characters out of 6136235
+ 1255080 words of memory out of 5000000
+ 38744 multiletter control sequences out of 15000+600000
  30513 words of font info for 88 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  68i,12n,87p,10458b,923s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -2267,10 +2297,10 @@ xmf/fonts/type1/public/cm-super/sfrm2488.pfb></usr/share/texmf/fonts/type1/publ
 ic/cm-super/sfti0600.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfti0700
 .pfb></usr/share/texmf/fonts/type1/public/cm-super/sfti0900.pfb></usr/share/tex
 mf/fonts/type1/public/cm-super/sfti1000.pfb>
-Output written on packagehandoff-main.pdf (25 pages, 473617 bytes).
+Output written on packagehandoff-main.pdf (27 pages, 542056 bytes).
 PDF statistics:
- 436 PDF objects out of 1000 (max. 8388607)
- 374 compressed objects within 4 object streams
- 69 named destinations out of 1000 (max. 500000)
- 111 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 508 PDF objects out of 1000 (max. 8388607)
+ 414 compressed objects within 5 object streams
+ 76 named destinations out of 1000 (max. 500000)
+ 142 words of extra memory for PDF output out of 10000 (max. 10000000)
 

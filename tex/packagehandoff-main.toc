@@ -5,11 +5,13 @@
 \contentsline {section}{\numberline {2.1}Wavefront Algorithms}{5}{section.2.1}
 \contentsline {subsection}{\numberline {2.1.1}Preliminary Data Structures}{6}{subsection.2.1.1}
 \contentsline {subsection}{\numberline {2.1.2}One-Dimensional Greedy Wavefront}{6}{subsection.2.1.2}
-\contentsline {section}{\numberline {2.2}Run Handler associated with this Chapter}{13}{section.2.2}
-\contentsline {section}{\numberline {2.3}Chapter Index of Fragments}{15}{section.2.3}
-\contentsline {section}{\numberline {2.4}Chapter Index of Identifiers}{15}{section.2.4}
-\contentsline {chapter}{Appendices}{17}{section*.3}
-\contentsline {chapter}{\numberline {A}Supporting Code}{18}{Appendix.a.A}
-\contentsline {section}{\numberline {A.1}Main File}{18}{section.a.A.1}
-\contentsline {section}{\numberline {A.2}Algorithmic Utilities}{23}{section.a.A.2}
-\contentsline {section}{\numberline {A.3}Graphical Utilities}{24}{section.a.A.3}
+\contentsline {section}{\numberline {2.2}Handoff in a particular order}{11}{section.2.2}
+\contentsline {section}{\numberline {2.3}Plotting}{12}{section.2.3}
+\contentsline {section}{\numberline {2.4}Run Handler associated with this Chapter}{15}{section.2.4}
+\contentsline {section}{\numberline {2.5}Chapter Index of Fragments}{17}{section.2.5}
+\contentsline {section}{\numberline {2.6}Chapter Index of Identifiers}{17}{section.2.6}
+\contentsline {chapter}{Appendices}{19}{section*.6}
+\contentsline {chapter}{\numberline {A}Supporting Code}{20}{Appendix.a.A}
+\contentsline {section}{\numberline {A.1}Main File}{20}{section.a.A.1}
+\contentsline {section}{\numberline {A.2}Algorithmic Utilities}{25}{section.a.A.2}
+\contentsline {section}{\numberline {A.3}Graphical Utilities}{26}{section.a.A.3}

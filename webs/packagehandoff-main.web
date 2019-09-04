@@ -1,4 +1,4 @@
-\documentclass[12.0pt]{report}
+\documentclass[10.0pt]{report}
 \input{standard_settings.tex}
 
 \usepackage{harpoon}% <---
@@ -37,7 +37,7 @@
 	\centering
         {\Huge Analyses of Experimental Heuristics for Package-Handoff Type Problems\\}
         \vspace{20mm}
-        {\Large Gaurish Telang}
+        {\Large Kien Huynh, J.S.B, Mitchell, Gaurish Telang}
 \end{titlepage}
 \pagenumbering{arabic}
 \setcounter{page}{2} 

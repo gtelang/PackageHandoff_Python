@@ -129,7 +129,7 @@ def algo_odw(drone_info, source, target,
 
               drone_pool.remove(idx_tI_min)
               used_drones.append(idx_tI_min)  
-    
+   
     package_trail_cvx = algo_pho_exact_given_order_of_drones ([drone_info[idx] for idx in used_drones],source,target )
     mspan_straight = makespan(drone_info, used_drones, package_trail)
     mspan_cvx      = makespan(drone_info, used_drones, package_trail_cvx)
@@ -137,7 +137,12 @@ def algo_odw(drone_info, source, target,
     #assert (mspan_cvx <= mspan_straight), ""
 
     if plot_tour_p:
-         plot_tour(source, target, drone_info, used_drones, package_trail_cvx)
+         fig0, ax0 = plt.subplots()
+         plot_tour(fig0, ax0, "ODW: Straight Line"       , source, target, drone_info, used_drones, package_trail)
+
+         fig1, ax1 = plt.subplots()
+         plot_tour(fig1, ax1, "ODE: Straight Line, Post Convex Optimization", source, target, drone_info, used_drones, package_trail_cvx)
+         plt.show()
 
     if animate_tour_p:
          print Fore.CYAN, "Animating the computed tour", Style.RESET_ALL
@@ -232,8 +237,8 @@ def algo_pho_exact_given_order_of_drones ( drone_info, source, target ):
     return package_trail
 
 
-def plot_tour(source, target, drone_info, used_drones, package_trail):
-    fig, ax = plt.subplots()
+def plot_tour(fig, ax, figtitle, source, target, drone_info, used_drones, package_trail):
+
     ax.set_aspect(1.0)
     ax.set_xlim([0.0, 1.0])
     ax.set_ylim([0.0, 1.0])
@@ -284,12 +289,12 @@ def plot_tour(source, target, drone_info, used_drones, package_trail):
                   fontsize=15, horizontalalignment='center', verticalalignment='center' )
 
 
-    ax.set_title('Makespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=20)
+    fig.suptitle(figtitle, fontsize=25)
+    ax.set_title('\nMakespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=15)
 
 
     # A light grid
     plt.grid(color='0.5', linestyle='--', linewidth=0.5)
-    plt.show()
 
 def makespan(drone_info, used_drones, package_trail):
 

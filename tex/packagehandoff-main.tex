@@ -13,7 +13,7 @@
 \newcommand{\NWsep}{${\diamond}$}
 \newcommand{\NWnotglobal}{(not defined globally)}
 \newcommand{\NWuseHyperlinks}{}
-\documentclass[12.0pt]{report}
+\documentclass[10.0pt]{report}
 \input{standard_settings.tex}
 
 \usepackage{harpoon}% <---
@@ -52,7 +52,7 @@
 	\centering
         {\Huge Analyses of Experimental Heuristics for Package-Handoff Type Problems\\}
         \vspace{20mm}
-        {\Large Gaurish Telang}
+        {\Large Kien Huynh, J.S.B, Mitchell, Gaurish Telang}
 \end{titlepage}
 \pagenumbering{arabic}
 \setcounter{page}{2} 
@@ -261,8 +261,8 @@ animation and plotting are requested they are done in separate windows each.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@Single_PHO_Input@\nobreak\ \NWlink{nuweb13}{13}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@Single_PHO_Input@\nobreak\ \NWlink{nuweb15}{15}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -271,7 +271,15 @@ animation and plotting are requested they are done in separate windows each.
 
 \subsection{One-Dimensional Greedy Wavefront} \hspace{10mm}
 
-The following function simply calculates the time taken for a drone to move between two points at a given uniform speed. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=14cm]{images/circular_wavelets_intersect_along_st.pdf}
+\caption{Intersection of two expanding wavelets along $\vec{S_iT}$}
+\end{figure}
+
+The following function calculates the time taken for a drone to move between two points at a given uniform speed
+ 
 
 
 %{python-mode}%
@@ -290,9 +298,9 @@ The following function simply calculates the time taken for a drone to move betw
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb9}{, 9}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
-
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@time_of_travel@\nobreak\ \NWlink{nuweb7b}{7b}\NWlink{nuweb14}{, 14}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -382,7 +390,7 @@ The following function simply calculates the time taken for a drone to move betw
 \mbox{}\verb@@\\
 \mbox{}\verb@              drone_pool.remove(idx_tI_min)@\\
 \mbox{}\verb@              used_drones.append(idx_tI_min)  @\\
-\mbox{}\verb@    @\\
+\mbox{}\verb@   @\\
 \mbox{}\verb@    package_trail_cvx = algo_pho_exact_given_order_of_drones ([drone_info[idx] for idx in used_drones],source,target )@\\
 \mbox{}\verb@    mspan_straight = makespan(drone_info, used_drones, package_trail)@\\
 \mbox{}\verb@    mspan_cvx      = makespan(drone_info, used_drones, package_trail_cvx)@\\
@@ -390,7 +398,12 @@ The following function simply calculates the time taken for a drone to move betw
 \mbox{}\verb@    #assert (mspan_cvx <= mspan_straight), ""@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    if plot_tour_p:@\\
-\mbox{}\verb@         plot_tour(source, target, drone_info, used_drones, package_trail_cvx)@\\
+\mbox{}\verb@         fig0, ax0 = plt.subplots()@\\
+\mbox{}\verb@         plot_tour(fig0, ax0, "ODW: Straight Line"       , source, target, drone_info, used_drones, package_trail)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         fig1, ax1 = plt.subplots()@\\
+\mbox{}\verb@         plot_tour(fig1, ax1, "ODE: Straight Line, Post Convex Optimization", source, target, drone_info, used_drones, package_trail_cvx)@\\
+\mbox{}\verb@         plt.show()@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    if animate_tour_p:@\\
 \mbox{}\verb@         print Fore.CYAN, "Animating the computed tour", Style.RESET_ALL@\\
@@ -401,9 +414,9 @@ The following function simply calculates the time taken for a drone to move betw
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb9}{, 9}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb13}{13}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb15}{15}.\item \NWtxtIdentsUsed\nobreak\  \verb@time_of_travel@\nobreak\ \NWlink{nuweb7a}{7a}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -415,7 +428,7 @@ The following function simply calculates the time taken for a drone to move betw
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap4}\raggedright\small
-\NWtarget{nuweb9}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {9}}$\,\rangle\equiv$
+\NWtarget{nuweb10}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {10}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -472,8 +485,8 @@ The following function simply calculates the time taken for a drone to move betw
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb9}{, 9}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
 
 \item{}
 \end{list}
@@ -481,14 +494,49 @@ The following function simply calculates the time taken for a drone to move betw
 \end{flushleft}
 %{/python-mode}%
 
-When the drones involved in the package handoff process, along with the order of handoff is known in advance, we can find the handoff points exactly
-using convex optimization using SOCP. 
+When the drones involved in the package handoff process, along with the order of handoff is known in advance, 
+we can find the handoff points exactly using convex optimization using SOCP. 
 
+\section{Handoff in a particular order}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=10cm]{images/pho-cvx.pdf}
+\end{figure}
+
+
+Given drones $P_i$, with speeds $u_i$ $1 \leq i \leq r-1$, the intial position $S$ and final destination $T$ for the package. 
+The drones are expected to transport the package by handing of the package in the order $1,2,\ldots, r$.
+Let $t_i$ denote the departure time on a global clock from the $i$'th handoff point $X_i$. 
+
+Then the minimum time for transporting the package and the handoff points can be calculated according to the following 
+convex program 
+
+
+\noindent\fbox{%
+    \parbox{\textwidth}{%
+
+\begin{equation*}
+\min_{t_i, X_i} \; \; \; t_{r-1} + \frac{||T-X_{r-1}||}{u_{r-1}}
+\end{equation*}
+
+subject to the constraints
+
+\begin{align*}
+X_0 &= S\\  
+t_i &\geq \frac{||P_i-X_i||}{u_i} \qquad \qquad 0 \leq i \leq r-1\\
+t_i + \frac{||X_{i+1}-X_i||}{u_i} &\leq t_{i+1} \qquad \qquad \qquad \;\;\;\; 0 \leq i \leq r-2
+\end{align*}
+
+    }%
+}
+
+
+The following function is just an implentation of the program above. 
 
 %{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap5}\raggedright\small
-\NWtarget{nuweb10}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {10}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap5}\raggedright\small
+\NWtarget{nuweb11}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {11}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -534,31 +582,40 @@ using convex optimization using SOCP.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb9}{, 9}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
+\vspace{4ex}
 \end{flushleft}
 %{/python-mode}%
 
+\section{Plotting}
 
 We plot the tours onto a separate window if the switch \verb|plot_tour_p| is set to \verb|True| while calling the algorithm. 
 The path of the package is shown in bold red. The paths of the drones from their initial positions to the point where they pick 
 up the package from another drone are shown in blue.
 
+An example is shown below: 
+
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=8cm]{images/pho_example_plot.pdf}
+\end{figure}
+
 
 %{python-mode}%
-\begin{flushleft} \small
-\begin{minipage}{\linewidth}\label{scrap6}\raggedright\small
-\NWtarget{nuweb11}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {11}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap6}\raggedright\small
+\NWtarget{nuweb13}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {13}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@def plot_tour(source, target, drone_info, used_drones, package_trail):@\\
-\mbox{}\verb@    fig, ax = plt.subplots()@\\
+\mbox{}\verb@def plot_tour(fig, ax, figtitle, source, target, drone_info, used_drones, package_trail):@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@    ax.set_aspect(1.0)@\\
 \mbox{}\verb@    ax.set_xlim([0.0, 1.0])@\\
 \mbox{}\verb@    ax.set_ylim([0.0, 1.0])@\\
@@ -609,32 +666,34 @@ up the package from another drone are shown in blue.
 \mbox{}\verb@                  fontsize=15, horizontalalignment='center', verticalalignment='center' )@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    ax.set_title('Makespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=20)@\\
+\mbox{}\verb@    fig.suptitle(figtitle, fontsize=25)@\\
+\mbox{}\verb@    ax.set_title('\nMakespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=15)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # A light grid@\\
 \mbox{}\verb@    plt.grid(color='0.5', linestyle='--', linewidth=0.5)@\\
-\mbox{}\verb@    plt.show()@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb9}{, 9}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
 
 \item{}
 \end{list}
-\end{minipage}\vspace{4ex}
+\vspace{4ex}
 \end{flushleft}
 %{/python-mode}%
 
+
+By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 
 
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap7}\raggedright\small
-\NWtarget{nuweb12}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {12}}$\,\rangle\equiv$
+\NWtarget{nuweb14}{} $\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize {14}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -658,9 +717,9 @@ up the package from another drone are shown in blue.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb9}{, 9}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
-
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@time_of_travel@\nobreak\ \NWlink{nuweb7a}{7a}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -677,7 +736,7 @@ up the package from another drone are shown in blue.
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap8}\raggedright\small
-\NWtarget{nuweb13}{} $\langle\,${\itshape PHO Run Handlers}\nobreak\ {\footnotesize {13}}$\,\rangle\equiv$
+\NWtarget{nuweb15}{} $\langle\,${\itshape PHO Run Handlers}\nobreak\ {\footnotesize {15}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -798,8 +857,8 @@ up the package from another drone are shown in blue.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb18}{18}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@single_pho_run_handler@\nobreak\ \NWlink{nuweb18}{18}.\item \NWtxtIdentsUsed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb7b}{7b}, \verb@Single_PHO_Input@\nobreak\ \NWlink{nuweb6}{6}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@single_pho_run_handler@\nobreak\ \NWlink{nuweb20}{20}.\item \NWtxtIdentsUsed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb7b}{7b}, \verb@Single_PHO_Input@\nobreak\ \NWlink{nuweb6}{6}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -812,16 +871,17 @@ up the package from another drone are shown in blue.
 \section{Chapter Index of Fragments}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$PHO Algorithms\nobreak\ {\footnotesize \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb9}{, 9}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb18}{18}.}
-\item $\langle\,$PHO Data Structures\nobreak\ {\footnotesize \NWlink{nuweb6}{6}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb18}{18}.}
-\item $\langle\,$PHO Run Handlers\nobreak\ {\footnotesize \NWlink{nuweb13}{13}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb18}{18}.}
+\item $\langle\,$PHO Algorithms\nobreak\ {\footnotesize \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20}{20}.}
+\item $\langle\,$PHO Data Structures\nobreak\ {\footnotesize \NWlink{nuweb6}{6}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20}{20}.}
+\item $\langle\,$PHO Run Handlers\nobreak\ {\footnotesize \NWlink{nuweb15}{15}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20}{20}.}
 \end{list}}
 \section{Chapter Index of Identifiers}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \verb@algo_odw@: \underline{\NWlink{nuweb7b}{7b}}\NWlink{nuweb13}{, 13}.
-\item \verb@Single_PHO_Input@: \underline{\NWlink{nuweb6}{6}}\NWlink{nuweb13}{, 13}.
-\item \verb@single_pho_run_handler@: \underline{\NWlink{nuweb13}{13}}\NWlink{nuweb18}{, 18}.
+\item \verb@algo_odw@: \underline{\NWlink{nuweb7b}{7b}}\NWlink{nuweb15}{, 15}.
+\item \verb@Single_PHO_Input@: \underline{\NWlink{nuweb6}{6}}\NWlink{nuweb15}{, 15}.
+\item \verb@single_pho_run_handler@: \underline{\NWlink{nuweb15}{15}}\NWlink{nuweb20}{, 20}.
+\item \verb@time_of_travel@: \underline{\NWlink{nuweb7a}{7a}}\NWlink{nuweb7b}{, 7b}\NWlink{nuweb14}{, 14}.
 \end{list}} 
 %------------------------------------------------------
 \nocite{*} % include everything in the bibtex file
@@ -837,7 +897,7 @@ up the package from another drone are shown in blue.
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap9}\raggedright\small
-\NWtarget{nuweb18}{} \verb@"../src/pho-main.py"@\nobreak\ {\footnotesize {18}}$\equiv$
+\NWtarget{nuweb20}{} \verb@"../src/pho-main.py"@\nobreak\ {\footnotesize {20}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -865,7 +925,7 @@ up the package from another drone are shown in blue.
 \mbox{}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape PHO Data Structures}\nobreak\ {\footnotesize \NWlink{nuweb6}{6}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize \NWlink{nuweb7a}{7a}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape PHO Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb13}{13}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape PHO Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb15}{15}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@# Set up logging information relevant to this module@\\
 \mbox{}\verb@logger=logging.getLogger(__name__)@\\
@@ -1140,7 +1200,7 @@ up the package from another drone are shown in blue.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtIdentsUsed\nobreak\  \verb@single_pho_run_handler@\nobreak\ \NWlink{nuweb13}{13}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@single_pho_run_handler@\nobreak\ \NWlink{nuweb15}{15}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -1152,7 +1212,7 @@ up the package from another drone are shown in blue.
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap10}\raggedright\small
-\NWtarget{nuweb23}{} \verb@"../src/utils_algo.py"@\nobreak\ {\footnotesize {23}}$\equiv$
+\NWtarget{nuweb25}{} \verb@"../src/utils_algo.py"@\nobreak\ {\footnotesize {25}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
@@ -1257,7 +1317,7 @@ up the package from another drone are shown in blue.
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap11}\raggedright\small
-\NWtarget{nuweb24}{} \verb@"../src/utils_graphics.py"@\nobreak\ {\footnotesize {24}}$\equiv$
+\NWtarget{nuweb26}{} \verb@"../src/utils_graphics.py"@\nobreak\ {\footnotesize {26}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
