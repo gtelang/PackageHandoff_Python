@@ -105,8 +105,8 @@ class Single_PHO_Input:
          
     def get_tour(self, algo):
            return algo( self.drone_info, self.source, self.target, 
-                        animate_tour_p = False,
-                        plot_tour_p    = True)
+                        animate_tour_p = True,
+                        plot_tour_p    = False)
 
     # Methods for \verb|ReverseHorseflyInput|
     def clearAllStates (self):
@@ -234,7 +234,12 @@ def algo_odw(drone_info, source, target,
          plt.show()
 
     if animate_tour_p:
-         print Fore.CYAN, "Animating the computed tour", Style.RESET_ALL
+
+        #ptraj  = zip(package_trail_cvx, used_drones + [None])
+        animate_tour(drone_info, [package_trail] , used_drones,
+                     animation_file_name_prefix='package_handoff_animation.mp4', 
+                     algo_name='odw',  
+                     render_trajectory_trails_p=True) 
     
     return used_drones, package_trail, mspan_straight, mspan_cvx, 
 @| algo_odw @}
@@ -379,9 +384,10 @@ def algo_pho_exact_given_order_of_drones ( drone_info, source, target ):
 
 \section{Plotting}
 
-We plot the tours onto a separate window if the switch \verb|plot_tour_p| is set to \verb|True| while calling the algorithm. 
-The path of the package is shown in bold red. The paths of the drones from their initial positions to the point where they pick 
-up the package from another drone are shown in blue.
+We plot the tours onto a separate window if the switch \verb|plot_tour_p| is set to \verb|True| 
+while calling the algorithm. The path of the package is shown in bold red. The paths of the drones 
+from their initial positions to the point where they pick up the package from another drone 
+are shown in blue.
 
 An example is shown below: 
 

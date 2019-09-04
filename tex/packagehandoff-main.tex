@@ -247,8 +247,8 @@ animation and plotting are requested they are done in separate windows each.
 \mbox{}\verb@         @\\
 \mbox{}\verb@    def get_tour(self, algo):@\\
 \mbox{}\verb@           return algo( self.drone_info, self.source, self.target, @\\
-\mbox{}\verb@                        animate_tour_p = False,@\\
-\mbox{}\verb@                        plot_tour_p    = True)@\\
+\mbox{}\verb@                        animate_tour_p = True,@\\
+\mbox{}\verb@                        plot_tour_p    = False)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Methods for \verb|ReverseHorseflyInput|@\\
 \mbox{}\verb@    def clearAllStates (self):@\\
@@ -406,7 +406,12 @@ The following function calculates the time taken for a drone to move between two
 \mbox{}\verb@         plt.show()@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    if animate_tour_p:@\\
-\mbox{}\verb@         print Fore.CYAN, "Animating the computed tour", Style.RESET_ALL@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@        #ptraj  = zip(package_trail_cvx, used_drones + [None])@\\
+\mbox{}\verb@        animate_tour(drone_info, [package_trail] , used_drones,@\\
+\mbox{}\verb@                     animation_file_name_prefix='package_handoff_animation.mp4', @\\
+\mbox{}\verb@                     algo_name='odw',  @\\
+\mbox{}\verb@                     render_trajectory_trails_p=True) @\\
 \mbox{}\verb@    @\\
 \mbox{}\verb@    return used_drones, package_trail, mspan_straight, mspan_cvx, @\\
 \mbox{}\verb@@{\NWsep}
@@ -593,9 +598,10 @@ The following function is just an implentation of the program above.
 
 \section{Plotting}
 
-We plot the tours onto a separate window if the switch \verb|plot_tour_p| is set to \verb|True| while calling the algorithm. 
-The path of the package is shown in bold red. The paths of the drones from their initial positions to the point where they pick 
-up the package from another drone are shown in blue.
+We plot the tours onto a separate window if the switch \verb|plot_tour_p| is set to \verb|True| 
+while calling the algorithm. The path of the package is shown in bold red. The paths of the drones 
+from their initial positions to the point where they pick up the package from another drone 
+are shown in blue.
 
 An example is shown below: 
 
@@ -973,32 +979,16 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 \mbox{}\verb@    applyAxCorrection(ax)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@def animate_tour (sites, phi, horse_trajectories, fly_trajectories, @\\
-\mbox{}\verb@                  animation_file_name_prefix, algo_name,  render_trajectory_trails_p = False):@\\
-\mbox{}\verb@    """ This function can handle the animation of multiple@\\
-\mbox{}\verb@    horses and flies even when the the fly trajectories are all squiggly@\\
-\mbox{}\verb@    and if the flies have to wait at the end of their trajectories. @\\
-\mbox{}\verb@    @\\
-\mbox{}\verb@    A fly trajectory should only be a list of points! The sites are always the @\\
-\mbox{}\verb@    first points on the trajectories. Any waiting for the flies, is assumed to be @\\
-\mbox{}\verb@    at the end of their trajectories where it waits for the horse to come @\\
-\mbox{}\verb@    and pick them up. @\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    Every point on the horse trajectory stores a list of indices of the flies@\\
-\mbox{}\verb@    collected at the end point. (The first point just stores the dummy value None). @\\
-\mbox{}\verb@    Usually these index lists will be size 1, but there may be heuristics where you @\\
-\mbox{}\verb@    might want to collect a bunch of them together since they may already be waiting @\\
-\mbox{}\verb@    there at the pick up point. @\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    For each drone collected, a yellow circle is placed on top of it, so that @\\
-\mbox{}\verb@    it is marked as collected to be able to see the progress of the visualization @\\
-\mbox{}\verb@    as it goes on. @\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    """@\\
-\mbox{}\verb@    import numpy as np@\\
+\mbox{}\verb@# A drone trajectory is [ idx,      ]@\\
+\mbox{}\verb@def animate_tour(drone_info, @\\
+\mbox{}\verb@                 package_trajectories, @\\
+\mbox{}\verb@                 used_drones, @\\
+\mbox{}\verb@                 animation_file_name_prefix, @\\
+\mbox{}\verb@                 algo_name,  @\\
+\mbox{}\verb@                 render_trajectory_trails_p = True):@\\
 \mbox{}\verb@    import matplotlib.animation as animation@\\
 \mbox{}\verb@    from   matplotlib.patches import Circle@\\
-\mbox{}\verb@    import matplotlib.pyplot as plt @\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Set up configurations and parameters for all necessary graphics@\\
 \mbox{}\verb@    plt.rc('text', usetex=True)@\\
@@ -1024,172 +1014,166 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 \mbox{}\verb@    ax.get_xaxis().set_ticklabels([])@\\
 \mbox{}\verb@    ax.get_yaxis().set_ticklabels([])@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    mspan, _ = makespan(horse_trajectories)@\\
-\mbox{}\verb@    ax.set_title("Algo: " + algo_name + "  Makespan: " + '%.4f' % mspan , fontsize=25)@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@    number_of_flies  = len(fly_trajectories)@\\
-\mbox{}\verb@    number_of_horses = len(horse_trajectories)@\\
-\mbox{}\verb@    colors           = utils_graphics.get_colors(number_of_horses, lightness=0.5)@\\
-\mbox{}\verb@        @\\
-\mbox{}\verb@    ax.set_xlabel( "Number of drones: " + str(number_of_flies) + "\n" + r"$\varphi=$ " + str(phi), fontsize=25)@\\
+\mbox{}\verb@    number_of_drones   = len(used_drones) # A drone trajectory consits of the id of the drone, followed by the actual trajectory trail@\\
+\mbox{}\verb@    number_of_packages = len(package_trajectories)@\\
+\mbox{}\verb@    colors             = utils_graphics.get_colors(number_of_packages, lightness=0.5)@\\
 \mbox{}\verb@    ims                = []@\\
 \mbox{}\verb@    @\\
-\mbox{}\verb@    # Constant for discretizing each segment inside the trajectories of the horses@\\
-\mbox{}\verb@    # and flies. @\\
-\mbox{}\verb@    NUM_SUB_LEGS              = 2 # Number of subsegments within each segment of every trajectory@\\
+\mbox{}\verb@    # Constant for discretizing each segment inside the trajectories of the packages and drones@\\
+\mbox{}\verb@    NUM_SUB_LEGS              = 50 # Number of subsegments within each segment of every trajectory@\\
 \mbox{}\verb@    @\\
-\mbox{}\verb@    # Arrays keeping track of the states of the horses@\\
-\mbox{}\verb@    horses_reached_endpt_p    = [False for i in range(number_of_horses)]@\\
-\mbox{}\verb@    horses_traj_num_legs      = [len(traj)-1 for traj in horse_trajectories] # the -1 is because the initial position of the horse is always included. @\\
-\mbox{}\verb@    horses_current_leg_idx    = [0 for i in range(number_of_horses)]@\\
-\mbox{}\verb@    horses_current_subleg_idx = [0 for i in range(number_of_horses)] @\\
-\mbox{}\verb@    horses_current_posn       = [traj[0]['coords'] for traj in horse_trajectories]@\\
+\mbox{}\verb@    # Arrays keeping track of the states of the packages@\\
+\mbox{}\verb@    packages_reached_endpt_p    = [False        for  i    in range(number_of_packages)]@\\
+\mbox{}\verb@    packages_traj_num_legs      = [len(traj)-1  for  traj in package_trajectories     ] # the -1 is because the initial position of the package is always included. @\\
+\mbox{}\verb@    packages_current_leg_idx    = [0            for  i    in range(number_of_packages)]@\\
+\mbox{}\verb@    packages_current_subleg_idx = [0            for  i    in range(number_of_packages)] @\\
+\mbox{}\verb@    packages_current_posn       = [traj[0]      for traj in package_trajectories    ]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    # List of arrays keeping track of the flies collected by the horses at any given point in time, @\\
-\mbox{}\verb@    fly_idxs_collected_so_far = [[] for i in range(number_of_horses)] @\\
+\mbox{}\verb@    # Arrays keeping track of the states of the drones@\\
+\mbox{}\verb@    drones_reached_rendz_p    = [False          for  i    in range(number_of_drones)]@\\
+\mbox{}\verb@    drones_current_subleg_idx = [0              for i    in range(number_of_drones) ] @\\
+\mbox{}\verb@    drones_current_posn       = [drone[0]       for drone in drone_info             ]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    # Arrays keeping track of the states of the flies@\\
-\mbox{}\verb@    flies_reached_endpt_p    = [False for i in range(number_of_flies)]@\\
-\mbox{}\verb@    flies_traj_num_legs      = [len(traj)-1 for traj in fly_trajectories]@\\
-\mbox{}\verb@    flies_current_leg_idx    = [0 for i in range(number_of_flies)]@\\
-\mbox{}\verb@    flies_current_subleg_idx = [0 for i in range(number_of_flies)] @\\
-\mbox{}\verb@    flies_current_posn       = [traj[0] for traj in fly_trajectories]@\\
+\mbox{}\verb@    ptraj               = package_trajectories[0]@\\
+\mbox{}\verb@    drones_trajectories = zip(drones_current_posn, ptraj)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    # The drone collection process ends, when all the flies AND horses @\\
-\mbox{}\verb@    # have reached their ends. Some heuristics, might involve the flies @\\
-\mbox{}\verb@    # or the horses waiting at the endpoints of their respective trajectories. @\\
+\mbox{}\verb@    # The drone collection process ends, when all packages reach their endpoints@\\
 \mbox{}\verb@    image_frame_counter = 0@\\
-\mbox{}\verb@    while not(all(horses_reached_endpt_p + flies_reached_endpt_p)): @\\
+\mbox{}\verb@    while not(all(packages_reached_endpt_p)): @\\
+\mbox{}\verb@        #-----------------------------------------@\\
+\mbox{}\verb@        # Update the states of all the packages@\\
+\mbox{}\verb@        #-----------------------------------------@\\
+\mbox{}\verb@        for pkgidx in range(number_of_packages):@\\
+\mbox{}\verb@            #if packages_reached_endpt_p[pkgidx] == False:@\\
+\mbox{}\verb@            #    if drones_reached_rendz_p[0] == True:  # any updates to package trajectory happen only if the first drone has reached the package initial position@\\
+\mbox{}\verb@                  ptraj = package_trajectories[pkgidx]@\\
+\mbox{}\verb@                  if packages_current_subleg_idx[pkgidx] <= NUM_SUB_LEGS-2:@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@        # Update the states of all the horses@\\
-\mbox{}\verb@        for hidx in range(number_of_horses):@\\
-\mbox{}\verb@            if horses_reached_endpt_p[hidx] == False:@\\
-\mbox{}\verb@                htraj                       = [elt['coords'] for elt in horse_trajectories[hidx]]@\\
-\mbox{}\verb@                all_flys_collected_by_horse = [i             for elt in horse_trajectories[hidx] for i in elt['fly_idxs_picked_up']]@\\
+\mbox{}\verb@                    packages_current_subleg_idx[pkgidx] += 1     # subleg idx changes@\\
+\mbox{}\verb@                    legidx    = packages_current_leg_idx[pkgidx] # the legidx remains the same@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                if horses_current_subleg_idx[hidx] <= NUM_SUB_LEGS-2:@\\
+\mbox{}\verb@                    sublegidx = packages_current_subleg_idx[pkgidx] # shorthand for easier reference in the next two lines@\\
+\mbox{}\verb@                    xcurr = np.linspace( ptraj[legidx][0], ptraj[legidx+1][0], NUM_SUB_LEGS+1 )[sublegidx]@\\
+\mbox{}\verb@                    ycurr = np.linspace( ptraj[legidx][1], ptraj[legidx+1][1], NUM_SUB_LEGS+1 )[sublegidx]@\\
+\mbox{}\verb@                    packages_current_posn[pkgidx]  = [xcurr, ycurr]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                    horses_current_subleg_idx[hidx] += 1     # subleg idx changes@\\
-\mbox{}\verb@                    legidx    = horses_current_leg_idx[hidx] # the legidx remains the same@\\
-\mbox{}\verb@                    @\\
-\mbox{}\verb@                    sublegidx = horses_current_subleg_idx[hidx] # shorthand for easier reference in the next two lines@\\
-\mbox{}\verb@                    xcurr = np.linspace( htraj[legidx][0], htraj[legidx+1][0], NUM_SUB_LEGS+1 )[sublegidx]@\\
-\mbox{}\verb@                    ycurr = np.linspace( htraj[legidx][1], htraj[legidx+1][1], NUM_SUB_LEGS+1 )[sublegidx]@\\
-\mbox{}\verb@                    horses_current_posn[hidx]  = [xcurr, ycurr] @\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                    @\\
-\mbox{}\verb@                else:@\\
-\mbox{}\verb@                    horses_current_subleg_idx[hidx] = 0 # reset to 0@\\
-\mbox{}\verb@                    horses_current_leg_idx[hidx]   += 1 # you have passed onto the next leg@\\
-\mbox{}\verb@                    legidx    = horses_current_leg_idx[hidx]@\\
+\mbox{}\verb@                  else:@\\
+\mbox{}\verb@                    packages_current_subleg_idx[pkgidx] = 0 # reset to 0@\\
+\mbox{}\verb@                    packages_current_leg_idx[pkgidx]   += 1 # you have passed onto the next leg@\\
+\mbox{}\verb@                    legidx    = packages_current_leg_idx[pkgidx]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                    xcurr, ycurr = htraj[legidx][0], htraj[legidx][1] # current position is the zeroth point on the next leg@\\
-\mbox{}\verb@                    horses_current_posn[hidx]  = [xcurr , ycurr] @\\
+\mbox{}\verb@                    xcurr, ycurr = ptraj[legidx][0], ptraj[legidx][1] # current position is the zeroth point on the next leg@\\
+\mbox{}\verb@                    packages_current_posn[pkgidx]  = [xcurr , ycurr]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                    if horses_current_leg_idx[hidx] == horses_traj_num_legs[hidx]:@\\
-\mbox{}\verb@                        horses_reached_endpt_p[hidx] = True@\\
+\mbox{}\verb@                    if packages_current_leg_idx[pkgidx] == packages_traj_num_legs[pkgidx]:@\\
+\mbox{}\verb@                        packages_reached_endpt_p[pkgidx] = True@\\
+\mbox{}\verb@ @\\
+\mbox{}\verb@        #-------------------------------------@\\
+\mbox{}\verb@        # Update the states of all the drones@\\
+\mbox{}\verb@        #-------------------------------------@\\
+\mbox{}\verb@        for dridx in range(number_of_drones):@\\
+\mbox{}\verb@                  dtraj = drones_trajectories[dridx]@\\
+\mbox{}\verb@                  if drones_current_subleg_idx[dridx] <= NUM_SUB_LEGS-2:@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                ####################......for marking in yellow during rendering@\\
-\mbox{}\verb@                fly_idxs_collected_so_far[hidx].extend(horse_trajectories[hidx][legidx]['fly_idxs_picked_up'])@\\
-\mbox{}\verb@                fly_idxs_collected_so_far[hidx] = list(set(fly_idxs_collected_so_far[hidx])) ### critical line, to remove duplicate elements # https://stackoverflow.com/a/7961390@\\
+\mbox{}\verb@                    drones_current_subleg_idx[dridx] += 1     # subleg idx changes@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@        # Update the states of all the flies@\\
-\mbox{}\verb@        for fidx in range(number_of_flies):@\\
-\mbox{}\verb@            if flies_reached_endpt_p[fidx] == False:@\\
-\mbox{}\verb@                ftraj  = fly_trajectories[fidx]@\\
+\mbox{}\verb@                    sublegidx = drones_current_subleg_idx[dridx] # shorthand for easier reference in the next two lines@\\
+\mbox{}\verb@                    xcurr = np.linspace( dtraj[0][0], dtraj[1][0], NUM_SUB_LEGS+1 )[sublegidx]@\\
+\mbox{}\verb@                    ycurr = np.linspace( dtraj[0][1], dtraj[1][1], NUM_SUB_LEGS+1 )[sublegidx]@\\
+\mbox{}\verb@                    drones_current_posn[dridx]  = [xcurr, ycurr]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                if flies_current_subleg_idx[fidx] <= NUM_SUB_LEGS-2:@\\
-\mbox{}\verb@                    @\\
-\mbox{}\verb@                    flies_current_subleg_idx[fidx] += 1@\\
-\mbox{}\verb@                    legidx    = flies_current_leg_idx[fidx]@\\
+\mbox{}\verb@                  else:@\\
+\mbox{}\verb@                    drones_current_subleg_idx[dridx] = 0 # reset to 0@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                    sublegidx = flies_current_subleg_idx[fidx]@\\
-\mbox{}\verb@                    xcurr = np.linspace( ftraj[legidx][0], ftraj[legidx+1][0], NUM_SUB_LEGS+1 )[sublegidx]@\\
-\mbox{}\verb@                    ycurr = np.linspace( ftraj[legidx][1], ftraj[legidx+1][1], NUM_SUB_LEGS+1 )[sublegidx]@\\
-\mbox{}\verb@                    flies_current_posn[fidx]  = [xcurr, ycurr] @\\
+\mbox{}\verb@                    xcurr, ycurr = dtraj[0][0], dtraj[0][1] # current position is the zeroth point on the next leg@\\
+\mbox{}\verb@                    drones_current_posn[dridx]  = [xcurr , ycurr]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                else:@\\
-\mbox{}\verb@                    flies_current_subleg_idx[fidx] = 0 # reset to zero@\\
-\mbox{}\verb@                    flies_current_leg_idx[fidx]   += 1 # you have passed onto the next leg@\\
-\mbox{}\verb@                    legidx    = flies_current_leg_idx[fidx]@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@                    xcurr, ycurr = ftraj[legidx][0], ftraj[legidx][1] # current position is the zeroth point on the next leg@\\
-\mbox{}\verb@                    flies_current_posn[fidx]  = [xcurr , ycurr] @\\
-\mbox{}\verb@@\\
-\mbox{}\verb@                    if flies_current_leg_idx[fidx] == flies_traj_num_legs[fidx]:@\\
-\mbox{}\verb@                        flies_reached_endpt_p[fidx] = True@\\
-\mbox{}\verb@@\\
+\mbox{}\verb@                    if drones_current_subleg_idx[dridx] == NUM_SUB_LEGS:@\\
+\mbox{}\verb@                        drones_reached_rendz_p[dridx] = True@\\
+\mbox{}\verb@           @\\
+\mbox{}\verb@         @\\
+\mbox{}\verb@        #----------------@\\
+\mbox{}\verb@        # Rendering@\\
+\mbox{}\verb@        #----------------@\\
 \mbox{}\verb@        objs = []@\\
-\mbox{}\verb@        # Render all the horse trajectories uptil this point in time. @\\
-\mbox{}\verb@        for hidx in range(number_of_horses):@\\
-\mbox{}\verb@            traj               = [elt['coords'] for elt in horse_trajectories[hidx]]@\\
-\mbox{}\verb@            current_horse_posn = horses_current_posn[hidx]@\\
-\mbox{}\verb@            @\\
-\mbox{}\verb@            if horses_current_leg_idx[hidx] != horses_traj_num_legs[hidx]: # the horse is still moving@\\
+\mbox{}\verb@        # Render all the package trajectories uptil this point in time.  @\\
+\mbox{}\verb@        for pkgidx in range(number_of_packages):@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                  xhs = [traj[k][0] for k in range(1+horses_current_leg_idx[hidx])] + [current_horse_posn[0]]@\\
-\mbox{}\verb@                  yhs = [traj[k][1] for k in range(1+horses_current_leg_idx[hidx])] + [current_horse_posn[1]]@\\
+\mbox{}\verb@          traj                 = package_trajectories[pkgidx]@\\
+\mbox{}\verb@          current_package_posn = np.asarray(packages_current_posn[pkgidx])@\\
+\mbox{}\verb@          drcurrposn           = np.asarray( drones_current_posn[0]  )@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@            else: # The horse has stopped moving@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@          if np.linalg.norm(current_package_posn - drcurrposn) < 1e-1: # advance package only if it has been touhed by drone@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@            if packages_current_leg_idx[pkgidx] != packages_traj_num_legs[pkgidx]: # the package is still moving@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                  xhs = [traj[k][0] for k in range(1+packages_current_leg_idx[pkgidx])] + [current_package_posn[0]]@\\
+\mbox{}\verb@                  yhs = [traj[k][1] for k in range(1+packages_current_leg_idx[pkgidx])] + [current_package_posn[1]]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@            else: # The package has stopped moving@\\
 \mbox{}\verb@                  xhs = [x for (x,y) in traj]@\\
 \mbox{}\verb@                  yhs = [y for (x,y) in traj]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@            horseline, = ax.plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=0.80, color='#D13131')@\\
-\mbox{}\verb@            horseloc   = Circle((current_horse_posn[0], current_horse_posn[1]), 0.015, facecolor = '#D13131', edgecolor='k',  alpha=1.00)@\\
-\mbox{}\verb@            horsepatch = ax.add_patch(horseloc)@\\
-\mbox{}\verb@            objs.append(horseline)@\\
-\mbox{}\verb@            objs.append(horsepatch)@\\
+\mbox{}\verb@            print "-----------------------------------------------------"@\\
+\mbox{}\verb@            print Fore.RED, "plotting package line", Style.RESET_ALL@\\
+\mbox{}\verb@            print "-----------------------------------------------------"@\\
+\mbox{}\verb@            packageline, = ax.plot(np.asarray(xhs),np.asarray(yhs),'o-', @\\
+\mbox{}\verb@                                   linewidth=5.0,markersize=10, alpha=0.8, color='#D13131')@\\
+\mbox{}\verb@            packageloc   = Circle( np.asarray([current_package_posn[0], current_package_posn[1]]), 0.015, @\\
+\mbox{}\verb@                                    facecolor = '#D13131', @\\
+\mbox{}\verb@                                    edgecolor='k',  @\\
+\mbox{}\verb@                                    alpha=1.00)@\\
+\mbox{}\verb@            packagepatch = ax.add_patch(packageloc)@\\
+\mbox{}\verb@            objs.append(packageline)@\\
+\mbox{}\verb@            objs.append(packagepatch)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@        # Render all fly trajectories uptil this point in time@\\
-\mbox{}\verb@        for fidx in range(number_of_flies):@\\
-\mbox{}\verb@            traj               = fly_trajectories[fidx]@\\
-\mbox{}\verb@            current_fly_posn   = flies_current_posn[fidx]@\\
-\mbox{}\verb@            @\\
-\mbox{}\verb@            if flies_current_leg_idx[fidx] != flies_traj_num_legs[fidx]: # the fly is still moving@\\
+\mbox{}\verb@        # Render all the drone trajectories   uptil this point in time@\\
+\mbox{}\verb@        for dridx in range(number_of_drones):@\\
+\mbox{}\verb@            traj                 = drones_trajectories[dridx]@\\
+\mbox{}\verb@            current_drone_posn = drones_current_posn[dridx]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@                  xfs = [traj[k][0] for k in range(1+flies_current_leg_idx[fidx])] + [current_fly_posn[0]]@\\
-\mbox{}\verb@                  yfs = [traj[k][1] for k in range(1+flies_current_leg_idx[fidx])] + [current_fly_posn[1]]@\\
+\mbox{}\verb@            if drones_current_subleg_idx[dridx] != NUM_SUB_LEGS-1 : # the drone is still moving@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@            else: # The fly has stopped moving@\\
-\mbox{}\verb@                  xfs = [x for (x,y) in traj]@\\
-\mbox{}\verb@                  yfs = [y for (x,y) in traj]@\\
+\mbox{}\verb@                  xhs = [ traj[0][0] ] + [current_drone_posn[0]]@\\
+\mbox{}\verb@                  yhs = [ traj[0][1] ] + [current_drone_posn[1]]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@            if render_trajectory_trails_p:@\\
-\mbox{}\verb@                flyline, = ax.plot(xfs,yfs,'-',linewidth=2.5, markersize=6, alpha=0.32, color='b')@\\
-\mbox{}\verb@                objs.append(flyline)@\\
+\mbox{}\verb@            else: # The drone has stopped moving@\\
+\mbox{}\verb@                  xhs = [x for (x,y) in traj]@\\
+\mbox{}\verb@                  yhs = [y for (x,y) in traj]@\\
 \mbox{}\verb@@\\
+\mbox{}\verb@            print "-----------------------------------------------------"@\\
+\mbox{}\verb@            print Fore.RED, "plotting drone line", Style.RESET_ALL@\\
+\mbox{}\verb@            print "-----------------------------------------------------"@\\
+\mbox{}\verb@            droneline, = ax.plot(np.asarray(xhs),np.asarray(yhs),'o-', @\\
+\mbox{}\verb@                                   linewidth=5.0,markersize=10, alpha=0.8, color='g')@\\
+\mbox{}\verb@            droneloc   = Circle( np.asarray([current_drone_posn[0], current_drone_posn[1]]), 0.015, @\\
+\mbox{}\verb@                                    facecolor = 'g', @\\
+\mbox{}\verb@                                    edgecolor='g',  @\\
+\mbox{}\verb@                                    alpha=1.00)@\\
+\mbox{}\verb@            dronepatch = ax.add_patch(droneloc)@\\
+\mbox{}\verb@            objs.append(droneline)@\\
+\mbox{}\verb@            objs.append(dronepatch)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@            # If the current fly is in the list of flies already collected by some horse, @\\
-\mbox{}\verb@            # mark this fly with yellow. If it hasn't been serviced yet, mark it with blue@\\
-\mbox{}\verb@            service_status_col = 'b'@\\
-\mbox{}\verb@            for hidx in range(number_of_horses):@\\
-\mbox{}\verb@                #print fly_idxs_collected_so_far[hidx]@\\
-\mbox{}\verb@                if fidx in fly_idxs_collected_so_far[hidx]:@\\
-\mbox{}\verb@                    service_status_col = 'y'@\\
-\mbox{}\verb@                    break@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@            flyloc   = Circle((current_fly_posn[0], current_fly_posn[1]), 0.013, @\\
-\mbox{}\verb@                              facecolor = service_status_col, edgecolor='k', alpha=1.00)@\\
-\mbox{}\verb@            flypatch = ax.add_patch(flyloc)@\\
-\mbox{}\verb@            objs.append(flypatch)@\\
-\mbox{}\verb@        @\\
 \mbox{}\verb@        print "........................"@\\
 \mbox{}\verb@        print "Appending to ims ", image_frame_counter@\\
 \mbox{}\verb@        ims.append(objs) @\\
 \mbox{}\verb@        image_frame_counter += 1@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    from colorama import Back @\\
-\mbox{}\verb@   @\\
-\mbox{}\verb@    debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)@\\
-\mbox{}\verb@    ani = animation.ArtistAnimation(fig, ims, interval=70, blit=True, repeat=True, repeat_delay=500)@\\
-\mbox{}\verb@    debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)@\\
+\mbox{}\verb@    debug(Fore.CYAN + "\nStarted constructing ani object"+ Style.RESET_ALL)@\\
+\mbox{}\verb@    ani = animation.ArtistAnimation(fig, ims, interval=200, blit=True)@\\
+\mbox{}\verb@    debug(Fore.CYAN + "\nFinished constructing ani object"+ Style.RESET_ALL)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    #debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)@\\
 \mbox{}\verb@    #ani.save(animation_file_name_prefix+'.avi', dpi=100)@\\
-\mbox{}\verb@    #ani.save('reverse_horsefly.avi', dpi=300)@\\
-\mbox{}\verb@    debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)@\\
-\mbox{}\verb@@\\
+\mbox{}\verb@    #debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)@\\
+\mbox{}\verb@    @\\
 \mbox{}\verb@    plt.show()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@if __name__=="__main__":@\\
 \mbox{}\verb@     print "Running Package Handoff"@\\
@@ -1212,7 +1196,7 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap10}\raggedright\small
-\NWtarget{nuweb25}{} \verb@"../src/utils_algo.py"@\nobreak\ {\footnotesize {25}}$\equiv$
+\NWtarget{nuweb24}{} \verb@"../src/utils_algo.py"@\nobreak\ {\footnotesize {24}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\

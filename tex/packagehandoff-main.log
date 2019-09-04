@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.9.1)  3 SEP 2019 23:04
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.5.20)  4 SEP 2019 03:35
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -2158,92 +2158,88 @@ vex Optimization", source, target, drone_info, used_drones, package_trail_cvx)
  
  []
 
-[9] <images/pho-cvx.pdf, id=213, 593.7218pt x 471.68246pt>
+LaTeX Font Info:    Try loading font information for TS1+zi4 on input line 412.
+
+(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
+File: ts1zi4.fd 2014/06/22 Fontinst v1.933 font definitions for TS1/zi4.
+) [9]
+<images/pho-cvx.pdf, id=214, 593.7218pt x 471.68246pt>
 File: images/pho-cvx.pdf Graphic file (type pdf)
 
 <use images/pho-cvx.pdf>
-Package pdftex.def Info: images/pho-cvx.pdf used on input line 504.
+Package pdftex.def Info: images/pho-cvx.pdf used on input line 509.
 (pdftex.def)             Requested size: 284.52756pt x 226.03795pt.
  [10]
-Overfull \hbox (6.79999pt too wide) in paragraph at lines 516--533
+Overfull \hbox (6.79999pt too wide) in paragraph at lines 521--538
 [] 
  []
 
 [11 <./images/pho-cvx.pdf>]
-<images/pho_example_plot.pdf, id=232, 487.8225pt x 495.8525pt>
+<images/pho_example_plot.pdf, id=233, 487.8225pt x 495.8525pt>
 File: images/pho_example_plot.pdf Graphic file (type pdf)
 
 <use images/pho_example_plot.pdf>
-Package pdftex.def Info: images/pho_example_plot.pdf used on input line 606.
+Package pdftex.def Info: images/pho_example_plot.pdf used on input line 612.
 (pdftex.def)             Requested size: 227.62204pt x 231.37103pt.
- [12 <./images/pho_example_plot.pdf>]
-LaTeX Font Info:    Try loading font information for TS1+zi4 on input line 630.
-
-
-(/usr/share/texlive/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
-File: ts1zi4.fd 2014/06/22 Fontinst v1.933 font definitions for TS1/zi4.
-) [13] [14]
-[15] [16] (./packagehandoff-main.bbl (./packagehandoff-main.brf)
+ [12 <./images/pho_example_plot.pdf>] [13]
+[14] [15] [16] (./packagehandoff-main.bbl (./packagehandoff-main.brf)
 \tf@brf=\write11
 \openout11 = `packagehandoff-main.brf'.
 
- [17]) [18
+ [17])
+[18
 
-]
-[19
+] [19
 
 
 ]
 Appendix A.
 [20
 
-] [21]
-Overfull \hbox (133.29785pt too wide) in paragraph at lines 1043--1043
-[][][]    \T1/zi4/m/n/9 horses_traj_num_legs      = [len(traj)-1 for traj in ho
-rse_trajectories] # the -1 is because the initial position of the horse is alwa
-ys included.  
+]
+Overfull \hbox (64.89783pt too wide) in paragraph at lines 1017--1017
+[][][]    \T1/zi4/m/n/9 number_of_drones   = len(used_drones) # A drone traject
+ory consits of the id of the drone, followed by the actual trajectory trail  
+ []
+
+[21]
+Overfull \hbox (185.4979pt too wide) in paragraph at lines 1027--1027
+[][][]    \T1/zi4/m/n/9 packages_traj_num_legs      = [len(traj)-1  for  traj i
+n package_trajectories     ] # the -1 is because the initial position of the pa
+ckage is always included.  
  []
 
 
-Overfull \hbox (44.1979pt too wide) in paragraph at lines 1068--1068
-[][][]                \T1/zi4/m/n/9 all_flys_collected_by_horse = [i           
-  for elt in horse_trajectories[hidx] for i in elt[\TS1/zi4/m/n/9 '\T1/zi4/m/n/
-9 fly_idxs_picked_up\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 ]]  
+Overfull \hbox (183.6979pt too wide) in paragraph at lines 1048--1048
+[][][]            \T1/zi4/m/n/9 #    if drones_reached_rendz_p[0] == True:  # a
+ny updates to package trajectory happen only if the first drone has reached the
+ package initial position  
+ []
+
+
+Overfull \hbox (4.59787pt too wide) in paragraph at lines 1055--1055
+[][][]                    \T1/zi4/m/n/9 sublegidx = packages_current_subleg_idx
+[pkgidx] # shorthand for easier reference in the next two lines  
+ []
+
+
+Overfull \hbox (10.89789pt too wide) in paragraph at lines 1066--1066
+[][][]                    \T1/zi4/m/n/9 xcurr, ycurr = ptraj[legidx][0], ptraj[
+legidx][1] # current position is the zeroth point on the next leg  
  []
 
 [22]
-Overfull \hbox (10.89789pt too wide) in paragraph at lines 1086--1086
-[][][]                    \T1/zi4/m/n/9 xcurr, ycurr = htraj[legidx][0], htraj[
-legidx][1] # current position is the zeroth point on the next leg  
+Overfull \hbox (18.99783pt too wide) in paragraph at lines 1108--1108
+[][][]          \T1/zi4/m/n/9 if np.linalg.norm(current_package_posn - drcurrpo
+sn) < 1e-1: # advance package only if it has been touhed by drone  
  []
 
-
-Overfull \hbox (261.09784pt too wide) in paragraph at lines 1094--1094
-[][][]                \T1/zi4/m/n/9 fly_idxs_collected_so_far[hidx] = list(set(
-fly_idxs_collected_so_far[hidx])) ### critical line, to remove duplicate elemen
-ts # https://stackoverflow.com/a/7961390  
- []
-
-
-Overfull \hbox (10.89789pt too wide) in paragraph at lines 1116--1116
-[][][]                    \T1/zi4/m/n/9 xcurr, ycurr = ftraj[legidx][0], ftraj[
-legidx][1] # current position is the zeroth point on the next leg  
- []
-
-
-Overfull \hbox (79.29782pt too wide) in paragraph at lines 1138--1138
-[][][]            \T1/zi4/m/n/9 horseloc   = Circle((current_horse_posn[0], cur
-rent_horse_posn[1]), 0.015, facecolor = \TS1/zi4/m/n/9 '\T1/zi4/m/n/9 #D13131\T
-S1/zi4/m/n/9 '\T1/zi4/m/n/9 , edgecolor=\TS1/zi4/m/n/9 '\T1/zi4/m/n/9 k\TS1/zi4
-/m/n/9 '\T1/zi4/m/n/9 ,  alpha=1.00)  
- []
-
-[23] [24] [25] [26] [27]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1368.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1368.
+[23] [24] [25] [26]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1352.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1352.
  (./packagehandoff-main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1368.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1368.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1352.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1352.
 
 Package rerunfilecheck Info: File `packagehandoff-main.out' has not changed.
 (rerunfilecheck)             Checksum: 4BBADF213895FCBD9D2893A5795CC2D3;832.
@@ -2251,9 +2247,9 @@ Package rerunfilecheck Info: File `packagehandoff-main.brf' has not changed.
 (rerunfilecheck)             Checksum: B776E13FED08F1A3000828BC31FB053B;357.
  ) 
 Here is how much of TeX's memory you used:
- 35981 strings out of 493029
- 655393 string characters out of 6136235
- 1255080 words of memory out of 5000000
+ 35980 strings out of 493029
+ 655386 string characters out of 6136234
+ 1255082 words of memory out of 5000000
  38744 multiletter control sequences out of 15000+600000
  30513 words of font info for 88 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -2297,10 +2293,10 @@ xmf/fonts/type1/public/cm-super/sfrm2488.pfb></usr/share/texmf/fonts/type1/publ
 ic/cm-super/sfti0600.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfti0700
 .pfb></usr/share/texmf/fonts/type1/public/cm-super/sfti0900.pfb></usr/share/tex
 mf/fonts/type1/public/cm-super/sfti1000.pfb>
-Output written on packagehandoff-main.pdf (27 pages, 542056 bytes).
+Output written on packagehandoff-main.pdf (26 pages, 540844 bytes).
 PDF statistics:
- 508 PDF objects out of 1000 (max. 8388607)
- 414 compressed objects within 5 object streams
- 76 named destinations out of 1000 (max. 500000)
+ 504 PDF objects out of 1000 (max. 8388607)
+ 411 compressed objects within 5 object streams
+ 75 named destinations out of 1000 (max. 500000)
  142 words of extra memory for PDF output out of 10000 (max. 10000000)
 

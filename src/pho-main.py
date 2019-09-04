@@ -37,8 +37,8 @@ class Single_PHO_Input:
          
     def get_tour(self, algo):
            return algo( self.drone_info, self.source, self.target, 
-                        animate_tour_p = False,
-                        plot_tour_p    = True)
+                        animate_tour_p = True,
+                        plot_tour_p    = False)
 
     # Methods for \verb|ReverseHorseflyInput|
     def clearAllStates (self):
@@ -145,7 +145,12 @@ def algo_odw(drone_info, source, target,
          plt.show()
 
     if animate_tour_p:
-         print Fore.CYAN, "Animating the computed tour", Style.RESET_ALL
+
+        #ptraj  = zip(package_trail_cvx, used_drones + [None])
+        animate_tour(drone_info, [package_trail] , used_drones,
+                     animation_file_name_prefix='package_handoff_animation.mp4', 
+                     algo_name='odw',  
+                     render_trajectory_trails_p=True) 
     
     return used_drones, package_trail, mspan_straight, mspan_cvx, 
 
@@ -474,32 +479,16 @@ def clearAxPolygonPatches(ax):
     applyAxCorrection(ax)
 
 
-def animate_tour (sites, phi, horse_trajectories, fly_trajectories, 
-                  animation_file_name_prefix, algo_name,  render_trajectory_trails_p = False):
-    """ This function can handle the animation of multiple
-    horses and flies even when the the fly trajectories are all squiggly
-    and if the flies have to wait at the end of their trajectories. 
-    
-    A fly trajectory should only be a list of points! The sites are always the 
-    first points on the trajectories. Any waiting for the flies, is assumed to be 
-    at the end of their trajectories where it waits for the horse to come 
-    and pick them up. 
 
-    Every point on the horse trajectory stores a list of indices of the flies
-    collected at the end point. (The first point just stores the dummy value None). 
-    Usually these index lists will be size 1, but there may be heuristics where you 
-    might want to collect a bunch of them together since they may already be waiting 
-    there at the pick up point. 
-
-    For each drone collected, a yellow circle is placed on top of it, so that 
-    it is marked as collected to be able to see the progress of the visualization 
-    as it goes on. 
-
-    """
-    import numpy as np
+# A drone trajectory is [ idx,      ]
+def animate_tour(drone_info, 
+                 package_trajectories, 
+                 used_drones, 
+                 animation_file_name_prefix, 
+                 algo_name,  
+                 render_trajectory_trails_p = True):
     import matplotlib.animation as animation
     from   matplotlib.patches import Circle
-    import matplotlib.pyplot as plt 
 
     # Set up configurations and parameters for all necessary graphics
     plt.rc('text', usetex=True)
@@ -525,172 +514,167 @@ def animate_tour (sites, phi, horse_trajectories, fly_trajectories,
     ax.get_xaxis().set_ticklabels([])
     ax.get_yaxis().set_ticklabels([])
 
-    mspan, _ = makespan(horse_trajectories)
-    ax.set_title("Algo: " + algo_name + "  Makespan: " + '%.4f' % mspan , fontsize=25)
-
-    number_of_flies  = len(fly_trajectories)
-    number_of_horses = len(horse_trajectories)
-    colors           = utils_graphics.get_colors(number_of_horses, lightness=0.5)
-        
-    ax.set_xlabel( "Number of drones: " + str(number_of_flies) + "\n" + r"$\varphi=$ " + str(phi), fontsize=25)
+    number_of_drones   = len(used_drones) # A drone trajectory consits of the id of the drone, followed by the actual trajectory trail
+    number_of_packages = len(package_trajectories)
+    colors             = utils_graphics.get_colors(number_of_packages, lightness=0.5)
     ims                = []
     
-    # Constant for discretizing each segment inside the trajectories of the horses
-    # and flies. 
-    NUM_SUB_LEGS              = 2 # Number of subsegments within each segment of every trajectory
+    # Constant for discretizing each segment inside the trajectories of the packages and drones
+    NUM_SUB_LEGS              = 50 # Number of subsegments within each segment of every trajectory
     
-    # Arrays keeping track of the states of the horses
-    horses_reached_endpt_p    = [False for i in range(number_of_horses)]
-    horses_traj_num_legs      = [len(traj)-1 for traj in horse_trajectories] # the -1 is because the initial position of the horse is always included. 
-    horses_current_leg_idx    = [0 for i in range(number_of_horses)]
-    horses_current_subleg_idx = [0 for i in range(number_of_horses)] 
-    horses_current_posn       = [traj[0]['coords'] for traj in horse_trajectories]
+    # Arrays keeping track of the states of the packages
+    packages_reached_endpt_p    = [False        for  i    in range(number_of_packages)]
+    packages_traj_num_legs      = [len(traj)-1  for  traj in package_trajectories     ] # the -1 is because the initial position of the package is always included. 
+    packages_current_leg_idx    = [0            for  i    in range(number_of_packages)]
+    packages_current_subleg_idx = [0            for  i    in range(number_of_packages)] 
+    packages_current_posn       = [traj[0]      for traj in package_trajectories    ]
 
-    # List of arrays keeping track of the flies collected by the horses at any given point in time, 
-    fly_idxs_collected_so_far = [[] for i in range(number_of_horses)] 
+    # Arrays keeping track of the states of the drones
+    drones_reached_rendz_p    = [False                for  i    in range(number_of_drones) ]
+    drones_current_subleg_idx = [0                    for i     in range(number_of_drones) ] 
+    drones_current_posn       = [drone_info[idx][0]   for idx   in used_drones             ]
 
-    # Arrays keeping track of the states of the flies
-    flies_reached_endpt_p    = [False for i in range(number_of_flies)]
-    flies_traj_num_legs      = [len(traj)-1 for traj in fly_trajectories]
-    flies_current_leg_idx    = [0 for i in range(number_of_flies)]
-    flies_current_subleg_idx = [0 for i in range(number_of_flies)] 
-    flies_current_posn       = [traj[0] for traj in fly_trajectories]
+    ptraj               = package_trajectories[0]
+    drones_trajectories = zip(drones_current_posn, ptraj)
 
-    # The drone collection process ends, when all the flies AND horses 
-    # have reached their ends. Some heuristics, might involve the flies 
-    # or the horses waiting at the endpoints of their respective trajectories. 
+    # The drone collection process ends, when all packages reach their endpoints
     image_frame_counter = 0
-    while not(all(horses_reached_endpt_p + flies_reached_endpt_p)): 
+    while not(all(packages_reached_endpt_p)): 
+    
+        #-------------------------------------
+        # Update the states of all the drones
+        #-------------------------------------
+        for dridx in range(number_of_drones):
+             if drones_reached_rendz_p[dridx] == False :
+                  dtraj = drones_trajectories[dridx]
+                  if drones_current_subleg_idx[dridx] <= NUM_SUB_LEGS-2:
 
-        # Update the states of all the horses
-        for hidx in range(number_of_horses):
-            if horses_reached_endpt_p[hidx] == False:
-                htraj                       = [elt['coords'] for elt in horse_trajectories[hidx]]
-                all_flys_collected_by_horse = [i             for elt in horse_trajectories[hidx] for i in elt['fly_idxs_picked_up']]
+                    drones_current_subleg_idx[dridx] += 1     # subleg idx changes
 
-                if horses_current_subleg_idx[hidx] <= NUM_SUB_LEGS-2:
+                    sublegidx = drones_current_subleg_idx[dridx] # shorthand for easier reference in the next two lines
+                    xcurr = np.linspace( dtraj[0][0], dtraj[1][0], NUM_SUB_LEGS+1 )[sublegidx]
+                    ycurr = np.linspace( dtraj[0][1], dtraj[1][1], NUM_SUB_LEGS+1 )[sublegidx]
+                    drones_current_posn[dridx]  = [xcurr, ycurr]
 
-                    horses_current_subleg_idx[hidx] += 1     # subleg idx changes
-                    legidx    = horses_current_leg_idx[hidx] # the legidx remains the same
-                    
-                    sublegidx = horses_current_subleg_idx[hidx] # shorthand for easier reference in the next two lines
-                    xcurr = np.linspace( htraj[legidx][0], htraj[legidx+1][0], NUM_SUB_LEGS+1 )[sublegidx]
-                    ycurr = np.linspace( htraj[legidx][1], htraj[legidx+1][1], NUM_SUB_LEGS+1 )[sublegidx]
-                    horses_current_posn[hidx]  = [xcurr, ycurr] 
+                  else:
+                    #drones_current_subleg_idx[dridx] = 0 # reset to 0
 
-                    
-                else:
-                    horses_current_subleg_idx[hidx] = 0 # reset to 0
-                    horses_current_leg_idx[hidx]   += 1 # you have passed onto the next leg
-                    legidx    = horses_current_leg_idx[hidx]
+                    xcurr, ycurr = dtraj[0][0], dtraj[0][1] # current position is the zeroth point on the next leg
+                    drones_current_posn[dridx]  = [xcurr , ycurr]
 
-                    xcurr, ycurr = htraj[legidx][0], htraj[legidx][1] # current position is the zeroth point on the next leg
-                    horses_current_posn[hidx]  = [xcurr , ycurr] 
+                    if drones_current_subleg_idx[dridx] == NUM_SUB_LEGS-1:
+                        drones_reached_rendz_p[dridx] = True
 
-                    if horses_current_leg_idx[hidx] == horses_traj_num_legs[hidx]:
-                        horses_reached_endpt_p[hidx] = True
 
-                ####################......for marking in yellow during rendering
-                fly_idxs_collected_so_far[hidx].extend(horse_trajectories[hidx][legidx]['fly_idxs_picked_up'])
-                fly_idxs_collected_so_far[hidx] = list(set(fly_idxs_collected_so_far[hidx])) ### critical line, to remove duplicate elements # https://stackoverflow.com/a/7961390
 
-        # Update the states of all the flies
-        for fidx in range(number_of_flies):
-            if flies_reached_endpt_p[fidx] == False:
-                ftraj  = fly_trajectories[fidx]
+        #-----------------------------------------
+        # Update the states of all the packages
+        #-----------------------------------------
+        for pkgidx in range(number_of_packages):
+            #if packages_reached_endpt_p[pkgidx] == False:
+              #if drones_reached_rendz_p[0] == True:  
+              #if  np.linalg.norm( np.asarray(packages_current_posn[pkgidx]) - np.asarray(drones_current_posn[0]) ) < 0.001 :  
+                  ptraj = package_trajectories[pkgidx]
+                  if packages_current_subleg_idx[pkgidx] <= NUM_SUB_LEGS-2:
 
-                if flies_current_subleg_idx[fidx] <= NUM_SUB_LEGS-2:
-                    
-                    flies_current_subleg_idx[fidx] += 1
-                    legidx    = flies_current_leg_idx[fidx]
+                    packages_current_subleg_idx[pkgidx] += 1     # subleg idx changes
+                    legidx    = packages_current_leg_idx[pkgidx] # the legidx remains the same
 
-                    sublegidx = flies_current_subleg_idx[fidx]
-                    xcurr = np.linspace( ftraj[legidx][0], ftraj[legidx+1][0], NUM_SUB_LEGS+1 )[sublegidx]
-                    ycurr = np.linspace( ftraj[legidx][1], ftraj[legidx+1][1], NUM_SUB_LEGS+1 )[sublegidx]
-                    flies_current_posn[fidx]  = [xcurr, ycurr] 
+                    sublegidx = packages_current_subleg_idx[pkgidx] # shorthand for easier reference in the next two lines
+                    xcurr = np.linspace( ptraj[legidx][0], ptraj[legidx+1][0], NUM_SUB_LEGS+1 )[sublegidx]
+                    ycurr = np.linspace( ptraj[legidx][1], ptraj[legidx+1][1], NUM_SUB_LEGS+1 )[sublegidx]
+                    packages_current_posn[pkgidx]  = [xcurr, ycurr]
 
-                else:
-                    flies_current_subleg_idx[fidx] = 0 # reset to zero
-                    flies_current_leg_idx[fidx]   += 1 # you have passed onto the next leg
-                    legidx    = flies_current_leg_idx[fidx]
 
-                    xcurr, ycurr = ftraj[legidx][0], ftraj[legidx][1] # current position is the zeroth point on the next leg
-                    flies_current_posn[fidx]  = [xcurr , ycurr] 
+                  else:
+                    packages_current_subleg_idx[pkgidx] = 0 # reset to 0
+                    packages_current_leg_idx[pkgidx]   += 1 # you have passed onto the next leg
+                    legidx    = packages_current_leg_idx[pkgidx]
 
-                    if flies_current_leg_idx[fidx] == flies_traj_num_legs[fidx]:
-                        flies_reached_endpt_p[fidx] = True
+                    xcurr, ycurr = ptraj[legidx][0], ptraj[legidx][1] # current position is the zeroth point on the next leg
+                    packages_current_posn[pkgidx]  = [xcurr , ycurr]
 
-        objs = []
-        # Render all the horse trajectories uptil this point in time. 
-        for hidx in range(number_of_horses):
-            traj               = [elt['coords'] for elt in horse_trajectories[hidx]]
-            current_horse_posn = horses_current_posn[hidx]
+                    if packages_current_leg_idx[pkgidx] == packages_traj_num_legs[pkgidx]:
+                        packages_reached_endpt_p[pkgidx] = True
+ 
             
-            if horses_current_leg_idx[hidx] != horses_traj_num_legs[hidx]: # the horse is still moving
+         
+        #----------------
+        # Rendering
+        #----------------
+        objs = []
+        # Render all the package trajectories uptil this point in time.  
+        for pkgidx in range(number_of_packages):
+            traj                 = package_trajectories[pkgidx]
+            current_package_posn = packages_current_posn[pkgidx]
 
-                  xhs = [traj[k][0] for k in range(1+horses_current_leg_idx[hidx])] + [current_horse_posn[0]]
-                  yhs = [traj[k][1] for k in range(1+horses_current_leg_idx[hidx])] + [current_horse_posn[1]]
+            if packages_current_leg_idx[pkgidx] != packages_traj_num_legs[pkgidx]: # the package is still moving
 
-            else: # The horse has stopped moving
+                  xhs = [traj[k][0] for k in range(1+packages_current_leg_idx[pkgidx])] + [current_package_posn[0]]
+                  yhs = [traj[k][1] for k in range(1+packages_current_leg_idx[pkgidx])] + [current_package_posn[1]]
+
+            else: # The package has stopped moving
                   xhs = [x for (x,y) in traj]
                   yhs = [y for (x,y) in traj]
 
-            horseline, = ax.plot(xhs,yhs,'-',linewidth=5.0, markersize=6, alpha=0.80, color='#D13131')
-            horseloc   = Circle((current_horse_posn[0], current_horse_posn[1]), 0.015, facecolor = '#D13131', edgecolor='k',  alpha=1.00)
-            horsepatch = ax.add_patch(horseloc)
-            objs.append(horseline)
-            objs.append(horsepatch)
+            print "-----------------------------------------------------"
+            print Fore.RED, "plotting package line", Style.RESET_ALL
+            print "-----------------------------------------------------"
+            packageline, = ax.plot(np.asarray(xhs),np.asarray(yhs),'o-', 
+                                   linewidth=5.0,markersize=10, alpha=0.8, color='#D13131')
+            packageloc   = Circle( np.asarray([current_package_posn[0], current_package_posn[1]]), 0.015, 
+                                    facecolor = '#D13131', 
+                                    edgecolor='k',  
+                                    alpha=1.00)
+            packagepatch = ax.add_patch(packageloc)
+            objs.append(packageline)
+            objs.append(packagepatch)
 
-        # Render all fly trajectories uptil this point in time
-        for fidx in range(number_of_flies):
-            traj               = fly_trajectories[fidx]
-            current_fly_posn   = flies_current_posn[fidx]
-            
-            if flies_current_leg_idx[fidx] != flies_traj_num_legs[fidx]: # the fly is still moving
+        # Render all the drone trajectories   uptil this point in time
+        for dridx in range(number_of_drones):
+            traj                 = drones_trajectories[dridx]
+            current_drone_posn = drones_current_posn[dridx]
 
-                  xfs = [traj[k][0] for k in range(1+flies_current_leg_idx[fidx])] + [current_fly_posn[0]]
-                  yfs = [traj[k][1] for k in range(1+flies_current_leg_idx[fidx])] + [current_fly_posn[1]]
+            if drones_current_subleg_idx[dridx] != NUM_SUB_LEGS-1 : # the drone is still moving
 
-            else: # The fly has stopped moving
-                  xfs = [x for (x,y) in traj]
-                  yfs = [y for (x,y) in traj]
+                  xhs = [ traj[0][0] ] + [current_drone_posn[0]]
+                  yhs = [ traj[0][1] ] + [current_drone_posn[1]]
 
-            if render_trajectory_trails_p:
-                flyline, = ax.plot(xfs,yfs,'-',linewidth=2.5, markersize=6, alpha=0.32, color='b')
-                objs.append(flyline)
+            else: # The drone has stopped moving
+                  xhs = [x for (x,y) in traj]
+                  yhs = [y for (x,y) in traj]
 
+            print "-----------------------------------------------------"
+            print Fore.RED, "plotting drone line", Style.RESET_ALL
+            print "-----------------------------------------------------"
+            droneline, = ax.plot(np.asarray(xhs),np.asarray(yhs),'o-', 
+                                   linewidth=5.0,markersize=10, alpha=0.8, color='g')
+            droneloc   = Circle( np.asarray([current_drone_posn[0], current_drone_posn[1]]), 0.015, 
+                                    facecolor = 'g', 
+                                    edgecolor='g',  
+                                    alpha=1.00)
+            dronepatch = ax.add_patch(droneloc)
+            objs.append(droneline)
+            objs.append(dronepatch)
 
-            # If the current fly is in the list of flies already collected by some horse, 
-            # mark this fly with yellow. If it hasn't been serviced yet, mark it with blue
-            service_status_col = 'b'
-            for hidx in range(number_of_horses):
-                #print fly_idxs_collected_so_far[hidx]
-                if fidx in fly_idxs_collected_so_far[hidx]:
-                    service_status_col = 'y'
-                    break
-
-            flyloc   = Circle((current_fly_posn[0], current_fly_posn[1]), 0.013, 
-                              facecolor = service_status_col, edgecolor='k', alpha=1.00)
-            flypatch = ax.add_patch(flyloc)
-            objs.append(flypatch)
-        
         print "........................"
         print "Appending to ims ", image_frame_counter
         ims.append(objs) 
         image_frame_counter += 1
 
-    from colorama import Back 
-   
-    debug(Fore.BLACK + Back.WHITE + "\nStarted constructing ani object"+ Style.RESET_ALL)
-    ani = animation.ArtistAnimation(fig, ims, interval=70, blit=True, repeat=True, repeat_delay=500)
-    debug(Fore.BLACK + Back.WHITE + "\nFinished constructing ani object"+ Style.RESET_ALL)
 
-    debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
+    debug(Fore.CYAN + "\nStarted constructing ani object"+ Style.RESET_ALL)
+    ani = animation.ArtistAnimation(fig, ims, interval=200, blit=True)
+    debug(Fore.CYAN + "\nFinished constructing ani object"+ Style.RESET_ALL)
+
+    #debug(Fore.MAGENTA + "\nStarted writing animation to disk"+ Style.RESET_ALL)
     #ani.save(animation_file_name_prefix+'.avi', dpi=100)
-    #ani.save('reverse_horsefly.avi', dpi=300)
-    debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
-
+    #debug(Fore.MAGENTA + "\nFinished writing animation to disk"+ Style.RESET_ALL)
+    
     plt.show()
+
+
+
 
 if __name__=="__main__":
      print "Running Package Handoff"

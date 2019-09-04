@@ -13,5 +13,5 @@
 \contentsline {chapter}{Appendices}{19}{section*.6}
 \contentsline {chapter}{\numberline {A}Supporting Code}{20}{Appendix.a.A}
 \contentsline {section}{\numberline {A.1}Main File}{20}{section.a.A.1}
-\contentsline {section}{\numberline {A.2}Algorithmic Utilities}{25}{section.a.A.2}
+\contentsline {section}{\numberline {A.2}Algorithmic Utilities}{24}{section.a.A.2}
 \contentsline {section}{\numberline {A.3}Graphical Utilities}{26}{section.a.A.3}
