@@ -220,7 +220,7 @@ Precise details follow in the subsections below.
 Before proceeding, lets design some housekeeping data-structures to 
 represent the problem. The following data-structure simply maintains the 
 information about the drones, the source and target used as input to the 
-problem. To get a PHO tour for the package, algorithms are passed as 
+problem. To get a PHO tour for the package, algorithms are passed as
 first class values to the method \verb|get_tour| of this class. 
 
 Note that each algorithm does its own plotting and animation in a separate matplotlib window 
@@ -245,10 +245,12 @@ animation and plotting are requested they are done in separate windows each.
 \mbox{}\verb@    def get_drone_uis (self):@\\
 \mbox{}\verb@           return [self.drone_info[idx][1] for idx in range(len(self.drone_info)) ]@\\
 \mbox{}\verb@         @\\
-\mbox{}\verb@    def get_tour(self, algo):@\\
-\mbox{}\verb@           return algo( self.drone_info, self.source, self.target, @\\
-\mbox{}\verb@                        animate_tour_p = True,@\\
-\mbox{}\verb@                        plot_tour_p    = False)@\\
+\mbox{}\verb@    def get_tour(self, algo, animate_tour_p=False, plot_tour_p=False):@\\
+\mbox{}\verb@           return algo( self.drone_info, @\\
+\mbox{}\verb@                        self.source, @\\
+\mbox{}\verb@                        self.target, @\\
+\mbox{}\verb@                        animate_tour_p, @\\
+\mbox{}\verb@                        plot_tour_p    )@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Methods for \verb|ReverseHorseflyInput|@\\
 \mbox{}\verb@    def clearAllStates (self):@\\
@@ -261,8 +263,8 @@ animation and plotting are requested they are done in separate windows each.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@Single_PHO_Input@\nobreak\ \NWlink{nuweb15}{15}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb22}{22}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@Single_PHO_Input@\nobreak\ \NWlink{nuweb15}{15}\NWlink{nuweb18}{, 18}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -299,7 +301,7 @@ The following function calculates the time taken for a drone to move between two
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb22}{22}.
 \item \NWtxtIdentsDefed\nobreak\  \verb@time_of_travel@\nobreak\ \NWlink{nuweb7b}{7b}\NWlink{nuweb14}{, 14}.
 \item{}
 \end{list}
@@ -349,7 +351,7 @@ The following function calculates the time taken for a drone to move between two
 \mbox{}\verb@    drone_pool.remove(imin) @\\
 \mbox{}\verb@    used_drones = [imin]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    package_trail = [current_package_position]@\\
+\mbox{}\verb@    package_trail_straight = [current_package_position]@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    package_reached_p   = False@\\
 \mbox{}\verb@    while not(package_reached_p):@\\
@@ -378,12 +380,12 @@ The following function calculates the time taken for a drone to move between two
 \mbox{}\verb@@\\
 \mbox{}\verb@          if time_to_target_without_help < tI_min :@\\
 \mbox{}\verb@              package_reached_p = True@\\
-\mbox{}\verb@              package_trail.append(target)@\\
+\mbox{}\verb@              package_trail_straight.append(target)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@          else:@\\
 \mbox{}\verb@              package_handler_speed    = drone_info[current_package_handler_idx][1] @\\
 \mbox{}\verb@              current_package_position = current_package_position + package_handler_speed * (tI_min - clock_time) *  sthat@\\
-\mbox{}\verb@              package_trail.append(current_package_position)@\\
+\mbox{}\verb@              package_trail_straight.append(current_package_position)@\\
 \mbox{}\verb@    @\\
 \mbox{}\verb@              clock_time                  = tI_min @\\
 \mbox{}\verb@              current_package_handler_idx = idx_tI_min@\\
@@ -392,11 +394,9 @@ The following function calculates the time taken for a drone to move between two
 \mbox{}\verb@              used_drones.append(idx_tI_min)  @\\
 \mbox{}\verb@   @\\
 \mbox{}\verb@    package_trail_cvx = algo_pho_exact_given_order_of_drones ([drone_info[idx] for idx in used_drones],source,target )@\\
-\mbox{}\verb@    mspan_straight = makespan(drone_info, used_drones, package_trail)@\\
+\mbox{}\verb@    mspan_straight = makespan(drone_info, used_drones, package_trail_straight)@\\
 \mbox{}\verb@    mspan_cvx      = makespan(drone_info, used_drones, package_trail_cvx)@\\
 \mbox{}\verb@    @\\
-\mbox{}\verb@    #assert (mspan_cvx <= mspan_straight), ""@\\
-\mbox{}\verb@@\\
 \mbox{}\verb@    if plot_tour_p:@\\
 \mbox{}\verb@         fig0, ax0 = plt.subplots()@\\
 \mbox{}\verb@         plot_tour(fig0, ax0, "ODW: Straight Line"       , source, target, drone_info, used_drones, package_trail)@\\
@@ -406,22 +406,21 @@ The following function calculates the time taken for a drone to move between two
 \mbox{}\verb@         plt.show()@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    if animate_tour_p:@\\
-\mbox{}\verb@@\\
 \mbox{}\verb@        #ptraj  = zip(package_trail_cvx, used_drones + [None])@\\
 \mbox{}\verb@        animate_tour(drone_info, [package_trail] , used_drones,@\\
 \mbox{}\verb@                     animation_file_name_prefix='package_handoff_animation.mp4', @\\
 \mbox{}\verb@                     algo_name='odw',  @\\
 \mbox{}\verb@                     render_trajectory_trails_p=True) @\\
 \mbox{}\verb@    @\\
-\mbox{}\verb@    return used_drones, package_trail, mspan_straight, mspan_cvx, @\\
+\mbox{}\verb@    return used_drones, package_trail_straight, mspan_straight, package_trail_cvx, mspan_cvx@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb15}{15}.\item \NWtxtIdentsUsed\nobreak\  \verb@time_of_travel@\nobreak\ \NWlink{nuweb7a}{7a}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb22}{22}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb15}{15}\NWlink{nuweb18}{, 18}.\item \NWtxtIdentsUsed\nobreak\  \verb@time_of_travel@\nobreak\ \NWlink{nuweb7a}{7a}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -491,7 +490,7 @@ The following function calculates the time taken for a drone to move between two
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb22}{22}.
 
 \item{}
 \end{list}
@@ -577,7 +576,7 @@ The following function is just an implentation of the program above.
 \mbox{}\verb@@\\
 \mbox{}\verb@    prob = cp.Problem(objective, constraints_S + constraints_I + constraints_L)@\\
 \mbox{}\verb@    print Fore.CYAN@\\
-\mbox{}\verb@    prob.solve(solver=cp.SCS, verbose=True)@\\
+\mbox{}\verb@    prob.solve(solver=cp.SCS,verbose=True)@\\
 \mbox{}\verb@    print Style.RESET_ALL@\\
 \mbox{}\verb@    @\\
 \mbox{}\verb@    package_trail = [ np.asarray(X[i].value) for i in range(r) ] + [ target ]@\\
@@ -588,7 +587,7 @@ The following function is just an implentation of the program above.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb22}{22}.
 
 \item{}
 \end{list}
@@ -620,24 +619,19 @@ An example is shown below:
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@def plot_tour(fig, ax, figtitle, source, target, drone_info, used_drones, package_trail):@\\
+\mbox{}\verb@def plot_tour(fig, ax, figtitle, source, target, @\\
+\mbox{}\verb@              drone_info, used_drones, package_trail,@\\
+\mbox{}\verb@              xlims=[0,1],@\\
+\mbox{}\verb@              ylims=[0,1],@\\
+\mbox{}\verb@              aspect_ratio=1.0):@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    ax.set_aspect(1.0)@\\
-\mbox{}\verb@    ax.set_xlim([0.0, 1.0])@\\
-\mbox{}\verb@    ax.set_ylim([0.0, 1.0])@\\
+\mbox{}\verb@    import matplotlib.ticker as ticker@\\
+\mbox{}\verb@    ax.set_aspect(aspect_ratio)@\\
+\mbox{}\verb@    ax.set_xlim(xlims)@\\
+\mbox{}\verb@    ax.set_ylim(ylims)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    # Draw drone path from initial position to interception point@\\
-\mbox{}\verb@    for pt, idx in zip(package_trail, used_drones):@\\
-\mbox{}\verb@         initdroneposn = drone_info[idx][0]@\\
-\mbox{}\verb@         handoffpoint  = pt@\\
-\mbox{}\verb@    @\\
-\mbox{}\verb@         xs, ys = extract_coordinates([initdroneposn, handoffpoint])@\\
-\mbox{}\verb@         plt.arrow( xs[0], ys[0], xs[1]-xs[0], ys[1]-ys[0], @\\
-\mbox{}\verb@                    **{'length_includes_head': True, @\\
-\mbox{}\verb@                       'width': 0.005 , @\\
-\mbox{}\verb@                       'head_width':0.02, @\\
-\mbox{}\verb@                       'fc': 'b', @\\
-\mbox{}\verb@                       'ec': 'none'})@\\
+\mbox{}\verb@    plt.rc('font', family='serif')@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Draw the package trail@\\
 \mbox{}\verb@    xs, ys = extract_coordinates(package_trail)@\\
@@ -652,39 +646,69 @@ An example is shown below:
 \mbox{}\verb@                       'alpha': 0.8})@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@@\\
 \mbox{}\verb@    # Draw the source, target, and initial positions of the robots as bold dots@\\
 \mbox{}\verb@    xs,ys = extract_coordinates([source, target])@\\
-\mbox{}\verb@    ax.plot(xs,ys, 'o', markersize=30, alpha=0.8, ms=10, mec='k', mfc='#F1AB30' )@\\
-\mbox{}\verb@    ax.plot(xs,ys, 'k--', alpha=0.6 ) # light line connecting source and target@\\
+\mbox{}\verb@    ax.plot(xs,ys, 'o', markersize=12, alpha=0.8, ms=10, mec='k', mfc='#F1AB30' )@\\
+\mbox{}\verb@    #ax.plot(xs,ys, 'k--', alpha=0.6 ) # light line connecting source and target@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    ax.text(source[0], source[1], 'S', fontsize=22,\@\\
+\mbox{}\verb@    ax.text(source[0], source[1], 'S', fontsize=10,\@\\
 \mbox{}\verb@            horizontalalignment='center',verticalalignment='center')@\\
-\mbox{}\verb@    ax.text(target[0], target[1], 'T', fontsize=22,\@\\
+\mbox{}\verb@    ax.text(target[0], target[1], 'T', fontsize=10,\@\\
 \mbox{}\verb@            horizontalalignment='center',verticalalignment='center')@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    xs, ys = extract_coordinates( [ drone_info[idx][0] for idx in range(len(drone_info)) ]  )@\\
-\mbox{}\verb@    ax.plot(xs,ys, 'o', markersize=26, mec='k', mfc='#b7e8cc' )@\\
+\mbox{}\verb@    ax.plot(xs,ys, 'o', markersize=10, alpha = 0.5, mec='None', mfc='#b7e8cc' )@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Draw speed labels@\\
 \mbox{}\verb@    for idx in range(len(drone_info)):@\\
-\mbox{}\verb@         ax.text( drone_info[idx][0][0], drone_info[idx][0][1], drone_info[idx][1],@\\
-\mbox{}\verb@                  fontsize=15, horizontalalignment='center', verticalalignment='center' )@\\
+\mbox{}\verb@         ax.text( drone_info[idx][0][0], drone_info[idx][0][1], format(drone_info[idx][1],'.2f'),@\\
+\mbox{}\verb@                  fontsize=4, horizontalalignment='center', verticalalignment='center' )@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Draw drone path from initial position to interception point@\\
+\mbox{}\verb@    for pt, idx in zip(package_trail, used_drones):@\\
+\mbox{}\verb@         initdroneposn = drone_info[idx][0]@\\
+\mbox{}\verb@         handoffpoint  = pt@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@         xs, ys = extract_coordinates([initdroneposn, handoffpoint])@\\
+\mbox{}\verb@         plt.arrow( xs[0], ys[0], xs[1]-xs[0], ys[1]-ys[0], @\\
+\mbox{}\verb@                    **{'length_includes_head': True, @\\
+\mbox{}\verb@                       'width': 0.005 , @\\
+\mbox{}\verb@                       'head_width':0.02, @\\
+\mbox{}\verb@                       'fc': 'b', @\\
+\mbox{}\verb@                       'ec': 'none'})@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    fig.suptitle(figtitle, fontsize=25)@\\
-\mbox{}\verb@    ax.set_title('\nMakespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=15)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    fig.suptitle(figtitle, fontsize=15)@\\
+\mbox{}\verb@    ax.set_title('\nMakespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=8)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    startx, endx = ax.get_xlim()@\\
+\mbox{}\verb@    starty, endy = ax.get_ylim()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    ax.xaxis.set_ticks(np.arange(startx, endx, 0.4))@\\
+\mbox{}\verb@    ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@     @\\
+\mbox{}\verb@    ax.yaxis.set_ticks(np.arange(starty, endy, 0.4))@\\
+\mbox{}\verb@    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    plt.yticks(fontsize=5, rotation=90)@\\
+\mbox{}\verb@    plt.xticks(fontsize=5)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # A light grid@\\
-\mbox{}\verb@    plt.grid(color='0.5', linestyle='--', linewidth=0.5)@\\
+\mbox{}\verb@    #plt.grid(color='0.5', linestyle='--', linewidth=0.5)@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb22}{22}.
 
 \item{}
 \end{list}
@@ -724,7 +748,7 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}.
-\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb22}{22}.
 \item \NWtxtIdentsUsed\nobreak\  \verb@time_of_travel@\nobreak\ \NWlink{nuweb7a}{7a}.
 \item{}
 \end{list}
@@ -732,6 +756,11 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 \end{flushleft}
 %{/python-mode}%
   
+
+
+
+
+
 
 
 
@@ -863,8 +892,8 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroRefIn\ \NWlink{nuweb20}{20}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@single_pho_run_handler@\nobreak\ \NWlink{nuweb20}{20}.\item \NWtxtIdentsUsed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb7b}{7b}, \verb@Single_PHO_Input@\nobreak\ \NWlink{nuweb6}{6}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb22}{22}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@single_pho_run_handler@\nobreak\ \NWlink{nuweb22}{22}.\item \NWtxtIdentsUsed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb7b}{7b}, \verb@Single_PHO_Input@\nobreak\ \NWlink{nuweb6}{6}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -874,19 +903,164 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 
 
 
+\chapter{Experiments}
+
+
+\section{Single Package Handoff}
+
+\subsection{Experiment 1: Comparing Makespans of various heuristics for randomly generated instances}
+
+
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap9}\raggedright\small
+\NWtarget{nuweb18}{} $\langle\,${\itshape PHO Experiments}\nobreak\ {\footnotesize {18}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@def experiment_1():@\\
+\mbox{}\verb@    # generate the experiments folder@\\
+\mbox{}\verb@    import shutil@\\
+\mbox{}\verb@    import os@\\
+\mbox{}\verb@    import random@\\
+\mbox{}\verb@    from datetime import datetime@\\
+\mbox{}\verb@    import yaml@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    #random.seed(6)@\\
+\mbox{}\verb@    random.seed(7)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@   @\\
+\mbox{}\verb@    # Uniform random points@\\
+\mbox{}\verb@    source_init  = np.asarray([-1.0,0]) @\\
+\mbox{}\verb@    target_init  = np.asarray([ 1.0,0]) @\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    exsize = 100@\\
+\mbox{}\verb@    exreps = 5@\\
+\mbox{}\verb@    dtheta = 2.0*np.pi/exreps@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    dir = 'pho_experiment_1' + '_exsize_' + str(exsize)@\\
+\mbox{}\verb@    if os.path.exists(dir):@\\
+\mbox{}\verb@       shutil.rmtree(dir)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    os.makedirs(dir)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    xs     = [ random.uniform(-1,1) for _ in range(exsize) ] @\\
+\mbox{}\verb@    ys     = [ random.uniform(-1,1) for _ in range(exsize)] @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    initdroneposns = map(np.asarray, zip(xs,ys))@\\
+\mbox{}\verb@    utils_algo.print_list(initdroneposns)@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    speeds = [random.uniform(0.01,1.) for _ in range(exsize)]@\\
+\mbox{}\verb@    drone_info = zip(initdroneposns, speeds)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    for idx in range(exreps):@\\
+\mbox{}\verb@        @\\
+\mbox{}\verb@         th    = idx * dtheta@\\
+\mbox{}\verb@         costh = np.cos(th)@\\
+\mbox{}\verb@         sinth = np.sin(th)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         rotmat = np.asarray([[costh, sinth],@\\
+\mbox{}\verb@                              [-sinth, costh]])@\\
+\mbox{}\verb@   @\\
+\mbox{}\verb@         source = rotmat.dot(source_init)@\\
+\mbox{}\verb@         target = rotmat.dot(target_init)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         run = Single_PHO_Input(drone_info, source, target)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         # Execute the algorithm and unpack the data@\\
+\mbox{}\verb@         used_drones,           \@\\
+\mbox{}\verb@         package_trail_straight,\@\\
+\mbox{}\verb@         mspan_straight,        \@\\
+\mbox{}\verb@         package_trail_cvx,      \@\\
+\mbox{}\verb@         mspan_cvx = run.get_tour(algo_odw, @\\
+\mbox{}\verb@                                  animate_tour_p = False, @\\
+\mbox{}\verb@                                  plot_tour_p    = False )     @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         trivial_lower_bound = np.linalg.norm(target-source)/max(speeds) @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         print "Used Drones: "   , used_drones @\\
+\mbox{}\verb@         print "\n"@\\
+\mbox{}\verb@         print Fore.CYAN, "Package Trail Straight: " , Style.RESET_ALL@\\
+\mbox{}\verb@         utils_algo.print_list(package_trail_straight)@\\
+\mbox{}\verb@         print "\n"@\\
+\mbox{}\verb@         print Fore.CYAN, "Package Trail CVX: ", Style.RESET_ALL        @\\
+\mbox{}\verb@         utils_algo.print_list(package_trail_cvx)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         print Fore.RED, "mspan_straight: ",  mspan_straight, "\n mspan_cvx:      ", mspan_cvx, Style.RESET_ALL@\\
+\mbox{}\verb@         print "Dilation Factor:(CVX to Straight) ", mspan_straight/mspan_cvx@\\
+\mbox{}\verb@         print ""@\\
+\mbox{}\verb@         print "CVX Solution within: ", Fore.CYAN,  mspan_cvx/trivial_lower_bound , Style.RESET_ALL, " of optimum"@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         # Write data to YAML file@\\
+\mbox{}\verb@         data = {'drone_info'  : drone_info,@\\
+\mbox{}\verb@                 'source'      : source,@\\
+\mbox{}\verb@                 'target'      : target,@\\
+\mbox{}\verb@                 'used_drones' : used_drones, @\\
+\mbox{}\verb@                 'odw_straight': {'package_trail': package_trail_straight,@\\
+\mbox{}\verb@                                  'makespan'     : mspan_straight},@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                 'odw_cvx'     : {'package_trail': package_trail_cvx,@\\
+\mbox{}\verb@                                  'makespan'     : mspan_cvx },@\\
+\mbox{}\verb@                 'trivial_lower_bound': trivial_lower_bound}@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         subdir = 'data_exsize_'+str(exsize) + '_repnum_' + str(idx)@\\
+\mbox{}\verb@         os.makedirs(dir + '/' + subdir)@\\
+\mbox{}\verb@   @\\
+\mbox{}\verb@         filename = dir + '/' + subdir + '/' + subdir + '.yml'@\\
+\mbox{}\verb@         with open(filename, 'w') as outfile:@\\
+\mbox{}\verb@             yaml.dump(data, outfile, default_flow_style=True)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         eps = 1e-1@\\
+\mbox{}\verb@         fig, ax = plt.subplots()@\\
+\mbox{}\verb@         plot_tour(fig, ax, "Package Handoff: ODW Heuristic", @\\
+\mbox{}\verb@                   source, target, drone_info, used_drones, @\\
+\mbox{}\verb@                   package_trail_cvx, @\\
+\mbox{}\verb@                   xlims=[-1-eps,1+eps], @\\
+\mbox{}\verb@                   ylims=[-1-eps,1+eps], @\\
+\mbox{}\verb@                   aspect_ratio=1.0)@\\
+\mbox{}\verb@         print Fore.RED, "Saving figure to disk : ", idx, Style.RESET_ALL@\\
+\mbox{}\verb@         plt.savefig(dir + '/' + subdir + '/' + subdir + @\\
+\mbox{}\verb@                     '.png', bbox_inches="tight", dpi=200)@\\
+\mbox{}\verb@         plt.savefig(dir+'/plot'+str(idx).zfill(4)+'.png', bbox_inches="tight", dpi=200 )@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    import subprocess@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    command =  "ffmpeg -r 4 -f image2 -s 1920x1080 -i " + dir +"/plot%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " +\@\\
+\mbox{}\verb@               " " + dir+ "/" + "pho_handoff_animation_different_source_target.mp4"@\\
+\mbox{}\verb@    subprocess.call(command.split())@\\
+\mbox{}\verb@          @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb22}{22}.
+\item \NWtxtIdentsUsed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb7b}{7b}, \verb@Single_PHO_Input@\nobreak\ \NWlink{nuweb6}{6}.
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+
 \section{Chapter Index of Fragments}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item $\langle\,$PHO Algorithms\nobreak\ {\footnotesize \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20}{20}.}
-\item $\langle\,$PHO Data Structures\nobreak\ {\footnotesize \NWlink{nuweb6}{6}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20}{20}.}
-\item $\langle\,$PHO Run Handlers\nobreak\ {\footnotesize \NWlink{nuweb15}{15}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb20}{20}.}
+\item $\langle\,$PHO Algorithms\nobreak\ {\footnotesize \NWlink{nuweb7a}{7a}\NWlink{nuweb7b}{b}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb13}{, 13}\NWlink{nuweb14}{, 14}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb22}{22}.}
+\item $\langle\,$PHO Data Structures\nobreak\ {\footnotesize \NWlink{nuweb6}{6}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb22}{22}.}
+\item $\langle\,$PHO Experiments\nobreak\ {\footnotesize \NWlink{nuweb18}{18}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb22}{22}.}
+\item $\langle\,$PHO Run Handlers\nobreak\ {\footnotesize \NWlink{nuweb15}{15}}$\,\rangle$ {\footnotesize {\NWtxtRefIn} \NWlink{nuweb22}{22}.}
 \end{list}}
 \section{Chapter Index of Identifiers}
 
 {\small\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \verb@algo_odw@: \underline{\NWlink{nuweb7b}{7b}}\NWlink{nuweb15}{, 15}.
-\item \verb@Single_PHO_Input@: \underline{\NWlink{nuweb6}{6}}\NWlink{nuweb15}{, 15}.
-\item \verb@single_pho_run_handler@: \underline{\NWlink{nuweb15}{15}}\NWlink{nuweb20}{, 20}.
+\item \verb@algo_odw@: \underline{\NWlink{nuweb7b}{7b}}\NWlink{nuweb15}{, 15}\NWlink{nuweb18}{, 18}.
+\item \verb@Single_PHO_Input@: \underline{\NWlink{nuweb6}{6}}\NWlink{nuweb15}{, 15}\NWlink{nuweb18}{, 18}.
+\item \verb@single_pho_run_handler@: \underline{\NWlink{nuweb15}{15}}\NWlink{nuweb22}{, 22}.
 \item \verb@time_of_travel@: \underline{\NWlink{nuweb7a}{7a}}\NWlink{nuweb7b}{, 7b}\NWlink{nuweb14}{, 14}.
 \end{list}} 
 %------------------------------------------------------
@@ -902,8 +1076,8 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap9}\raggedright\small
-\NWtarget{nuweb20}{} \verb@"../src/pho-main.py"@\nobreak\ {\footnotesize {20}}$\equiv$
+\begin{flushleft} \small\label{scrap10}\raggedright\small
+\NWtarget{nuweb22}{} \verb@"../src/pho-main.py"@\nobreak\ {\footnotesize {22}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -932,6 +1106,7 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 \mbox{}\verb@@\hbox{$\langle\,${\itshape PHO Data Structures}\nobreak\ {\footnotesize \NWlink{nuweb6}{6}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape PHO Algorithms}\nobreak\ {\footnotesize \NWlink{nuweb7a}{7a}, \ldots\ }$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape PHO Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb15}{15}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape PHO Experiments}\nobreak\ {\footnotesize \NWlink{nuweb18}{18}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@# Set up logging information relevant to this module@\\
 \mbox{}\verb@logger=logging.getLogger(__name__)@\\
@@ -978,9 +1153,10 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 \mbox{}\verb@    ax.lines[:]=[]@\\
 \mbox{}\verb@    applyAxCorrection(ax)@\\
 \mbox{}\verb@@\\
+\mbox{}\verb@##################################@\\
+\mbox{}\verb@#### Buggy don't use! @\\
+\mbox{}\verb@##################################@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@# A drone trajectory is [ idx,      ]@\\
 \mbox{}\verb@def animate_tour(drone_info, @\\
 \mbox{}\verb@                 package_trajectories, @\\
 \mbox{}\verb@                 used_drones, @\\
@@ -1030,9 +1206,9 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 \mbox{}\verb@    packages_current_posn       = [traj[0]      for traj in package_trajectories    ]@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Arrays keeping track of the states of the drones@\\
-\mbox{}\verb@    drones_reached_rendz_p    = [False          for  i    in range(number_of_drones)]@\\
-\mbox{}\verb@    drones_current_subleg_idx = [0              for i    in range(number_of_drones) ] @\\
-\mbox{}\verb@    drones_current_posn       = [drone[0]       for drone in drone_info             ]@\\
+\mbox{}\verb@    drones_reached_rendz_p    = [False                for  i    in range(number_of_drones) ]@\\
+\mbox{}\verb@    drones_current_subleg_idx = [0                    for i     in range(number_of_drones) ] @\\
+\mbox{}\verb@    drones_current_posn       = [drone_info[idx][0]   for idx   in used_drones             ]@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    ptraj               = package_trajectories[0]@\\
 \mbox{}\verb@    drones_trajectories = zip(drones_current_posn, ptraj)@\\
@@ -1040,12 +1216,40 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 \mbox{}\verb@    # The drone collection process ends, when all packages reach their endpoints@\\
 \mbox{}\verb@    image_frame_counter = 0@\\
 \mbox{}\verb@    while not(all(packages_reached_endpt_p)): @\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@        #-------------------------------------@\\
+\mbox{}\verb@        # Update the states of all the drones@\\
+\mbox{}\verb@        #-------------------------------------@\\
+\mbox{}\verb@        for dridx in range(number_of_drones):@\\
+\mbox{}\verb@             if drones_reached_rendz_p[dridx] == False :@\\
+\mbox{}\verb@                  dtraj = drones_trajectories[dridx]@\\
+\mbox{}\verb@                  if drones_current_subleg_idx[dridx] <= NUM_SUB_LEGS-2:@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                    drones_current_subleg_idx[dridx] += 1     # subleg idx changes@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                    sublegidx = drones_current_subleg_idx[dridx] # shorthand for easier reference in the next two lines@\\
+\mbox{}\verb@                    xcurr = np.linspace( dtraj[0][0], dtraj[1][0], NUM_SUB_LEGS+1 )[sublegidx]@\\
+\mbox{}\verb@                    ycurr = np.linspace( dtraj[0][1], dtraj[1][1], NUM_SUB_LEGS+1 )[sublegidx]@\\
+\mbox{}\verb@                    drones_current_posn[dridx]  = [xcurr, ycurr]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                  else:@\\
+\mbox{}\verb@                    #drones_current_subleg_idx[dridx] = 0 # reset to 0@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                    xcurr, ycurr = dtraj[0][0], dtraj[0][1] # current position is the zeroth point on the next leg@\\
+\mbox{}\verb@                    drones_current_posn[dridx]  = [xcurr , ycurr]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                    if drones_current_subleg_idx[dridx] == NUM_SUB_LEGS-1:@\\
+\mbox{}\verb@                        drones_reached_rendz_p[dridx] = True@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@        #-----------------------------------------@\\
 \mbox{}\verb@        # Update the states of all the packages@\\
 \mbox{}\verb@        #-----------------------------------------@\\
 \mbox{}\verb@        for pkgidx in range(number_of_packages):@\\
 \mbox{}\verb@            #if packages_reached_endpt_p[pkgidx] == False:@\\
-\mbox{}\verb@            #    if drones_reached_rendz_p[0] == True:  # any updates to package trajectory happen only if the first drone has reached the package initial position@\\
+\mbox{}\verb@              #if drones_reached_rendz_p[0] == True:  @\\
+\mbox{}\verb@              #if  np.linalg.norm( np.asarray(packages_current_posn[pkgidx]) - np.asarray(drones_current_posn[0]) ) < 0.001 :  @\\
 \mbox{}\verb@                  ptraj = package_trajectories[pkgidx]@\\
 \mbox{}\verb@                  if packages_current_subleg_idx[pkgidx] <= NUM_SUB_LEGS-2:@\\
 \mbox{}\verb@@\\
@@ -1069,29 +1273,7 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 \mbox{}\verb@                    if packages_current_leg_idx[pkgidx] == packages_traj_num_legs[pkgidx]:@\\
 \mbox{}\verb@                        packages_reached_endpt_p[pkgidx] = True@\\
 \mbox{}\verb@ @\\
-\mbox{}\verb@        #-------------------------------------@\\
-\mbox{}\verb@        # Update the states of all the drones@\\
-\mbox{}\verb@        #-------------------------------------@\\
-\mbox{}\verb@        for dridx in range(number_of_drones):@\\
-\mbox{}\verb@                  dtraj = drones_trajectories[dridx]@\\
-\mbox{}\verb@                  if drones_current_subleg_idx[dridx] <= NUM_SUB_LEGS-2:@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@                    drones_current_subleg_idx[dridx] += 1     # subleg idx changes@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@                    sublegidx = drones_current_subleg_idx[dridx] # shorthand for easier reference in the next two lines@\\
-\mbox{}\verb@                    xcurr = np.linspace( dtraj[0][0], dtraj[1][0], NUM_SUB_LEGS+1 )[sublegidx]@\\
-\mbox{}\verb@                    ycurr = np.linspace( dtraj[0][1], dtraj[1][1], NUM_SUB_LEGS+1 )[sublegidx]@\\
-\mbox{}\verb@                    drones_current_posn[dridx]  = [xcurr, ycurr]@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@                  else:@\\
-\mbox{}\verb@                    drones_current_subleg_idx[dridx] = 0 # reset to 0@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@                    xcurr, ycurr = dtraj[0][0], dtraj[0][1] # current position is the zeroth point on the next leg@\\
-\mbox{}\verb@                    drones_current_posn[dridx]  = [xcurr , ycurr]@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@                    if drones_current_subleg_idx[dridx] == NUM_SUB_LEGS:@\\
-\mbox{}\verb@                        drones_reached_rendz_p[dridx] = True@\\
-\mbox{}\verb@           @\\
+\mbox{}\verb@            @\\
 \mbox{}\verb@         @\\
 \mbox{}\verb@        #----------------@\\
 \mbox{}\verb@        # Rendering@\\
@@ -1099,13 +1281,8 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 \mbox{}\verb@        objs = []@\\
 \mbox{}\verb@        # Render all the package trajectories uptil this point in time.  @\\
 \mbox{}\verb@        for pkgidx in range(number_of_packages):@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@          traj                 = package_trajectories[pkgidx]@\\
-\mbox{}\verb@          current_package_posn = np.asarray(packages_current_posn[pkgidx])@\\
-\mbox{}\verb@          drcurrposn           = np.asarray( drones_current_posn[0]  )@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@          if np.linalg.norm(current_package_posn - drcurrposn) < 1e-1: # advance package only if it has been touhed by drone@\\
+\mbox{}\verb@            traj                 = package_trajectories[pkgidx]@\\
+\mbox{}\verb@            current_package_posn = packages_current_posn[pkgidx]@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@            if packages_current_leg_idx[pkgidx] != packages_traj_num_legs[pkgidx]: # the package is still moving@\\
 \mbox{}\verb@@\\
@@ -1176,8 +1353,9 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 \mbox{}\verb@@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@if __name__=="__main__":@\\
-\mbox{}\verb@     print "Running Package Handoff"@\\
-\mbox{}\verb@     single_pho_run_handler()@\\
+\mbox{}\verb@     #print "Running Package Handoff"@\\
+\mbox{}\verb@     #single_pho_run_handler()@\\
+\mbox{}\verb@     experiment_1() @\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
@@ -1195,8 +1373,8 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 \section{Algorithmic Utilities}
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap10}\raggedright\small
-\NWtarget{nuweb24}{} \verb@"../src/utils_algo.py"@\nobreak\ {\footnotesize {24}}$\equiv$
+\begin{flushleft} \small\label{scrap11}\raggedright\small
+\NWtarget{nuweb26}{} \verb@"../src/utils_algo.py"@\nobreak\ {\footnotesize {26}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
@@ -1300,8 +1478,8 @@ By makespan, we mean the time taken for the package to travel from $S$ to $T$.
 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap11}\raggedright\small
-\NWtarget{nuweb26}{} \verb@"../src/utils_graphics.py"@\nobreak\ {\footnotesize {26}}$\equiv$
+\begin{flushleft} \small\label{scrap12}\raggedright\small
+\NWtarget{nuweb28}{} \verb@"../src/utils_graphics.py"@\nobreak\ {\footnotesize {28}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\

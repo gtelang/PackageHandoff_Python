@@ -1,0 +1,333 @@
+{drone_info: [!!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [&id001 !!python/name:numpy.ndarray '', !!python/tuple [0], b], state: !!python/tuple [
+          1, !!python/tuple [2], &id002 !!python/object/apply:numpy.dtype {args: [
+              f8, 0, 1], state: !!python/tuple [3, <, null, null, null, -1, -1, 0]},
+          false, !!binary "JIvV4KWM1r8UJMpG2bjkvw==\n"]}, 0.6371506199898127], !!python/tuple [
+      !!python/object/apply:numpy.core.multiarray._reconstruct {args: [*id001, !!python/tuple [
+            0], b], state: !!python/tuple [1, !!python/tuple [2], *id002, false, !!binary "yGbXtHxY5r+cW7tinifhvw==\n"]},
+      0.2979888702842787], !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [*id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "/MfFINJR0z98S+eHBRHhvw==\n"]}, 0.355165974351231],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "wAduMTRd678AdD0r3Muevw==\n"]}, 0.1939889712825968],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "ADoGRiBfsj+4wNVFzNDGPw==\n"]}, 0.12455827969574394],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "fOasBhsx0b84Nn2bUV7evw==\n"]}, 0.2789447930907425],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "FO244L5J7L+ep9Uu7rzvvw==\n"]}, 0.3589108009943589],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "gOvsbe50jj+AoeQO7L/Evw==\n"]}, 0.1842275198652335],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "5vpPz6uZ7b9UNT6GTLzQvw==\n"]}, 0.16743769095455716],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "cFWespj8wL8YETIKvfvAPw==\n"]}, 0.03359660211446739],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "SB8THn2H67+wAQFxjv/sPw==\n"]}, 0.4192345787356337],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "inSXC8Ix6r+ISr+dGGLYPw==\n"]}, 0.0008993773403002148],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "UMQb3rVSw79A4EHz+LmfPw==\n"]}, 0.2600286026993409],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "lgyGLCXr5D84fPX0jhrOPw==\n"]}, 0.9510425139639356],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "fp9r8KAT6L+IKNZruY3WPw==\n"]}, 0.08384106437791478],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "aHr06nO24b8uy1hkYYvsvw==\n"]}, 0.5502472903463769],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "jPRTWbtP0D8YxPfm8pHpPw==\n"]}, 0.19245605546219557],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "hrF+aEOn7D+Edp0nBevhPw==\n"]}, 0.6471578021238243],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "WMG80gS9wz9a0XElBvjnPw==\n"]}, 0.38920969776489356],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "sMNp/iVzyr92Y3lsWhDjPw==\n"]}, 0.4621699447268271],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "jMbEsfZ67j+AA0NTDo3Lvw==\n"]}, 0.6689919405179793],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "SPOLE8oE7b9wXmPzhdzJvw==\n"]}, 0.7491430593381814],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "9L0QsSXx5j9e1yX0pV/pvw==\n"]}, 0.21804029892136703],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "3DRLORXu2r+INmiGZjDRPw==\n"]}, 0.5308643943499777],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "4qysU4bE5r+2oXm2IQTsvw==\n"]}, 0.271843116068023],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "zsRuixd26L+YZh+gk7Drvw==\n"]}, 0.21928823924438723],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "rC8J56qD2L+gmHm8n6Pivw==\n"]}, 0.23231478217135376],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "1L10DWo75D/q3R4X05zlvw==\n"]}, 0.21962832480777653],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "IvEsn/pu5L/Qa2M2H3nUvw==\n"]}, 0.5276210860042361],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "aE5Hkr/jxD+cUy7vmaLsvw==\n"]}, 0.25446430348257104],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "DIUBo+rH0T8oOneLLfzvvw==\n"]}, 0.3796486857470593],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "pOxw/kZV0L9EAbXjrFHmvw==\n"]}, 0.12357577604912341],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "ADmTbfZxuD+OjWiYm4Hpvw==\n"]}, 0.26848908035595487],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "eix880P767/YIS7mOnXRvw==\n"]}, 0.15720935464472885],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "tEQMk34v7L9k/m+HMV7uvw==\n"]}, 0.3249827364307464],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "2FcHjJLR4r8Y46nJD/XnPw==\n"]}, 0.022313783939378187],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "FO2BqFgX1z8oEgoMoDPNPw==\n"]}, 0.8774170455427632],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "IPEgh0+Jwr+suuwaJn7mvw==\n"]}, 0.09650160130107266],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "EOWMiAbK178sZ7aQBLbfvw==\n"]}, 0.6046554919078772],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "8NSM3WHnxT+AEF1GvYjTvw==\n"]}, 0.10233882926784396],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "sNXbqDf4t78o4GmoF2PRvw==\n"]}, 0.05222669672421233],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "3HEGLDyh2b+KwRNXWiPovw==\n"]}, 0.5525403462662977],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "jClwCR3X4j84kOeL+1TmPw==\n"]}, 0.17013125629999942],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "oC56TKZ42T/clNK3/o7vPw==\n"]}, 0.5483236947574356],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "aFxYB7lg4L/wNEFh1Gmxvw==\n"]}, 0.08437866964549838],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "CKSbqW4Nwz9AORXYpY2gvw==\n"]}, 0.35356726858170623],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "APlfvxzNqT/u2Nie3YDqvw==\n"]}, 0.2543759685514801],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "LnC/skAC6D/2qgASwnXpvw==\n"]}, 0.7926724116823437],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "wGwul3Ze3T98hSdEgiTUvw==\n"]}, 0.16070342562081397],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "NLRB9tok27+IkFc4chzevw==\n"]}, 0.4191581887228921],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "VuqVSC+77j8OVYlt9wvlPw==\n"]}, 0.39440605819746527],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "xI/nO5xx6L8CjN5j/arlvw==\n"]}, 0.7695021123138285],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "aKG4Guf1xL8+uFuGmYXuvw==\n"]}, 0.1878744960367334],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "wIe8Ov904D8ovZ2X8tzsPw==\n"]}, 0.24323734102590563],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "oqmIqOJF5r+A502uge+sPw==\n"]}, 0.1337585199416726],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "wJMLlIOalr/avXpiEJ7mvw==\n"]}, 0.6443071233193565],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "8shN2KB97b9QXYE6shq2Pw==\n"]}, 0.17148068069152614],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "+O494RiI1T/AUu+R70Tuvw==\n"]}, 0.520782367657315],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "avB2pLru4D+AzSemuMisPw==\n"]}, 0.33895769855874],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "aEJA+dOxwj+0sSStw5/uPw==\n"]}, 0.22073955621028427],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "1vyLFtQH6D+8Y7qgt0DnPw==\n"]}, 0.2790192563933338],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "3NuOGh/X178M9Ibt+RzZPw==\n"]}, 0.5616829781186156],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "pFSaRXD/2D+ApbT3xpPevw==\n"]}, 0.5397932630688929],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "iMLkz58oyD/kxXcx+w/Rvw==\n"]}, 0.12120777557838165],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "mCOAGQN0xD/GiCftLk/lvw==\n"]}, 0.28920870206488525],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "UGOZO0Fstr+QR8hBbmfhPw==\n"]}, 0.27305254688673886],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "QK+/OAjC5T8gCali86+wPw==\n"]}, 0.17396945630375302],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "7NUosqd17D8EhgUMCdzhPw==\n"]}, 0.08357898950516857],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "YFPHJveFqr9IItGVic3Vvw==\n"]}, 0.40551252228999385],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "aD0KgfAC1T/OGxhrr7nhvw==\n"]}, 0.844245339083902],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "8JUm+v0d7L9EpE7ezO/jPw==\n"]}, 0.014978002500784788],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "3Cb0lH3K2T9YCxFGBwnvPw==\n"]}, 0.35541628371126993],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "iEQ/SR7V0j+4qI9heJHmPw==\n"]}, 0.33383578065712405],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "eCxzReKO7z8UROqhypbjPw==\n"]}, 0.14959872800521523],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "GqyQa2qa5D8AmjQjkV/kPw==\n"]}, 0.7919680017501538],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "TLGIpF+S279sbNq8KLTePw==\n"]}, 0.21988992783767175],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "sF2do8U8zb9okWamGX3hvw==\n"]}, 0.5177917249569154],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "YFWNhWmW1T+geRO/4g+iPw==\n"]}, 0.2927924919373556],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "QI15OFSO7r/Ezk007XzSvw==\n"]}, 0.8673821430706767],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "gBNA6aycs7+4ShVwMCXuvw==\n"]}, 0.6057561804157973],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "ONYcA7I+5b+k2K1pRzbuvw==\n"]}, 0.3981465894956782],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "sOoMpICB6L9otHFoAzzcvw==\n"]}, 0.23256212112437163],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "ShxBPhc67L+Q1ObcX9Pevw==\n"]}, 0.08518482749377464],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "HKlMsroq4T9Apq4Zj6TYPw==\n"]}, 0.5898377945157799],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "8tQXyuO4579aFsECizftPw==\n"]}, 0.3767877092577917],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "BhvRHBQn4L+AdUBM+QS7vw==\n"]}, 0.9314082675328975],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "CHGpYrjqy79O98jFJ/jrPw==\n"]}, 0.407155793907423],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "gNj4q2DF5z/20Mv6AzzvPw==\n"]}, 0.6326683517720996],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "KEirhsHX6r+Czsv3uh7tPw==\n"]}, 0.5922549376266365],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "8HVL5hsEur+oHbZ+nFPRvw==\n"]}, 0.8045601967945146],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "wB3IETBQuT88yC7/8ePhvw==\n"]}, 0.08732564483049172],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "umwYUVyJ6D+2Rj2kW3vhvw==\n"]}, 0.013041980731781736],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "VLVxsxRv5D9MUEyNKmnjvw==\n"]}, 0.3493532455001825],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "gtlmhIVL5z+shiP8i+vivw==\n"]}, 0.18177352834366362],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "YJmy1LJc3L/gKIe/0MLPPw==\n"]}, 0.5547096432393254],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "mNxuoCCvxb8e0eHcpp7pPw==\n"]}, 0.2787522196373883],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "AJETVckT0r+A6AMYssnlPw==\n"]}, 0.2730233759211253],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "ziQLg52W6D9gXJ8L6wSlvw==\n"]}, 0.14403854134439015],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "PpTY0XdL7T9gDYHVyJTTPw==\n"]}, 0.6033680278804495],
+    !!python/tuple [!!python/object/apply:numpy.core.multiarray._reconstruct {args: [
+          *id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "IAxW109X5r/2IiX1XC3jPw==\n"]}, 0.020172871742310545]],
+  odw_cvx: {makespan: !!python/object/apply:numpy.core.multiarray.scalar [*id002,
+      !!binary "G4UX/C8yA0A=\n"], package_trail: [!!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [*id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "lS6FN8zG07/wjW38K2/uPw==\n"]}, !!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [*id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "SBbUs7N50b/9FWzJCBzrPw==\n"]}, !!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [*id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "afJOWvfXz7+MISabK+boPw==\n"]}, !!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [*id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "y9B0Y3UAzL+UMSPUqKXmPw==\n"]}, !!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [*id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "cIWeEwe5yr/O4bv8+JnlPw==\n"]}, !!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [*id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "4f6+Li0GyL/0mPVSyovjPw==\n"]}, &id003 !!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [*id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "UOkvN+/G0z//VEQTDm/uvw==\n"]}]}, odw_straight: {
+    makespan: !!python/object/apply:numpy.core.multiarray.scalar [*id002, !!binary "3gGhb0ozA0A=\n"],
+    package_trail: [&id004 !!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [*id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "UOkvN+/G07//VEQTDm/uPw==\n"]}, !!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [*id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "FtlWg6Ca0b+Sh+5h/BbrPw==\n"]}, !!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [*id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "7rCVnSgt0L8qDSOBluToPw==\n"]}, !!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [*id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "DjMMg6Mvzb+uRwe61XTmPw==\n"]}, !!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [*id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "hlamvcoXzL8yWzzSg53lPw==\n"]}, !!python/object/apply:numpy.core.multiarray._reconstruct {
+        args: [*id001, !!python/tuple [0], b], state: !!python/tuple [1, !!python/tuple [
+            2], *id002, false, !!binary "4Cu+yTQayb/Js/cOdVDjPw==\n"]}, *id003]},
+  source: *id004, target: *id003, trivial_lower_bound: !!python/object/apply:numpy.core.multiarray.scalar [
+    *id002, !!binary "L307SdrSAEA=\n"], used_drones: [86, 19, 61, 36, 85, 13]}

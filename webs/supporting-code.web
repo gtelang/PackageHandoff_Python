@@ -31,6 +31,7 @@ import utils_graphics
 @< PHO Data Structures @>
 @< PHO Algorithms @>
 @< PHO Run Handlers@>
+@< PHO Experiments @>
 
 # Set up logging information relevant to this module
 logger=logging.getLogger(__name__)
@@ -76,8 +77,6 @@ def clearAxPolygonPatches(ax):
             patch.remove()
     ax.lines[:]=[]
     applyAxCorrection(ax)
-
-
 
 ##################################
 #### Buggy don't use! 
@@ -279,9 +278,10 @@ def animate_tour(drone_info,
 
 
 if __name__=="__main__":
-     print "Running Package Handoff"
-     single_pho_run_handler()
-
+     #single_pho_run_handler()
+     #experiment_1() 
+     #experiment_2() 
+     experiment_3()
 @|  @}
 %{/python-mode}%
 

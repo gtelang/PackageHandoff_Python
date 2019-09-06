@@ -35,10 +35,12 @@ class Single_PHO_Input:
     def get_drone_uis (self):
            return [self.drone_info[idx][1] for idx in range(len(self.drone_info)) ]
          
-    def get_tour(self, algo):
-           return algo( self.drone_info, self.source, self.target, 
-                        animate_tour_p = True,
-                        plot_tour_p    = False)
+    def get_tour(self, algo, animate_tour_p=False, plot_tour_p=False):
+           return algo( self.drone_info, 
+                        self.source, 
+                        self.target, 
+                        animate_tour_p, 
+                        plot_tour_p    )
 
     # Methods for \verb|ReverseHorseflyInput|
     def clearAllStates (self):
@@ -88,7 +90,7 @@ def algo_odw(drone_info, source, target,
     drone_pool.remove(imin) 
     used_drones = [imin]
 
-    package_trail = [current_package_position]
+    package_trail_straight = [current_package_position]
 
     package_reached_p   = False
     while not(package_reached_p):
@@ -117,12 +119,12 @@ def algo_odw(drone_info, source, target,
 
           if time_to_target_without_help < tI_min :
               package_reached_p = True
-              package_trail.append(target)
+              package_trail_straight.append(target)
 
           else:
               package_handler_speed    = drone_info[current_package_handler_idx][1] 
               current_package_position = current_package_position + package_handler_speed * (tI_min - clock_time) *  sthat
-              package_trail.append(current_package_position)
+              package_trail_straight.append(current_package_position)
     
               clock_time                  = tI_min 
               current_package_handler_idx = idx_tI_min
@@ -131,28 +133,25 @@ def algo_odw(drone_info, source, target,
               used_drones.append(idx_tI_min)  
    
     package_trail_cvx = algo_pho_exact_given_order_of_drones ([drone_info[idx] for idx in used_drones],source,target )
-    mspan_straight = makespan(drone_info, used_drones, package_trail)
+    mspan_straight = makespan(drone_info, used_drones, package_trail_straight)
     mspan_cvx      = makespan(drone_info, used_drones, package_trail_cvx)
     
-    #assert (mspan_cvx <= mspan_straight), ""
-
     if plot_tour_p:
          fig0, ax0 = plt.subplots()
-         plot_tour(fig0, ax0, "ODW: Straight Line"       , source, target, drone_info, used_drones, package_trail)
+         plot_tour(fig0, ax0, "ODW: Straight Line"       , source, target, drone_info, used_drones, package_trail_straight)
 
          fig1, ax1 = plt.subplots()
          plot_tour(fig1, ax1, "ODE: Straight Line, Post Convex Optimization", source, target, drone_info, used_drones, package_trail_cvx)
          plt.show()
 
     if animate_tour_p:
-
         #ptraj  = zip(package_trail_cvx, used_drones + [None])
         animate_tour(drone_info, [package_trail] , used_drones,
                      animation_file_name_prefix='package_handoff_animation.mp4', 
                      algo_name='odw',  
                      render_trajectory_trails_p=True) 
     
-    return used_drones, package_trail, mspan_straight, mspan_cvx, 
+    return used_drones, package_trail_straight, mspan_straight, package_trail_cvx, mspan_cvx
 
 
 def extract_coordinates(points):
@@ -167,7 +166,7 @@ def extract_coordinates(points):
 def get_interception_time(s, us, p, up, t, t0) :
     
     t_m = t - s # the _m subscript stands for modify
-    t_m /= np.linalg.norm(t_m) # normalize to unit
+    t_m = t_m / np.linalg.norm(t_m) # normalize to unit
 
     # For rotating a vector clockwise by theta, 
     # to get the vector t_m into alignment with (1,0)
@@ -235,18 +234,61 @@ def algo_pho_exact_given_order_of_drones ( drone_info, source, target ):
 
     prob = cp.Problem(objective, constraints_S + constraints_I + constraints_L)
     print Fore.CYAN
-    prob.solve(solver=cp.SCS, verbose=True)
+    prob.solve(solver=cp.SCS,verbose=True)
     print Style.RESET_ALL
     
     package_trail = [ np.asarray(X[i].value) for i in range(r) ] + [ target ]
     return package_trail
 
 
-def plot_tour(fig, ax, figtitle, source, target, drone_info, used_drones, package_trail):
+def plot_tour(fig, ax, figtitle, source, target, 
+              drone_info, used_drones, package_trail,
+              xlims=[0,1],
+              ylims=[0,1],
+              aspect_ratio=1.0,
+              speedfontsize=4,
+              speedmarkersize=10,
+              sourcetargetmarkerfontsize=4,
+              sourcetargetmarkersize=10 ):
 
-    ax.set_aspect(1.0)
-    ax.set_xlim([0.0, 1.0])
-    ax.set_ylim([0.0, 1.0])
+    import matplotlib.ticker as ticker
+    ax.set_aspect(aspect_ratio)
+    ax.set_xlim(xlims)
+    ax.set_ylim(ylims)
+
+    plt.rc('font', family='serif')
+
+
+    # Draw the package trail
+    xs, ys = extract_coordinates(package_trail)
+    ax.plot(xs,ys, 'ro', markersize=5 )
+    for idx in range(len(xs)-1):
+          plt.arrow( xs[idx], ys[idx], xs[idx+1]-xs[idx], ys[idx+1]-ys[idx], 
+                    **{'length_includes_head': True, 
+                       'width': 0.007 , 
+                       'head_width':0.01, 
+                       'fc': 'r', 
+                       'ec': 'none',
+                       'alpha': 0.8})
+
+
+    # Draw the source, target, and initial positions of the robots as bold dots
+    xs,ys = extract_coordinates([source, target])
+    ax.plot(xs,ys, 'o', markersize=sourcetargetmarkersize, alpha=0.8, ms=10, mec='k', mfc='#F1AB30' )
+    #ax.plot(xs,ys, 'k--', alpha=0.6 ) # light line connecting source and target
+
+    ax.text(source[0], source[1], 'S', fontsize=sourcetargetmarkerfontsize,\
+            horizontalalignment='center',verticalalignment='center')
+    ax.text(target[0], target[1], 'T', fontsize=sourcetargetmarkerfontsize,\
+            horizontalalignment='center',verticalalignment='center')
+
+    xs, ys = extract_coordinates( [ drone_info[idx][0] for idx in range(len(drone_info)) ]  )
+    ax.plot(xs,ys, 'o', markersize=speedmarkersize, alpha = 0.5, mec='None', mfc='#b7e8cc' )
+
+    # Draw speed labels
+    for idx in range(len(drone_info)):
+         ax.text( drone_info[idx][0][0], drone_info[idx][0][1], format(drone_info[idx][1],'.3f'),
+                  fontsize=speedfontsize, horizontalalignment='center', verticalalignment='center' )
 
     # Draw drone path from initial position to interception point
     for pt, idx in zip(package_trail, used_drones):
@@ -261,45 +303,34 @@ def plot_tour(fig, ax, figtitle, source, target, drone_info, used_drones, packag
                        'fc': 'b', 
                        'ec': 'none'})
 
-    # Draw the package trail
-    xs, ys = extract_coordinates(package_trail)
-    ax.plot(xs,ys, 'ro', markersize=5 )
-    for idx in range(len(xs)-1):
-          plt.arrow( xs[idx], ys[idx], xs[idx+1]-xs[idx], ys[idx+1]-ys[idx], 
-                    **{'length_includes_head': True, 
-                       'width': 0.007 , 
-                       'head_width':0.03, 
-                       'fc': 'r', 
-                       'ec': 'none',
-                       'alpha': 0.8})
+    fig.suptitle(figtitle, fontsize=15)
+    ax.set_title('\nMakespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=8)
+
+    startx, endx = ax.get_xlim()
+    starty, endy = ax.get_ylim()
 
 
+    ax.tick_params(which='both', # Options for both major and minor ticks
+                top='off', # turn off top ticks
+                left='off', # turn off left ticks
+                right='off',  # turn off right ticks
+                bottom='off') # turn off bottom ticks
+    
+    # Customize the major grid
+    ax.grid(which='major', linestyle='-', linewidth='0.1', color='red')
+    ax.grid(which='minor', linestyle=':', linewidth='0.1', color='black')
 
-    # Draw the source, target, and initial positions of the robots as bold dots
-    xs,ys = extract_coordinates([source, target])
-    ax.plot(xs,ys, 'o', markersize=30, alpha=0.8, ms=10, mec='k', mfc='#F1AB30' )
-    ax.plot(xs,ys, 'k--', alpha=0.6 ) # light line connecting source and target
+    #ax.xaxis.set_ticks(np.arange(startx, endx, 0.4))
+    #ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))
+     
+    #ax.yaxis.set_ticks(np.arange(starty, endy, 0.4))
+    #ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))
 
-    ax.text(source[0], source[1], 'S', fontsize=22,\
-            horizontalalignment='center',verticalalignment='center')
-    ax.text(target[0], target[1], 'T', fontsize=22,\
-            horizontalalignment='center',verticalalignment='center')
-
-    xs, ys = extract_coordinates( [ drone_info[idx][0] for idx in range(len(drone_info)) ]  )
-    ax.plot(xs,ys, 'o', markersize=26, mec='k', mfc='#b7e8cc' )
-
-    # Draw speed labels
-    for idx in range(len(drone_info)):
-         ax.text( drone_info[idx][0][0], drone_info[idx][0][1], drone_info[idx][1],
-                  fontsize=15, horizontalalignment='center', verticalalignment='center' )
-
-
-    fig.suptitle(figtitle, fontsize=25)
-    ax.set_title('\nMakespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=15)
-
+    #plt.yticks(fontsize=5, rotation=90)
+    #plt.xticks(fontsize=5)
 
     # A light grid
-    plt.grid(color='0.5', linestyle='--', linewidth=0.5)
+    #plt.grid(color='0.5', linestyle='--', linewidth=0.5)
 
 def makespan(drone_info, used_drones, package_trail):
 
@@ -385,7 +416,7 @@ def single_pho_run_handler():
                     # Incase there are patches present from the previous clustering, just clear them
                     clearAxPolygonPatches(ax)
                     if   algo_str == 'odw':
-                          tour = run.get_tour( algo_odw )
+                          tour = run.get_tour( algo_odw, plot_tour_p=True )
                     else:
                           print "Unknown option. No horsefly for you! ;-D "
                           sys.exit()
@@ -431,6 +462,290 @@ def single_pho_run_handler():
     fig.canvas.mpl_connect('key_press_event', keyPress   )
     
     plt.show()
+
+# PHO Experiments
+
+def experiment_1():
+    # generate the experiments folder
+    import shutil
+    import os
+    import random
+    from datetime import datetime
+    import yaml
+
+
+    #random.seed(6)
+    random.seed(7)
+
+   
+    # Uniform random points
+    source_init  = np.asarray([-1.0,0]) 
+    target_init  = np.asarray([ 1.0,0]) 
+    
+    exsize = 100
+    exreps = 5
+    dtheta = 2.0*np.pi/exreps
+
+    dir = 'pho_experiment_1' + '_exsize_' + str(exsize)
+    if os.path.exists(dir):
+       shutil.rmtree(dir)
+
+    os.makedirs(dir)
+
+    xs     = [ random.uniform(-1,1) for _ in range(exsize) ] 
+    ys     = [ random.uniform(-1,1) for _ in range(exsize)] 
+
+    initdroneposns = map(np.asarray, zip(xs,ys))
+    utils_algo.print_list(initdroneposns)
+    
+    speeds = [random.uniform(0.01,1.) for _ in range(exsize)]
+
+    drone_info = zip(initdroneposns, speeds)
+
+    for idx in range(exreps):
+        
+         th    = idx * dtheta
+         costh = np.cos(th)
+         sinth = np.sin(th)
+
+         rotmat = np.asarray([[costh, sinth],
+                              [-sinth, costh]])
+   
+         source = rotmat.dot(source_init)
+         target = rotmat.dot(target_init)
+
+         run = Single_PHO_Input(drone_info, source, target)
+
+         # Execute the algorithm and unpack the data
+         used_drones,           \
+         package_trail_straight,\
+         mspan_straight,        \
+         package_trail_cvx,      \
+         mspan_cvx = run.get_tour(algo_odw, 
+                                  animate_tour_p = False, 
+                                  plot_tour_p    = False )     
+
+         trivial_lower_bound = np.linalg.norm(target-source)/max(speeds) 
+
+         print "Used Drones: "   , used_drones 
+         print "\n"
+         print Fore.CYAN, "Package Trail Straight: " , Style.RESET_ALL
+         utils_algo.print_list(package_trail_straight)
+         print "\n"
+         print Fore.CYAN, "Package Trail CVX: ", Style.RESET_ALL        
+         utils_algo.print_list(package_trail_cvx)
+
+         print Fore.RED, "mspan_straight: ",  mspan_straight, "\n mspan_cvx:      ", mspan_cvx, Style.RESET_ALL
+         print "Dilation Factor:(CVX to Straight) ", mspan_straight/mspan_cvx
+         print ""
+         print "CVX Solution within: ", Fore.CYAN,  mspan_cvx/trivial_lower_bound , Style.RESET_ALL, " of optimum"
+
+         # Write data to YAML file
+         data = {'drone_info'  : drone_info,
+                 'source'      : source,
+                 'target'      : target,
+                 'used_drones' : used_drones, 
+                 'odw_straight': {'package_trail': package_trail_straight,
+                                  'makespan'     : mspan_straight},
+
+                 'odw_cvx'     : {'package_trail': package_trail_cvx,
+                                  'makespan'     : mspan_cvx },
+                 'trivial_lower_bound': trivial_lower_bound}
+
+         subdir = 'data_exsize_'+str(exsize) + '_repnum_' + str(idx)
+         os.makedirs(dir + '/' + subdir)
+   
+         filename = dir + '/' + subdir + '/' + subdir + '.yml'
+         with open(filename, 'w') as outfile:
+             yaml.dump(data, outfile, default_flow_style=True)
+
+         eps = 1e-1
+         fig, ax = plt.subplots()
+         plot_tour(fig, ax, "Package Handoff: ODW Heuristic", 
+                   source, target, drone_info, used_drones, 
+                   package_trail_cvx, 
+                   xlims=[-1-eps,1+eps], 
+                   ylims=[-1-eps,1+eps], 
+                   aspect_ratio=1.0)
+         print Fore.RED, "Saving figure to disk : ", idx, Style.RESET_ALL
+         plt.savefig(dir + '/' + subdir + '/' + subdir + 
+                     '.png', bbox_inches="tight", dpi=200)
+         plt.savefig(dir+'/plot'+str(idx).zfill(4)+'.png', bbox_inches="tight", dpi=200 )
+
+    import subprocess
+
+    command =  "ffmpeg -r 4 -f image2 -s 1920x1080 -i " + dir +"/plot%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " +\
+               " " + dir+ "/" + "pho_handoff_animation_different_source_target.mp4"
+    subprocess.call(command.split())
+          
+  
+def experiment_2():
+    import shutil
+    import os
+    import random
+    from datetime import datetime
+    import yaml
+
+    random.seed(7)
+   
+    source  = np.asarray([0.1,0]) 
+    target  = np.asarray([1,0]) 
+
+    # Basic copy
+    numdrones_bas = 30
+
+    xs0     = [0.101                                for idx in range(numdrones_bas)] 
+    ys0     = [(idx+1)/float(numdrones_bas)         for idx in range(numdrones_bas)] 
+    speeds0 = [1.1 - (idx+1)/float(1.1*numdrones_bas) for idx in range(numdrones_bas)] 
+    speeds0.reverse()
+
+    xs = xs0 
+    ys = ys0
+    speeds = speeds0 
+
+    initdroneposns = map(np.asarray, zip(xs,ys))
+    drone_info = zip(initdroneposns, speeds)
+
+    run = Single_PHO_Input(drone_info, source, target)
+
+    # Execute the algorithm and unpack the data
+    used_drones,           \
+    package_trail_straight,\
+    mspan_straight,        \
+    package_trail_cvx,     \
+    mspan_cvx = run.get_tour(algo_odw, 
+                             animate_tour_p = False, 
+                             plot_tour_p    = False )     
+
+    trivial_lower_bound = np.linalg.norm(target-source)/max(speeds) 
+
+
+    print "Used Drones: "   , used_drones 
+    print "\n"
+    print Fore.CYAN, "Package Trail Straight: " , Style.RESET_ALL
+    utils_algo.print_list(package_trail_straight)
+    print "\n"
+    print Fore.CYAN, "Package Trail CVX: ", Style.RESET_ALL        
+    utils_algo.print_list(package_trail_cvx)
+
+    print Fore.RED, "mspan_straight: ",  mspan_straight, "\n mspan_cvx:      ", mspan_cvx, Style.RESET_ALL
+    print "Dilation Factor:(CVX to Straight) ", mspan_straight/mspan_cvx
+    print ""
+    print "CVX Solution within: ", Fore.CYAN,  mspan_cvx/trivial_lower_bound , Style.RESET_ALL, " of optimum"
+
+
+    eps = 1e-1
+    fig, ax = plt.subplots()
+    plot_tour(fig, ax, "Package Handoff: Bending Behavior", 
+                source, target, drone_info, used_drones, 
+                package_trail_cvx, 
+                xlims=[-eps,1+eps], 
+                ylims=[-eps,1+eps], 
+                aspect_ratio=1.0,
+                speedfontsize=1,
+                speedmarkersize=4,
+                sourcetargetmarkersize=19,
+                sourcetargetmarkerfontsize=14)
+    plt.show()
+ 
+  
+def experiment_3():
+    import shutil
+    import os
+    import random
+    from datetime import datetime
+    import yaml
+
+    random.seed(7)
+    eps = 1e-1
+
+    source  = np.asarray([0.1, 0.5]) 
+    target  = np.asarray([1.0, 0.5]) 
+
+    numdrones = 100
+
+    config = 'bendy'
+    
+
+    if config == 'menorah':
+        speeds = []
+        xs     = []
+        ys     = []
+    
+        for idx in range(numdrones):
+             xs.append(0.1)
+             ys.append( 0.5+(-1.07)**idx * 0.001 )
+             speeds.append((idx+1)/float(40*numdrones))
+        figtitle="Package Handoff: Many Inflection Points"
+
+
+    elif config == 'bendy':   
+        # Basic copy
+        numdrones_bas = 15
+ 
+        xs0     = [0.101                                for idx in range(numdrones_bas)] 
+        ys0     = [0.5 + (idx+1)/float(2*numdrones_bas)         for idx in range(numdrones_bas)] 
+        speeds0 = [1.1 - (idx+1)/float(1.2*numdrones_bas) for idx in range(numdrones_bas)] 
+        speeds0.reverse()
+
+        xs1    = [0.6 + (idx+1)/float(1.5*numdrones_bas)         for idx in range(numdrones_bas)] 
+        ys1    = [1.0 - idx/float(1000000.0*numdrones_bas) for idx in range(numdrones_bas)]
+        speeds1 = [1.04 + (idx+1)/float(3*numdrones_bas) for idx in range(numdrones_bas)]
+
+
+        xs = xs0 + xs1
+        ys = ys0 + ys1
+        speeds = speeds0 + speeds1 
+
+
+        figtitle="Bendy"
+     
+
+
+
+
+    initdroneposns = map(np.asarray, zip(xs,ys))
+    drone_info     = zip(initdroneposns, speeds)
+
+    run = Single_PHO_Input(drone_info, source, target)
+
+    # Execute the algorithm and unpack the data
+    used_drones,           \
+    package_trail_straight,\
+    mspan_straight,        \
+    package_trail_cvx,     \
+    mspan_cvx = run.get_tour(algo_odw, 
+                             animate_tour_p = False, 
+                             plot_tour_p    = False )     
+
+    trivial_lower_bound = np.linalg.norm(target-source)/max(speeds) 
+
+    print "Used Drones: "   , used_drones 
+    print "\n"
+    print Fore.CYAN, "Package Trail Straight: " , Style.RESET_ALL
+    utils_algo.print_list(package_trail_straight)
+    print "\n"
+    print Fore.CYAN, "Package Trail CVX: ", Style.RESET_ALL        
+    utils_algo.print_list(package_trail_cvx)
+
+    print Fore.RED, "mspan_straight: ",  mspan_straight, "\n mspan_cvx:      ", mspan_cvx, Style.RESET_ALL
+    print "Dilation Factor:(CVX to Straight) ", mspan_straight/mspan_cvx
+    print ""
+    print "CVX Solution within: ", Fore.CYAN,  mspan_cvx/trivial_lower_bound , Style.RESET_ALL, " of optimum\n"
+
+    fig, ax = plt.subplots()
+    plot_tour(fig, ax, figtitle, 
+                source, target, drone_info, used_drones, 
+                package_trail_cvx, 
+                xlims=[-eps,1+eps], 
+                ylims=[-eps,1+eps], 
+                aspect_ratio=1.0,
+                speedfontsize=7,
+                speedmarkersize=16,
+                sourcetargetmarkersize=19,
+                sourcetargetmarkerfontsize=14)
+    plt.show()
+ 
 
 
 # Set up logging information relevant to this module
@@ -478,9 +793,10 @@ def clearAxPolygonPatches(ax):
     ax.lines[:]=[]
     applyAxCorrection(ax)
 
+##################################
+#### Buggy don't use! 
+##################################
 
-
-# A drone trajectory is [ idx,      ]
 def animate_tour(drone_info, 
                  package_trajectories, 
                  used_drones, 
@@ -677,6 +993,7 @@ def animate_tour(drone_info,
 
 
 if __name__=="__main__":
-     print "Running Package Handoff"
      single_pho_run_handler()
-
+     #experiment_1() 
+     #experiment_2() 
+     #experiment_3()

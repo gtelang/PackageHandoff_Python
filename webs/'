@@ -261,7 +261,7 @@ def extract_coordinates(points):
 def get_interception_time(s, us, p, up, t, t0) :
     
     t_m = t - s # the _m subscript stands for modify
-    t_m = t_m / np.linalg.norm(t_m) # normalize to unit
+    t_m /= np.linalg.norm(t_m) # normalize to unit
 
     # For rotating a vector clockwise by theta, 
     # to get the vector t_m into alignment with (1,0)
@@ -405,11 +405,7 @@ def plot_tour(fig, ax, figtitle, source, target,
               drone_info, used_drones, package_trail,
               xlims=[0,1],
               ylims=[0,1],
-              aspect_ratio=1.0,
-              speedfontsize=4,
-              speedmarkersize=10,
-              sourcetargetmarkerfontsize=4,
-              sourcetargetmarkersize=10 ):
+              aspect_ratio=1.0):
 
     import matplotlib.ticker as ticker
     ax.set_aspect(aspect_ratio)
@@ -426,7 +422,7 @@ def plot_tour(fig, ax, figtitle, source, target,
           plt.arrow( xs[idx], ys[idx], xs[idx+1]-xs[idx], ys[idx+1]-ys[idx], 
                     **{'length_includes_head': True, 
                        'width': 0.007 , 
-                       'head_width':0.01, 
+                       'head_width':0.03, 
                        'fc': 'r', 
                        'ec': 'none',
                        'alpha': 0.8})
@@ -434,21 +430,21 @@ def plot_tour(fig, ax, figtitle, source, target,
 
     # Draw the source, target, and initial positions of the robots as bold dots
     xs,ys = extract_coordinates([source, target])
-    ax.plot(xs,ys, 'o', markersize=sourcetargetmarkersize, alpha=0.8, ms=10, mec='k', mfc='#F1AB30' )
+    ax.plot(xs,ys, 'o', markersize=12, alpha=0.8, ms=10, mec='k', mfc='#F1AB30' )
     #ax.plot(xs,ys, 'k--', alpha=0.6 ) # light line connecting source and target
 
-    ax.text(source[0], source[1], 'S', fontsize=sourcetargetmarkerfontsize,\
+    ax.text(source[0], source[1], 'S', fontsize=10,\
             horizontalalignment='center',verticalalignment='center')
-    ax.text(target[0], target[1], 'T', fontsize=sourcetargetmarkerfontsize,\
+    ax.text(target[0], target[1], 'T', fontsize=10,\
             horizontalalignment='center',verticalalignment='center')
 
     xs, ys = extract_coordinates( [ drone_info[idx][0] for idx in range(len(drone_info)) ]  )
-    ax.plot(xs,ys, 'o', markersize=speedmarkersize, alpha = 0.5, mec='None', mfc='#b7e8cc' )
+    ax.plot(xs,ys, 'o', markersize=10, alpha = 0.5, mec='None', mfc='#b7e8cc' )
 
     # Draw speed labels
     for idx in range(len(drone_info)):
-         ax.text( drone_info[idx][0][0], drone_info[idx][0][1], format(drone_info[idx][1],'.3f'),
-                  fontsize=speedfontsize, horizontalalignment='center', verticalalignment='center' )
+         ax.text( drone_info[idx][0][0], drone_info[idx][0][1], format(drone_info[idx][1],'.2f'),
+                  fontsize=4, horizontalalignment='center', verticalalignment='center' )
 
     # Draw drone path from initial position to interception point
     for pt, idx in zip(package_trail, used_drones):
@@ -463,31 +459,28 @@ def plot_tour(fig, ax, figtitle, source, target,
                        'fc': 'b', 
                        'ec': 'none'})
 
+
+
+
+
+
+
     fig.suptitle(figtitle, fontsize=15)
     ax.set_title('\nMakespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=8)
 
     startx, endx = ax.get_xlim()
     starty, endy = ax.get_ylim()
 
+    ax.xaxis.set_ticks(np.arange(startx, endx, 0.4))
+    ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))
 
-    ax.tick_params(which='both', # Options for both major and minor ticks
-                top='off', # turn off top ticks
-                left='off', # turn off left ticks
-                right='off',  # turn off right ticks
-                bottom='off') # turn off bottom ticks
-    
-    # Customize the major grid
-    ax.grid(which='major', linestyle='-', linewidth='0.1', color='red')
-    ax.grid(which='minor', linestyle=':', linewidth='0.1', color='black')
-
-    #ax.xaxis.set_ticks(np.arange(startx, endx, 0.4))
-    #ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))
      
-    #ax.yaxis.set_ticks(np.arange(starty, endy, 0.4))
-    #ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))
+    ax.yaxis.set_ticks(np.arange(starty, endy, 0.4))
+    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))
 
-    #plt.yticks(fontsize=5, rotation=90)
-    #plt.xticks(fontsize=5)
+    plt.yticks(fontsize=5, rotation=90)
+    plt.xticks(fontsize=5)
+
 
     # A light grid
     #plt.grid(color='0.5', linestyle='--', linewidth=0.5)
@@ -680,7 +673,7 @@ def experiment_1():
     target_init  = np.asarray([ 1.0,0]) 
     
     exsize = 100
-    exreps = 5
+    exreps = 10
     dtheta = 2.0*np.pi/exreps
 
     dir = 'pho_experiment_1' + '_exsize_' + str(exsize)
@@ -689,6 +682,7 @@ def experiment_1():
 
     os.makedirs(dir)
 
+
     xs     = [ random.uniform(-1,1) for _ in range(exsize) ] 
     ys     = [ random.uniform(-1,1) for _ in range(exsize)] 
 
@@ -696,7 +690,6 @@ def experiment_1():
     utils_algo.print_list(initdroneposns)
     
     speeds = [random.uniform(0.01,1.) for _ in range(exsize)]
-
     drone_info = zip(initdroneposns, speeds)
 
     for idx in range(exreps):
@@ -770,201 +763,11 @@ def experiment_1():
          plt.savefig(dir+'/plot'+str(idx).zfill(4)+'.png', bbox_inches="tight", dpi=200 )
 
     import subprocess
-
-    command =  "ffmpeg -r 4 -f image2 -s 1920x1080 -i " + dir +"/plot%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p " +\
-               " " + dir+ "/" + "pho_handoff_animation_different_source_target.mp4"
+    command =  "ffmpeg -r 4 -f image2 -s 1920x1080 -i " + dir +"/plot%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p pho_handoff_animation_different_source_target.mp4"
     subprocess.call(command.split())
           
 @| @}
 %{/python-mode}%
-
-
-
-
-\subsection{Experiment 2: Dragging the pho curve as far as possible}
-
-%{python-mode}%
-@d PHO Experiments  @{  
-def experiment_2():
-    import shutil
-    import os
-    import random
-    from datetime import datetime
-    import yaml
-
-    random.seed(7)
-   
-    source  = np.asarray([0.1,0]) 
-    target  = np.asarray([1,0]) 
-
-    # Basic copy
-    numdrones_bas = 30
-
-    xs0     = [0.101                                for idx in range(numdrones_bas)] 
-    ys0     = [(idx+1)/float(numdrones_bas)         for idx in range(numdrones_bas)] 
-    speeds0 = [1.1 - (idx+1)/float(1.1*numdrones_bas) for idx in range(numdrones_bas)] 
-    speeds0.reverse()
-
-    xs = xs0 
-    ys = ys0
-    speeds = speeds0 
-
-    initdroneposns = map(np.asarray, zip(xs,ys))
-    drone_info = zip(initdroneposns, speeds)
-
-    run = Single_PHO_Input(drone_info, source, target)
-
-    # Execute the algorithm and unpack the data
-    used_drones,           \
-    package_trail_straight,\
-    mspan_straight,        \
-    package_trail_cvx,     \
-    mspan_cvx = run.get_tour(algo_odw, 
-                             animate_tour_p = False, 
-                             plot_tour_p    = False )     
-
-    trivial_lower_bound = np.linalg.norm(target-source)/max(speeds) 
-
-
-    print "Used Drones: "   , used_drones 
-    print "\n"
-    print Fore.CYAN, "Package Trail Straight: " , Style.RESET_ALL
-    utils_algo.print_list(package_trail_straight)
-    print "\n"
-    print Fore.CYAN, "Package Trail CVX: ", Style.RESET_ALL        
-    utils_algo.print_list(package_trail_cvx)
-
-    print Fore.RED, "mspan_straight: ",  mspan_straight, "\n mspan_cvx:      ", mspan_cvx, Style.RESET_ALL
-    print "Dilation Factor:(CVX to Straight) ", mspan_straight/mspan_cvx
-    print ""
-    print "CVX Solution within: ", Fore.CYAN,  mspan_cvx/trivial_lower_bound , Style.RESET_ALL, " of optimum"
-
-
-    eps = 1e-1
-    fig, ax = plt.subplots()
-    plot_tour(fig, ax, "Package Handoff: Bending Behavior", 
-                source, target, drone_info, used_drones, 
-                package_trail_cvx, 
-                xlims=[-eps,1+eps], 
-                ylims=[-eps,1+eps], 
-                aspect_ratio=1.0,
-                speedfontsize=1,
-                speedmarkersize=4,
-                sourcetargetmarkersize=19,
-                sourcetargetmarkerfontsize=14)
-    plt.show()
- 
-@| @}
-%{/python-mode}%
-
-
-
-\subsection{Experiment 3: Making the curve as wiggly as possible}
-
-How many times can the convexity of the curve change? 
-
-%{python-mode}%
-@d PHO Experiments  @{  
-def experiment_3():
-    import shutil
-    import os
-    import random
-    from datetime import datetime
-    import yaml
-
-    random.seed(7)
-    eps = 1e-1
-
-    source  = np.asarray([0.1, 0.5]) 
-    target  = np.asarray([1.0, 0.5]) 
-
-    numdrones = 100
-
-    config = 'bendy'
-    
-
-    if config == 'menorah':
-        speeds = []
-        xs     = []
-        ys     = []
-    
-        for idx in range(numdrones):
-             xs.append(0.1)
-             ys.append( 0.5+(-1.07)**idx * 0.001 )
-             speeds.append((idx+1)/float(40*numdrones))
-        figtitle="Package Handoff: Many Inflection Points"
-
-
-    elif config == 'bendy':   
-        # Basic copy
-        numdrones_bas = 15
- 
-        xs0     = [0.101                                for idx in range(numdrones_bas)] 
-        ys0     = [0.5 + (idx+1)/float(2*numdrones_bas)         for idx in range(numdrones_bas)] 
-        speeds0 = [1.1 - (idx+1)/float(1.2*numdrones_bas) for idx in range(numdrones_bas)] 
-        speeds0.reverse()
-
-        xs1    = [0.6 + (idx+1)/float(1.5*numdrones_bas)         for idx in range(numdrones_bas)] 
-        ys1    = [1.0 - idx/float(1000000.0*numdrones_bas) for idx in range(numdrones_bas)]
-        speeds1 = [1.04 + (idx+1)/float(3*numdrones_bas) for idx in range(numdrones_bas)]
-
-
-        xs = xs0 + xs1
-        ys = ys0 + ys1
-        speeds = speeds0 + speeds1 
-
-
-        figtitle="Bendy"
-     
-
-
-
-
-    initdroneposns = map(np.asarray, zip(xs,ys))
-    drone_info     = zip(initdroneposns, speeds)
-
-    run = Single_PHO_Input(drone_info, source, target)
-
-    # Execute the algorithm and unpack the data
-    used_drones,           \
-    package_trail_straight,\
-    mspan_straight,        \
-    package_trail_cvx,     \
-    mspan_cvx = run.get_tour(algo_odw, 
-                             animate_tour_p = False, 
-                             plot_tour_p    = False )     
-
-    trivial_lower_bound = np.linalg.norm(target-source)/max(speeds) 
-
-    print "Used Drones: "   , used_drones 
-    print "\n"
-    print Fore.CYAN, "Package Trail Straight: " , Style.RESET_ALL
-    utils_algo.print_list(package_trail_straight)
-    print "\n"
-    print Fore.CYAN, "Package Trail CVX: ", Style.RESET_ALL        
-    utils_algo.print_list(package_trail_cvx)
-
-    print Fore.RED, "mspan_straight: ",  mspan_straight, "\n mspan_cvx:      ", mspan_cvx, Style.RESET_ALL
-    print "Dilation Factor:(CVX to Straight) ", mspan_straight/mspan_cvx
-    print ""
-    print "CVX Solution within: ", Fore.CYAN,  mspan_cvx/trivial_lower_bound , Style.RESET_ALL, " of optimum\n"
-
-    fig, ax = plt.subplots()
-    plot_tour(fig, ax, figtitle, 
-                source, target, drone_info, used_drones, 
-                package_trail_cvx, 
-                xlims=[-eps,1+eps], 
-                ylims=[-eps,1+eps], 
-                aspect_ratio=1.0,
-                speedfontsize=7,
-                speedmarkersize=16,
-                sourcetargetmarkersize=19,
-                sourcetargetmarkerfontsize=14)
-    plt.show()
- 
-@| @}
-%{/python-mode}%
-
 
 
 
