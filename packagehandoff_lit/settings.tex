@@ -1,0 +1,286 @@
+\usepackage[a4paper, left=1cm, right=1cm, top=3cm, marginparwidth=2cm]{geometry}
+\usepackage{marginnote}
+
+\setcounter{secnumdepth}{3} % default value for 'report' class is "2"
+
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikzsymbols}
+\usepackage[backend=bibtex, style=numeric, sorting=none]{biblatex} 
+\usepackage{csquotes}
+\setlength\bibitemsep{\baselineskip}
+\addbibresource{References.bib}
+
+\usepackage{float} % to take away the error unknown float option `H'
+% https://stackoverflow.com/a/27243065/505306
+% Making caption font smaller on figures and tables.
+\usepackage{caption}
+\captionsetup{font=footnotesize}
+
+%-------------------------------------------------------------------------------
+%\usepackage[left,pagewise]{lineno}
+%\usepackage[right]{lineno}
+%\linenumbers
+%--------------------------------------------------------------------------------
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{wrapfig}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+% ------------------------------------------------------------------------------
+\usepackage[toc,page]{appendix}
+\usepackage[stretch=10]{microtype} % https://tex.stackexchange.com/a/586  The great microtype package
+%-------------------------------------------------------------------------------
+%https://tex.stackexchange.com/a/278199/17858
+% For aligning itemize environments to left
+\usepackage{enumitem}
+\mdfsetup{%
+   middlelinecolor=red,
+   middlelinewidth=0pt,
+   roundcorner=10pt}
+
+\mdfdefinestyle{MyFrame}{%
+    linecolor=black,
+    outerlinewidth=0.1pt,
+    roundcorner=0pt,
+    innertopmargin=14pt,
+    innerbottommargin=4pt,
+    innerrightmargin=4pt,
+    innerleftmargin=4pt,
+        leftmargin = 4pt,
+        rightmargin = 4pt,
+    %backgroundcolor=gray!50!white}
+     }
+%-------------------------------------------------------------------------------
+
+\definecolor{theocol}{RGB}{255, 222, 228}
+\newtheorem{theo}{Theorem}
+\newenvironment{ftheo}
+  {\begin{mdframed}[style=MyFrame,nobreak=true, backgroundcolor=theocol]\begin{theo}}
+  {\end{theo}\end{mdframed}}
+
+
+\definecolor{lemcol}{RGB}{226, 255, 220}
+\newtheorem{lem}{Lemma}
+\newenvironment{flem}
+  {\begin{mdframed}[style=MyFrame,nobreak=true, backgroundcolor=lemcol]\begin{lem}}
+  {\end{lem}\end{mdframed}}
+
+\definecolor{corcol}{RGB}{227, 227, 227}
+\newtheorem{cor}{Corollary}
+\newenvironment{fcor}
+  {\begin{mdframed}[style=MyFrame,nobreak=true, backgroundcolor=corcol]\begin{cor}}
+  {\end{cor}\end{mdframed}}
+
+\definecolor{propcol}{RGB}{227, 227, 227}
+\newtheorem{prop}{Proposition}
+\newenvironment{fprop}
+  {\begin{mdframed}[style=MyFrame,nobreak=true, backgroundcolor=propcol]\begin{prop}}
+  {\end{prop}\end{mdframed}}
+
+\definecolor{conjcol}{RGB}{248, 218, 194}
+\newtheorem{conj}{Conjecture}
+\newenvironment{fconj}
+  {\begin{mdframed}[style=MyFrame,nobreak=true, backgroundcolor=conjcol]\begin{conj}}
+  {\end{conj}\end{mdframed}}
+
+
+\definecolor{notecol}{RGB}{255, 152, 149  }
+\newenvironment{note}
+  {\begin{mdframed}[style=MyFrame,nobreak=true, backgroundcolor=notecol]}
+  {\end{mdframed}}
+
+\usepackage{enumitem}
+
+%-------------------------------------------------------------------------------
+% https://tex.stackexchange.com/q/2291/17858
+% if you want to create a new list from scratch
+\newlist{alphalist}{enumerate}{1}
+% in that case, at least label must be specified using \setlist
+\setlist[alphalist,1]{label=\textbf{\Alph*.}}
+
+%--------------------------------------------------------------------------------
+\usepackage[english]{babel}
+%\setlength{\voffset}{-0.75in}
+\setlength{\headsep}{5pt}
+
+%-------------------------------------------------------------------------------
+\usepackage{blindtext}
+\usepackage{lipsum}
+\usepackage{kantlipsum}
+\usepackage{textcomp}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{IEEEtrantools}
+\usepackage{mathtools}
+
+\usepackage{listings}
+
+
+%-----------------------------------------------------------------------------------------------
+\usepackage[inline]{asymptote}
+\usepackage{asypictureB}
+\usepackage{filecontents}
+\usepackage{parskip} 
+\usepackage{tocloft}
+\usepackage{graphicx}                             % Include images into pdf document 
+\usepackage{tikz}                                 % Useful for the circled command. Don't remove!
+\usepackage{multicol}                             % For lists in two or more columns
+
+
+%% top right numbering of pages https://tex.stackexchange.com/a/56321
+\pagestyle{myheadings}
+
+
+
+\usepackage[nokwfunc, ruled, linesnumbered,nofillcomment]{algorithm2e}
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{gray}{#1}}
+\SetCommentSty{mycommfont}
+
+\usepackage[T1]{fontenc}
+%------------------------------------------------------------------------------------------------
+\usepackage{needspace}                % So that sections/code-blocks don't straddle two pages 
+\usepackage{mathtools}
+\usepackage{subfig}
+\usepackage{etoolbox}
+\usepackage{color}
+\usepackage{pifont}
+\setlength{\parindent}{20pt}
+% For italicizing quotes: https://tex.stackexchange.com/a/288556/17858
+
+%------------------------------------------------------------------------------------------------
+\usepackage{quoting,xparse}  %%% from https://tex.stackexchange.com/a/391739
+
+\NewDocumentCommand{\bywhom}{m}{% the Bourbaki trick
+  {\nobreak\hfill\penalty50\hskip1em\null\nobreak
+   \hfill\mbox{\normalfont(#1)}%
+   \parfillskip=0pt \finalhyphendemerits=0 \par}%
+}
+
+\NewDocumentEnvironment{pquotation}{m}
+  {\begin{quoting}[
+     indentfirst=true,
+     leftmargin=\parindent,
+     rightmargin=\parindent]\itshape}
+  {\bywhom{#1}\end{quoting}}
+
+
+%------------------------------------------------------------------------------------------------
+% Convenience commands
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{\node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+\providecommand{\myceil}[1]{\left \lceil #1 \right \rceil }	% Ceil function
+\providecommand{\myfloor}[1]{\left \lfloor #1 \right \rfloor }	% Floor function\renewcommand{\labelitemi}{\tiny$\blacksquare$}	
+\newcommand\given[1][]{\:#1\vert\:}                             % for drawing the conditional probability `|` sign neatly.
+\newcommand\RR{\mathbb{R}}					% Set of reals numbers
+\newcommand\CC{\mathbb{C}}					% Set of complex numbers
+\newcommand\ZZ{\mathbb{Z}}					% Set of integers
+\newcommand\NN{\mathbb{N}}					% Set of naturals
+\newcommand\rarr{\rightarrow}					% Rightarrow
+\newcommand\larr{\leftarrow}					% Leftarrow
+\newcommand\defeq{\coloneqq}					% := symbol
+\renewcommand\tilde{ \: \thicksim \: }				% Sane tildas
+
+\newmdenv[topline=false, bottomline=false, skipabove=\topsep,skipbelow=\topsep]{siderules}
+
+% https://tex.stackexchange.com/a/458876/17858 rounded
+% pink rectangles around an inline word
+\newcommand{\sticker}[1]{\tikz[baseline=(X.base)]\node [draw=red,fill=pink!60,semithick,
+     rectangle,inner sep=2pt, rounded corners=3pt] (X) { {\footnotesize \color{red} #1}};}
+
+\newif\ifshowcode
+\showcodetrue
+\usepackage{latexsym}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{linkcolor}{rgb}{0.7, 0, 0}
+
+\usepackage{todonotes}
+\usepackage{booktabs}
+
+\usepackage[%
+raiselinks,%
+pdfhighlight=/O,%
+hyperfigures,%
+breaklinks,%
+colorlinks,%
+pdfstartview=FitBH,%
+linkcolor={linkcolor},%
+anchorcolor={linkcolor},%
+citecolor={linkcolor},%
+filecolor={linkcolor},%
+menucolor={linkcolor},%
+urlcolor={linkcolor}%
+]{hyperref}
+
+% taken from https://tex.stackexchange.com/a/371469 
+% fior drawing a nice rule across the page
+\newcommand\myrule{\par\noindent\rule{\textwidth}{0.4pt}}
+
+%---------------------------------------------------------
+\usepackage{xcolor}
+\usepackage{sectsty}
+\allsectionsfont{\sffamily}
+\definecolor{lava}{rgb}{0.81, 0.06, 0.13}
+\definecolor{mahogany}{rgb}{0.75, 0.25, 0.0}
+\definecolor{sacramentostategreen}{rgb}{0.0, 0.34, 0.25}
+%---------------------------------------------------------
+
+
+%-------------------------------------
+%\usepackage[toc]{multitoc}
+%\renewcommand*{\multicolumntoc}{2}
+%\setlength{\columnsep}{1cm}
+%\setlength{\columnseprule}{0.1pt} % for a vertical separator between the columns
+%------------------------------------
+
+\setcounter{tocdepth}{2}
+
+%-----------------------------------------------------------------------------------------
+% FOR SOURCE CODE FORMATTING
+\definecolor{cosmiclatte}{rgb}{1.0, 0.97, 0.91}
+\definecolor{asparagus}{rgb}{0.53, 0.66, 0.42}
+\lstdefinestyle{numbers} {numbers=left, stepnumber=1, numberstyle=\tiny, numbersep=10pt}
+\lstdefinestyle{MyFrame}{backgroundcolor=\color{cosmiclatte},frame=shadowbox}
+
+\lstdefinestyle{MyPythonStyle} {language=Python,style=MyFrame,frame=lines}
+\lstset{language=Python,
+                basicstyle=\ttfamily,
+                keywordstyle=\color{blue}\ttfamily,
+                stringstyle=\color{red}\ttfamily,
+                commentstyle=\color{asparagus}\ttfamily,
+                morecomment=[l][\color{magenta}]{\#}}
+
+
+\lstdefinestyle{MyHaskellStyle} {language=Haskell,style=MyFrame,frame=lines}
+\lstset{language=Haskell,
+                basicstyle=\ttfamily,
+                keywordstyle=\color{blue}\ttfamily,
+                stringstyle=\color{red}\ttfamily,
+                commentstyle=\color{asparagus}\ttfamily,
+                morecomment=[l][\color{magenta}]{\#}}
+%-----------------------------------------------------------------------------------------
+\usepackage{marginnote}
+
+\newcommand\margin[1]{\marginnote{\color{cadmiumgreen}{#1} }}				% Sane tildas
+\definecolor{cadmiumgreen}{rgb}{0.0, 0.42, 0.24}
+%---------------------------------------------------------------------------------------------------
+\renewcommand{\labelitemi}{\scriptsize$\blacksquare$} % squaremarkers for bullets of itemized lists
+
+
+%-------------------------------------------------------------------------------
+% To express an idea in a crunchy way.
+\newcommand{\crunchy}[1]{\lbrack{} \large \textit{#1} \normalsize \rbrack} 
+
+
+
+% For italicizing quotes https://tex.stackexchange.com/a/288556
+\usepackage{csquotes}
+\renewcommand{\mkbegdispquote}[2]{\itshape}
+
+% for italcizing figure captions
+\usepackage[font={small,it}]{caption} % from https://tex.stackexchange.com/a/832
+
+
+\SetKwComment{Comment}{$\triangleright$\ }{}
+\newcommand{\myblue}[1]{{\color{blue}{#1}}}

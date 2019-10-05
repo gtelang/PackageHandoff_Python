@@ -138,7 +138,7 @@ def algo_odw(drone_info, source, target,
     
     if plot_tour_p:
          fig0, ax0 = plt.subplots()
-         plot_tour(fig0, ax0, "ODW: Straight Line"       , source, target, drone_info, used_drones, package_trail_straight)
+         plot_tour(fig0, ax0, "ODW: Straight Line"       , source, target, drone_info, used_drones, package_trail)
 
          fig1, ax1 = plt.subplots()
          plot_tour(fig1, ax1, "ODE: Straight Line, Post Convex Optimization", source, target, drone_info, used_drones, package_trail_cvx)
@@ -416,7 +416,7 @@ def single_pho_run_handler():
                     # Incase there are patches present from the previous clustering, just clear them
                     clearAxPolygonPatches(ax)
                     if   algo_str == 'odw':
-                          tour = run.get_tour( algo_odw, plot_tour_p=True )
+                          tour = run.get_tour( algo_odw )
                     else:
                           print "Unknown option. No horsefly for you! ;-D "
                           sys.exit()
@@ -993,7 +993,7 @@ def animate_tour(drone_info,
 
 
 if __name__=="__main__":
-     single_pho_run_handler()
+     #single_pho_run_handler()
      #experiment_1() 
      #experiment_2() 
-     #experiment_3()
+     experiment_3()

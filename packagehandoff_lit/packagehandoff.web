@@ -1,0 +1,808 @@
+\documentclass[12pt, english, oneside]{report}
+\input{settings.tex}
+
+\renewcommand{\ttdefault}{txtt}
+\usepackage{titling}
+\setlength{\droptitle}{-95pt}
+\title{\huge{\bfseries{Coordinating Heterogenous Agents for Fast Package Delivery --- The Package Handoff Problem}}}
+\author{Jie Gao $^1$, Kien Huynh $^1$, Joseph S.B. Mitchell $^2$, Gaurish Telang$^2$}
+\date{
+   \small{$^1$ Department of Computer Science, Stony Brook University \\%
+   $^2$ Department of Applied Mathematics and Statistics, Stony Brook University} \\[2ex]% 
+   \today
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+How do you get a package from an initial location $S$ to a destination point $T$ using a 
+fleet of ``heterogenous'' carrier agents (e.g. drones, taxis). By ``heterogenous'' we mean 
+the two agents can have different capabilities like different maximum speed
+or different fuel capacity. 
+
+\vspace{2mm}
+
+In the simplest version of the category of problems, 
+we are given as input the initial locations of $n$  agents in $\mathbb{R}^2$ 
+each capable of a maximum speed $u_i >0$ (where $u_i$ need \textsl{not} be equal to $v_j$ for $i \neq j$). 
+Each agent can pick up the package and move to another point to \textit{rendezvous with} and 
+\textit{hand off} the 
+package to another agent. This other agent then either proceeds to $T$ or decides to meet with 
+and hand off the package to another agent, until the last agent decides to head directly to $T$. 
+
+\vspace{2mm}
+
+The objective is to get the agents to cooperate to send the package from $S$ to $T$ in the 
+least possible time. We call this the \textit{Package Handoff Problem}. 
+
+\vspace{2mm}
+
+To solve this problem and its various avatars we need to 
+
+\vspace{2mm}
+
+\begin{enumerate}
+\item Figure out which subset $S = \{i_1, i_2, \ldots i_k\}$ of the drones are used in the optimal schedule. 
+\item Find the order in which the handoffs happend between the drones used in a schedule. 
+\item Calculate the ``handoff'' points where drone $i_m$ hands over the package to drone 
+      $i_{m+1}$, for $1 \leq m \leq k-1$
+\end{enumerate}
+
+\vspace{2mm}
+
+This report is an algorithmic study of various heuristics developed to solve different variants of Package Handoff.
+
+\end{abstract}
+
+
+\newpage
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+%--------------------------
+\chapter{Single Package Handoff}
+
+\section{Introduction}
+\begin{wrapfigure}{R}{0.5\textwidth}
+  \begin{center}
+    \includegraphics[width=6cm]{docs/introex.eps}
+    \caption{An instance of the Package Handoff problem for a single package being transported from $S$ to $T$. 
+     Agents are located at the dots marked in black. The package travels along the red path. The agents all have 
+     different velocities, and in this example, assumed to have infinite battery capacity.}%
+    \label{fig:introex}%
+  \end{center}
+\end{wrapfigure}
+
+How do you get a package from an initial location $S$ to a destination point $T$ using a fleet of ``heterogenous'' carrier agents 
+(e.g. drones, taxis). By ``heterogenous'' we mean the two agents can have different capabilities like 
+different maximum speed or different fuel capacity. 
+
+
+In the simplest version of the category of problems, 
+we are given as input the initial locations of $n$  agents in $\mathbb{R}^2$ 
+each capable of a maximum speed $u_i >0$ (where $u_i$ need not be equal to $v_j$ for $i \neq j$).
+Each agent can pick up the package and move to another point to \textit{rendezvous with} and 
+\textit{hand off} the 
+package to another agent. This other agent then either proceeds to $T$ or decides to meet with 
+and hand off the package to another agent \footnote{If it makes the package get to $T$ faster} 
+and so on and so forth. 
+
+The objective is to get the agents to cooperate to send the package from $S$ to $T$ in the 
+least possible time. We call this the \textit{Package Handoff Problem}. 
+
+To solve this problem and its various avatars 
+\footnote{Say when there are multiple packages to be delivered or a bound on fuel} 
+we need to 
+
+
+\begin{enumerate}
+\item Figure out which subset $S = \{i_1, i_2, \ldots i_k\}$ of the drones are used in the optimal schedule. 
+\item Find the order in which the handoffs happend between the drones used in a schedule. 
+\item Calculate the ``handoff'' points where drone $i_m$ hands over the package to drone $i_{m+1}$ 
+\footnote{The last drone in the computed schedule, of course, flies directly to $T$}
+\end{enumerate}
+
+A real world instance of the basic Package Handoff problem, as described in the abstract, is when a 
+ride hailing service  must co-ordinate its fleet of taxis to transport a passenger from a given location 
+in the quickest possible time to the target destination on the map. In this model, 
+a passenger ``hops rides'' when two taxis meet: a taxi first gets to the passenger and takes him/her to 
+a point where it rendezvous with another taxi, at which point the passenger swaps taxis. This process continues 
+until the passenger hops onto a taxi that goes straight to the target.  
+
+This package handoff process is depicted in \autoref{fig:introex}. 
+
+
+\section{A note on source code}
+Many of the heuristics algorithms described here are implemented as literate programs \cite{Knuth:1984:LP:473.479} 
+in Python 2.7.12 using the NuWeb tool \cite{briggs1992nuweb} available from \url{http://nuweb.sourceforge.net/}
+alongside associated theoretical and empirical analysis. All the algorithmic code goes into the 
+file \verb|pholib.py|, and any associated helper codes go into the files which are named as \verb|utils_*.py|. 
+The code for these utility files has been given in the appendices. 
+
+The \verb|pholib.py| file looks like 
+
+%{python-mode}%
+@O src/pholib.py -cp @{
+from colorama import Fore, Style
+from matplotlib import rc
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize
+from sklearn.cluster import KMeans
+import numpy as np
+import argparse, inspect, itertools, logging
+import os, time, sys
+import pprint as pp, randomcolor 
+import utils_algo, utils_graphics
+
+@< Algorithms @>
+@< Experiments @>
+@< Run Handlers @>
+@< Plotting @>
+@|  @}
+%{/python-mode}%
+
+The chapters are devoted to fleshing out the chunks \textlangle \verb|Algorithms|\textrangle and 
+\textlangle\verb|Experiments|\textrangle.  The \newline \textlangle \verb|Run Handlers|\textrangle and 
+\textlangle \verb|Plotting|\textrangle \; chunks is mainly to deal with interactive matplotlib input, 
+and as such are boring and banished to the Appendix \Winkey . 
+
+All source code files are tangled to the \verb|src| directory. The point of entry for the code are 
+\verb|main*.py| which are implemented separately in the \verb|src| directory, since their contents 
+can change based on what library code is being called 
+for during development and testing. Since these files are very short and the mechanics clear, 
+they are implemented as standalone files (i.e. not inside this document) but directly in the \verb|src| folder 
+itself. To run the code in interactive mode run the code as \verb|python src/main_interactive.py| on a 
+Unix / Windows terminal in the root folder of the project \footnote{This code has been tested on an 64 bit 
+machine running Linux Mint 18.3 (Sylvia) running the Linux Kernel version 4.10.0-38-generic with an 
+Intel(R) Core(TM) i7 CPU 960 @@ 3.20GHz CPU}. 
+
+For a short overview of previous work on this problem see Appendix 
+
+Each of the following sections correspond to a fixed variant of the package handoff problem and describe
+algorithms for that specific variant. Enough talk! Onto algorithms! 
+
+\section{Unlimited Fuel, Different Drone Speeds}
+
+Much of the machinery developed in solving this basic basic basic question will be generalized and extended to 
+other variants of the package handoff problem. 
+
+We repeat the problem definition and fix some notation that will be used for the remainder 
+of the section 
+
+\begin{displayquote}
+  We are given as input the initial locations $P_i$ of $n$  agents in $\mathbb{R}^2$ 
+each capable of a maximum speed $u_i >0$ (where $u_i$ need not be equal to $v_j$ for $i \neq j$).
+Each agent can pick up the package and move to another point to \textit{rendezvous with} and 
+\textit{hand off} the 
+package to another agent. This other agent then either proceeds to $T$ or decides to meet with 
+and hand off the package to another agent and so on. 
+The objective is to get the agents to cooperate to send the package from $S$ to $T$ in the 
+least possible time. 
+\end{displayquote}
+
+We represent the handoff points as follows $H_{i_1} \ldots H_{i_k}$ for $0 \leq i_0, \ldots i_k \leq n$ stand 
+for points where the drones with labels $i_0, \ldots i_k$ hand the package off in that order. More precisely 
+$H_{i_j}$ is the point where drone $i_{j-1}$ hands off the package to drone $i_j$ for $1 \leq j \leq k$.  
+
+A solution to the package handoff problem is completely specified by computing the handoff points \textit{and} the 
+drone ids involved in the exchange at each handoff point. 
+
+The optimal schedule is denoted $OPT$. It is easy to see the statements of the following structural lemma always 
+hold for $OPT$. 
+
+\begin{flem}
+
+In $OPT$
+\begin{alphalist}
+\item A package is always transferred to a faster drone at a handoff point. 
+\item A drone handles a package at most once i.e. if a drone hands off the package, 
+      it will never be involved in a handling that package again. 
+\item All drones involved in the handoff start moving simultaneously at time $t=0$ 
+\item No two drones wait at a rendezvous point before rendezvous happens. 
+     \footnote{waiting can happen in other problem variants 
+     say when there is limited fuel or only a finite set of 
+     allowed rendezvous points}
+\item The path of the package is a radially monotone piecewise straight polygonal curve with respect to the 
+    direction ST no matter what the initial positions $P_i$ or speeds $u_i$ of the drones. 
+\item $\frac{|ST|}{v_{max}}$ is a (trivial) lower bound for $OPT$, where $v_{max}$ denotes the speed of the fastest drone. 
+\end{alphalist}
+\end{flem}
+
+\begin{proof}
+\todo[inline]{TODO!}
+\end{proof}
+
+\newpage
+\subsection{Handoff in a fixed order}
+\label{ssec:fixorder}
+If we know the drones involved in the handoff \textit{along with} the order of handoff 
+then we can compute the handoff points --- and hence the path of the package --- exactly via 
+convex optimization as outlined in Lemma \autoref{lem:fixorder}. This fact will be exploited in many 
+heuristics: such methods will compute a subset of drones involved in the handoff (alongwith 
+the handoff order) followed by a call to the convex program. 
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=8cm]{docs/pho-cvx.pdf}
+\caption{The path of the package is shown in red. The drones invovled in the handoff are 
+labelled $P_i$ in the prespecified handoff order.}
+\end{figure}
+\label{fig:fixorder}
+
+\begin{flem} \label{lem:fixorder}
+Given as input are drones with initial positions $P_i \in \RR^2$, with speeds $u_i>0$ 
+for  $1 \leq i \leq r-1$, the intial position $S$ and final destination $T$ 
+for the package. \footnote{See \autoref{fig:fixorder} for an illustration of the notation used in this lemma} 
+The drones are expected to transport the package by handing of the package in the order $1,2,\ldots, r$.
+Let $t_i$ denote the departure time on a global clock from the $i$'th handoff point $X_i$. 
+
+Then the minimum time and handoff points for transporting the package and the handoff points 
+can be calculated by the following convex program
+
+\begin{equation*}
+\min_{t_i, X_i} \; \; \; t_{r-1} + \frac{||T-X_{r-1}||}{u_{r-1}}
+\end{equation*}
+
+subject to the constraints
+
+\begin{align*}
+X_0 &= S\\  
+t_i &\geq \frac{||P_i-X_i||}{u_i} \qquad \qquad 0 \leq i \leq r-1\\
+t_i + \frac{||X_{i+1}-X_i||}{u_i} &\leq t_{i+1} \qquad \qquad \qquad \;\;\;\; 0 \leq i \leq r-2
+\end{align*}
+
+\end{flem}
+
+\begin{proof}
+\todo[inline]{TODO!}
+\end{proof}
+
+The following function is just an implentation of the convex program just described. 
+Here \verb|drone_info| is a list 
+of tuples, where each tuple consits of the initial position and speed of the drone. The order of the 
+drones is assumed to be that in which the list of drones is provided. \verb|source| and \verb|target|
+are just coordinate locations of $S$ and $T$ respectively. We use the CVXPY \cite{cvxpy} library 
+as a black-box convex optimization solver. 
+
+%{python-mode}%
+@D Algorithms 
+@{def algo_pho_exact_given_order_of_drones ( drone_info, source, target ):
+    import cvxpy as cp
+
+    source = np.asarray(source)
+    target = np.asarray(target)
+
+    r = len(drone_info) 
+    source = np.asarray(source)
+    target = np.asarray(target)
+    
+    # Variables for rendezvous points of drone with package
+    X, t = [], []
+    for i in range(r):
+       X.append(cp.Variable(2)) # vector variable
+       t.append(cp.Variable( )) # scalar variable
+
+    # Constraints 
+    constraints_S = [  X[0] == source ]
+
+    constraints_I = [] 
+    for i in range(r):
+      constraints_I.append(0.0 <= t[i])
+      constraints_I.append(t[i] >= cp.norm(np.asarray(drone_info[i][0])-X[i])/drone_info[i][1])
+
+    constraints_L = []
+    for i in range(r-1):
+      constraints_L.append(t[i] + cp.norm(X[i+1] - X[i])/drone_info[i][1] <= t[i+1])
+
+    objective = cp.Minimize(t[r-1]+cp.norm(target-X[r-1])/drone_info[r-1][1])
+
+    prob = cp.Problem(objective, constraints_S + constraints_I + constraints_L)
+    print Fore.CYAN
+    prob.solve(solver=cp.SCS,verbose=True)
+    print Style.RESET_ALL
+    
+    package_trail = [ np.asarray(X[i].value) for i in range(r) ] + [ target ]
+    return package_trail
+@| @}
+%{/python-mode}%
+
+
+We next describe a heuristic that use Continuous Dijkstra \cite{mitchell2000geometric} 
+type approach in computing approximate solutions to $OPT$.
+
+\subsection{One Dimensional Greedy Wavefront}
+\label{ssec:odw}
+
+In this heuristic we first constrain the package to travel along the line $\vec{ST}$, then compute the 
+subset of the drones involved in the schedule, and finally pass of the list of drones involved to the convex
+program given in Lemma \autoref{lem:fixorder} to calculate the rendezvous points. 
+
+
+\begin{figure}[H]
+\centering
+   \includegraphics[width=14cm]{docs/straight-line-pho-ex.pdf}
+    \caption{The package travels along the straight line $\vec{ST}$. The point where drone $A$ hands off the 
+     package to drone $B$ depicted as $H_B$, and similarly for other drones. Drones involved in the handoff 
+     are marked in pink. Those not involved are marked in gray. Two drones may have different speed.}
+\end{figure}
+
+
+
+\begin{algorithm}[H]
+\DontPrintSemicolon % Some LaTeX compilers require you to use \dontprintsemicolon instead 
+\KwIn{
+\begin{enumerate}
+\item Coordinates of initial position of source $S$ and target $T$ of the package.
+\item Coordinates of the onitial positions $P_i$ of each drone $1 \leq i \leq n$.
+\item Maximum possible speed $u_i$ of each drone $1 \leq i \leq n$. 
+\end{enumerate}
+
+}
+\KwOut{
+
+\begin{enumerate}
+ \item  \myblue{$t^*$}: The time required for the package to get from $S$ to $T$.
+ \item  \myblue{$L = (i_1, i_2, \ldots, i_k)$} : An ordered list of indices of the drones involved in the handoff. 
+ \item \myblue{$\mathcal{H} =  \{ \, S \, \} \cup \{ \, H_{i_j} \mid j\geq 2  \, \}$}:  An ordered list of handoff points.
+$H_{i_j} \in \RR^2$ is where the drone with index $i_j$ picks up the package 
+       \textit{from} drone $i_{j-1}$. 
+\end{enumerate}
+}
+
+\vspace{4mm}
+
+$t \gets 0$ \tcp*[h]{Time on the global clock} \;
+$wavelets \gets [ (i, 0) \mid 0 \leq i \leq n ]$ \tcp*[h]{Active Wavelets: indices and current radius}\;
+
+\vspace{2mm}
+\tcc*[h]{Find first wavelet to reach $S$ and update $wavelets$} \;
+
+\tcc*[h]{Start wavelet expansion from $S$} \;
+\For{$i \gets 1$ \textbf{to} $r$}{
+  \While{$n \geq c_i$} {
+    $C \gets C \cup \{c_i\}$   \;
+    $n \gets n - c_i$ 
+  }
+}
+\Return{$t^*, L, \mathcal{H}$}\;
+\caption{{\sc One dimensional greedy wavefront}}
+\label{algo:odgw}
+\end{algorithm}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=12cm]{docs/circular_wavelets_intersect_along_st.pdf}
+\caption{Intersection of two expanding wavelets along $\vec{H_iT}$. The figure shows  snapshots of two times;
+one at time $t$ when the package has just been handed off to drone $i$ at $H_i$ and another at time $t + \delta t$
+when a wavelet corresponding a drone faster than drone $i$ meets the wavelet expanding from $H_i$ with speed $u_i$ 
+at $M$}
+\end{figure}
+
+\newpage
+\nocite{*}
+\printbibliography
+\begin{appendices}
+
+\chapter{Previous Work}
+
+
+\begin{wrapfigure}{L}{0.5\textwidth}
+  \begin{center}
+      \includegraphics[width=6cm]{docs/pony-express.png}
+      \caption{A job application poster and a relay route used for the Pony Express. 
+      Images taken from \cite{orphans} and \cite{ponyroute} respectively.}
+  \end{center}
+\end{wrapfigure}
+
+A system of using relays for delivering packages is not a particularly new idea. The most famous (and shortlived!)
+example of such a relay system was the Pony Express company which was used a system of a relay of horse riders tp
+transport mail from St. Joseph, Missouri to Sacramento, California. 
+
+To quote the Wikipedia article
+
+\textit{``Operated by Central Overland California and Pike's Peak Express Company, the Pony Express was a great financial investment to the U.S. During its 18 months of operation, it reduced the time for messages to travel between the Atlantic and Pacific coasts to about 10 days. It became the West's most direct means of east-west communication before the transcontinental telegraph was established (October 24, 1861), and was vital for tying the new U.S. state of California with the rest of the United States.The Pony Express demonstrated that a unified transcontinental system of communications could be established and operated year-round. ''}
+
+While the invention of the telegraph might have run the Pony Express out of business, the idea of using relay agents 
+such as drones --- instead of horses! --- to transfer packages can have applications today for sending physical goods 
+(which of course can't be telegraphed! \Winkey) such as  life-saving medicinces in under-developed 
+countries or in disaster relief areas. 
+ZipLine\cite{zipline} \cite{zipline-ted} and Matternet \cite{matternet} are just two of the companies which 
+are involved in building networks of drones for precisely such missions.
+
+\chapter{\texttt{utils\char`_graphics.py}}
+
+This file contains useful functions for visualization and plotting functions described in the previous chapters.
+%{python-mode}%
+@O src/utils_graphics.py -cp @{    
+from matplotlib import rc
+from colorama import Fore
+from colorama import Style
+from scipy.optimize import minimize
+from sklearn.cluster import KMeans
+import argparse
+import itertools
+import math
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import pprint as pp
+import randomcolor 
+import sys
+import time
+
+xlim, ylim = [0,1], [0,1]
+
+# Borrowed from https://stackoverflow.com/a/9701141
+import numpy as np
+import colorsys
+
+def get_colors(num_colors, lightness=0.2):
+    colors=[]
+    for i in np.arange(60., 360., 300. / num_colors):
+        hue        = i/360.0
+        saturation = 0.95
+        colors.append(colorsys.hls_to_rgb(hue, lightness, saturation))
+    return colors
+@|  @}
+%{/python-mode}%
+
+\newpage
+
+\chapter{\texttt{utils\char`_algo.py}}
+
+This file contains useful functions for writing algorithms described in the previous chapters.
+
+%{python-mode}%
+@O src/utils_algo.py -cp @{
+ import numpy as np
+import random
+from colorama import Fore
+from colorama import Style
+
+def vector_chain_from_point_list(pts):
+    vec_chain = []
+    for pair in zip(pts, pts[1:]):
+        tail= np.array (pair[0])
+        head= np.array (pair[1])
+        vec_chain.append(head-tail)
+
+    return vec_chain
+
+def length_polygonal_chain(pts):
+    vec_chain = vector_chain_from_point_list(pts)
+
+    acc = 0
+    for vec in vec_chain:
+        acc = acc + np.linalg.norm(vec)
+    return acc
+def pointify_vector (x):
+    if len(x) % 2 == 0:
+        pts = []
+        for i in range(len(x))[::2]:
+            pts.append( [x[i],x[i+1]] )
+        return pts
+    else :
+        sys.exit('List of items does not have an even length to be able to be pointifyed')
+def flatten_list_of_lists(l):
+       return [item for sublist in l for item in sublist]
+def print_list(xs):
+    for x in xs:
+        print x
+def partial_sums( xs ):
+    psum = 0
+    acc = []
+    for x in xs:
+        psum = psum+x
+        acc.append( psum )
+    return acc
+def are_site_orderings_equal(sites1, sites2):
+
+    for (x1,y1), (x2,y2) in zip(sites1, sites2): 
+        if (x1-x2)**2 + (y1-y2)**2 > 1e-8:
+            return False
+    return True
+def bunch_of_non_uniform_random_points(numpts):
+    cluster_size = int(np.sqrt(numpts)) 
+    numcenters   = cluster_size
+    
+    import scipy
+    import random
+    centers = scipy.rand(numcenters,2).tolist()
+
+    scale, points = 4.0, []
+    for c in centers:
+        cx, cy = c[0], c[1]
+        # For current center $c$ of this loop, generate \verb|cluster_size| points uniformly in a square centered at it
+           
+        sq_size      = min(cx,1-cx,cy, 1-cy)
+        loc_pts_x    = np.random.uniform(low=cx-sq_size/scale, high=cx+sq_size/scale, size=(cluster_size,))
+        loc_pts_y    = np.random.uniform(low=cy-sq_size/scale, high=cy+sq_size/scale, size=(cluster_size,))
+        points.extend(zip(loc_pts_x, loc_pts_y))
+        
+
+    # Whatever number of points are left to be generated, generate them uniformly inside the unit-square
+       
+    num_remaining_pts = numpts - cluster_size * numcenters
+    remaining_pts = scipy.rand(num_remaining_pts, 2).tolist()
+    points.extend(remaining_pts)
+    
+
+    return points
+    
+def write_to_yaml_file(data, dir_name, file_name):
+   import yaml
+   with open(dir_name + '/' + file_name, 'w') as outfile:
+     yaml.dump( data, outfile, default_flow_style = False)
+@|  @}
+%{/python-mode}%
+
+\chapter{Implementation of \textlangle \texttt{Run Handlers}\textrangle}
+
+This chunk contains code required for the interactive input of sites and agents onto the canvas. 
+
+%{python-mode}%
+@D Run Handlers @{
+
+class Single_PHO_Input:
+    def __init__(self, drone_info = [] , source = None, target=None):
+           self.drone_info = drone_info 
+           self.source     = source
+           self.target     = target
+
+    def get_drone_pis (self):
+           return [self.drone_info[idx][0] for idx in range(len(self.drone_info)) ]
+           
+    def get_drone_uis (self):
+           return [self.drone_info[idx][1] for idx in range(len(self.drone_info)) ]
+         
+    def get_tour(self, algo, animate_tour_p=False, plot_tour_p=False):
+           return algo( self.drone_info, 
+                        self.source, 
+                        self.target, 
+                        animate_tour_p, 
+                        plot_tour_p    )
+
+    # Methods for \verb|ReverseHorseflyInput|
+    def clearAllStates (self):
+          self.drone_info = []
+          self.source = None
+          self.target = None
+
+def single_pho_run_handler():
+    import random
+    def wrapperEnterRunPoints(fig, ax, run):
+      def _enterPoints(event):
+        if event.name      == 'button_press_event'          and \
+           (event.button   == 1 or event.button == 3)       and \
+            event.dblclick == True and event.xdata  != None and event.ydata  != None:
+
+             if event.button == 1:  
+                 # Insert blue circle representing the initial position of a drone
+                 print Fore.GREEN
+                 newPoint = (event.xdata, event.ydata)
+                 speed    = np.random.uniform() # float(raw_input('What speed do you want for the drone at '+str(newPoint)))
+                 run.drone_info.append( (newPoint, speed) ) 
+                 patchSize  = (xlim[1]-xlim[0])/40.0
+                 print Style.RESET_ALL
+                 
+                 ax.add_patch( mpl.patches.Circle( newPoint, radius = patchSize,
+                                                   facecolor='#b7e8cc', edgecolor='black'  ))
+
+                 ax.text( newPoint[0], newPoint[1], "{:.2f}".format(speed), fontsize=15, 
+                          horizontalalignment='center', verticalalignment='center' )
+
+                 ax.set_title('Number of drones inserted: ' +\
+                              str(len(run.drone_info)), fontdict={'fontsize':25})
+                 
+             elif event.button == 3:  
+                 # Insert big red circles representing the source and target points
+                 patchSize  = (xlim[1]-xlim[0])/50.0
+                 if run.source is None:    
+                      run.source = (event.xdata, event.ydata)  
+                      ax.add_patch( mpl.patches.Circle( run.source, radius = patchSize, 
+                                                        facecolor= '#ffd9d6', edgecolor='black', lw=1.0 ))
+                      ax.text( run.source[0], run.source[1], 'S', fontsize=15, 
+                               horizontalalignment='center', verticalalignment='center' )
+
+                 elif run.target is None:
+                      run.target = (event.xdata, event.ydata)  
+                      ax.add_patch( mpl.patches.Circle( run.target, radius = patchSize, 
+                                                       facecolor= '#ffd9d6', edgecolor='black', lw=1.0 ))
+                      ax.text( run.target[0], run.target[1], 'T', fontsize=15, 
+                               horizontalalignment='center', verticalalignment='center' )
+                 else:
+                       print Fore.RED, "Source and Target already set", Style.RESET_ALL
+             # Clear polygon patches and set up last minute \verb|ax| tweaks
+             clearAxPolygonPatches(ax)
+             applyAxCorrection(ax)
+             fig.canvas.draw()
+      return _enterPoints
+
+    # The key-stack argument is mutable! I am using this hack to my advantage.
+    def wrapperkeyPressHandler(fig, ax, run): 
+           def _keyPressHandler(event):
+               if event.key in ['i', 'I']:  
+
+                    # Select algorithm to execute
+                    algo_str = raw_input(Fore.YELLOW                                             +\
+                            "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
+                            " (odw)     One Dimensional Wavefront \n"                            +\
+                            Style.RESET_ALL)
+
+                    algo_str = algo_str.lstrip()
+                     
+                    # Incase there are patches present from the previous clustering, just clear them
+                    clearAxPolygonPatches(ax)
+                    if   algo_str == 'odw':
+                          tour = run.get_tour( algo_odw, plot_tour_p=True )
+                    else:
+                          print "Unknown option. No horsefly for you! ;-D "
+                          sys.exit()
+                    applyAxCorrection(ax)
+                    fig.canvas.draw()
+                    
+               elif event.key in ['c', 'C']: 
+                    # Clear canvas and states of all objects
+                    run.clearAllStates()
+                    ax.cla()
+                                  
+                    applyAxCorrection(ax)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                                     
+                    fig.texts = []
+                    fig.canvas.draw()
+           return _keyPressHandler
+    
+    # Set up interactive canvas
+    fig, ax =  plt.subplots()
+    run = Single_PHO_Input()
+        
+    from matplotlib import rc
+    
+    # specify the custom font to use
+    plt.rcParams['font.family'] = 'sans-serif'
+    plt.rcParams['font.sans-serif'] = 'Times New Roman'
+
+    ax.set_xlim([xlim[0], xlim[1]])
+    ax.set_ylim([ylim[0], ylim[1]])
+    ax.set_aspect(1.0)
+    ax.set_xticks([])
+    ax.set_yticks([])
+          
+    ax.set_title("Enter drone positions, source and target onto canvas. \n \
+(Enter speeds into the terminal, after inserting a drone at a particular position)")
+
+    mouseClick   = wrapperEnterRunPoints (fig,ax, run)
+    fig.canvas.mpl_connect('button_press_event' , mouseClick)
+          
+    keyPress     = wrapperkeyPressHandler(fig,ax, run)
+    fig.canvas.mpl_connect('key_press_event', keyPress   )
+    
+    plt.show()
+@| @}
+%{/python-mode}%
+
+\chapter{Implementation of \textlangle\texttt{Plotting}\textrangle}
+
+We typically plot the tours onto a separate window if the boolean switch \verb|plot_tour_p| 
+is set to \verb|True| while calling the algorithm. The path of the package is shown in bold red. 
+The paths of the drones from their initial positions to the point where they pick up the package 
+from another drone are shown in blue.
+
+An example output from the \verb|plot_tour| function is shown below.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=8cm]{docs/pho_example_plot.pdf}
+\caption{The numbers inside the circle indicate the speed of the drone}
+\end{figure}
+
+%{python-mode}%
+@D Plotting @{
+def plot_tour(fig, ax, figtitle, source, target, 
+              drone_info, used_drones, package_trail,
+              xlims=[0,1],
+              ylims=[0,1],
+              aspect_ratio=1.0,
+              speedfontsize=4,
+              speedmarkersize=10,
+              sourcetargetmarkerfontsize=4,
+              sourcetargetmarkersize=10 ):
+
+    import matplotlib.ticker as ticker
+    ax.set_aspect(aspect_ratio)
+    ax.set_xlim(xlims)
+    ax.set_ylim(ylims)
+
+    plt.rc('font', family='serif')
+
+    # Draw the package trail
+    xs, ys = extract_coordinates(package_trail)
+    ax.plot(xs,ys, 'ro', markersize=5 )
+    for idx in range(len(xs)-1):
+          plt.arrow( xs[idx], ys[idx], xs[idx+1]-xs[idx], ys[idx+1]-ys[idx], 
+                    **{'length_includes_head': True, 
+                       'width': 0.007 , 
+                       'head_width':0.01, 
+                       'fc': 'r', 
+                       'ec': 'none',
+                       'alpha': 0.8})
+
+
+    # Draw the source, target, and initial positions of the robots as bold dots
+    xs,ys = extract_coordinates([source, target])
+    ax.plot(xs,ys, 'o', markersize=sourcetargetmarkersize, alpha=0.8, ms=10, mec='k', mfc='#F1AB30' )
+    #ax.plot(xs,ys, 'k--', alpha=0.6 ) # light line connecting source and target
+
+    ax.text(source[0], source[1], 'S', fontsize=sourcetargetmarkerfontsize,\
+            horizontalalignment='center',verticalalignment='center')
+    ax.text(target[0], target[1], 'T', fontsize=sourcetargetmarkerfontsize,\
+            horizontalalignment='center',verticalalignment='center')
+
+    xs, ys = extract_coordinates( [ drone_info[idx][0] for idx in range(len(drone_info)) ]  )
+    ax.plot(xs,ys, 'o', markersize=speedmarkersize, alpha = 0.5, mec='None', mfc='#b7e8cc' )
+
+    # Draw speed labels
+    for idx in range(len(drone_info)):
+         ax.text( drone_info[idx][0][0], drone_info[idx][0][1], format(drone_info[idx][1],'.3f'),
+                  fontsize=speedfontsize, horizontalalignment='center', verticalalignment='center' )
+
+    # Draw drone path from initial position to interception point
+    for pt, idx in zip(package_trail, used_drones):
+         initdroneposn = drone_info[idx][0]
+         handoffpoint  = pt
+    
+         xs, ys = extract_coordinates([initdroneposn, handoffpoint])
+         plt.arrow( xs[0], ys[0], xs[1]-xs[0], ys[1]-ys[0], 
+                    **{'length_includes_head': True, 
+                       'width': 0.005 , 
+                       'head_width':0.02, 
+                       'fc': 'b', 
+                       'ec': 'none'})
+
+    fig.suptitle(figtitle, fontsize=15)
+    ax.set_title('\nMakespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=8)
+
+    startx, endx = ax.get_xlim()
+    starty, endy = ax.get_ylim()
+
+
+    ax.tick_params(which='both', # Options for both major and minor ticks
+                top='off', # turn off top ticks
+                left='off', # turn off left ticks
+                right='off',  # turn off right ticks
+                bottom='off') # turn off bottom ticks
+    
+    # Customize the major grid
+    ax.grid(which='major', linestyle='-', linewidth='0.1', color='red')
+    ax.grid(which='minor', linestyle=':', linewidth='0.1', color='black')
+
+    #ax.xaxis.set_ticks(np.arange(startx, endx, 0.4))
+    #ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))
+     
+    #ax.yaxis.set_ticks(np.arange(starty, endy, 0.4))
+    #ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%0.1f'))
+
+    #plt.yticks(fontsize=5, rotation=90)
+    #plt.xticks(fontsize=5)
+
+    # A light grid
+    #plt.grid(color='0.5', linestyle='--', linewidth=0.5)
+@| @}
+%{/python-mode}%
+
+
+
+
+
+\end{appendices}
+%---------------------
+\listoftodos
+%---------------------
+\end{document}

@@ -1,0 +1,25 @@
+Copy this folder to where you want the program to run and 
+write the literate program. Running the weave-tangle script
+weaves, and tangles and cleans up after itself. 
+
+The scratchpad.html file is a tiddly contains todo notes and other random scratchpad
+notes done in the process of developing the program. Basically used as a scaffolding
+system for the code. Better than Org mode because it allows me to tag and organize 
+various little bunches of thoughts. 
+
+If you only want to tangle then just pass the option --tangle-only
+
+Change the name litprog to whatever you want in the weave-tangle-clean 
+script and clean scripts
+
+Each literate program is contained in one folder. Thus each suite of related 
+program is meant to be written as an academic paper with references 
+and all that. 
+
+The main file and all are present in the form of Appendices. Only algorithmic code
+goes at the top. 
+
+
+To compile the TeX files, in addition to a TeX distribution you will 
+need Asymptote (http://asymptote.sourceforge.net/) for rendering 2D 
+vector graphics and 3D raster graphics. 
