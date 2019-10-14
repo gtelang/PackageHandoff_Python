@@ -27,7 +27,7 @@ or different fuel capacity.
 In the simplest version of the category of problems, 
 we are given as input the initial locations of $n$  agents in $\mathbb{R}^2$ 
 each capable of a maximum speed $u_i >0$ (where $u_i$ need \textsl{not} be equal to $v_j$ for $i \neq j$). 
-Each agent can pick up the package and move to another point to \textit{rendezvous with} and 
+Each agent can pick up the package and move to another point to \textit{rendezvous with} \underline{and} 
 \textit{hand off} the 
 package to another agent. This other agent then either proceeds to $T$ or decides to meet with 
 and hand off the package to another agent, until the last agent decides to head directly to $T$. 
@@ -159,7 +159,10 @@ Unix / Windows terminal in the root folder of the project \footnote{This code ha
 machine running Linux Mint 18.3 (Sylvia) running the Linux Kernel version 4.10.0-38-generic with an 
 Intel(R) Core(TM) i7 CPU 960 @@ 3.20GHz CPU}. 
 
-For a short overview of previous work on this problem see Appendix 
+For a short overview of previous work on this problem see Appendix. 
+
+The \verb|README| file containing instructions for running the source code and experiments is listed in the 
+appendix (also available on the Github repository)
 
 Each of the following sections correspond to a fixed variant of the package handoff problem and describe
 algorithms for that specific variant. Enough talk! Onto algorithms! 
@@ -174,7 +177,7 @@ of the section
 
 \begin{displayquote}
   We are given as input the initial locations $P_i$ of $n$  agents in $\mathbb{R}^2$ 
-each capable of a maximum speed $u_i >0$ (where $u_i$ need not be equal to $v_j$ for $i \neq j$).
+each capable of a maximum speed $u_i >0$ (where $u_i$ need not be equal to $u_j$ for $i \neq j$).
 Each agent can pick up the package and move to another point to \textit{rendezvous with} and 
 \textit{hand off} the 
 package to another agent. This other agent then either proceeds to $T$ or decides to meet with 
@@ -383,6 +386,21 @@ at $M$}
 \end{figure}
 
 \newpage
+
+
+
+\chapter{Multiple Package Handoff}
+
+\section{Section 1}
+
+\blindtext
+\section{Section 2}
+
+\blindtext
+\section{Section 3}
+
+\blindtext
+
 \nocite{*}
 \printbibliography
 \begin{appendices}
@@ -458,6 +476,44 @@ tiffins return to suburban homes by 6.00 pm.}
 \end{quote}
 
 See \url{https://youtu.be/dX-0el2wuEU} for a short video on the dabbawallas. 
+
+
+\chapter{\texttt{README}}
+
+This \verb|README| file can be read more clearly alongside its appropriate formatting at \url{https://github.com/gtelang/packagehandoff}
+
+@O README.md -cp @{    
+To run this code, you will need a distribution of Python 2.7.12 along 
+with the following libraries
+
+- networkx
+- matplotlib
+- numpy 
+- scipy
+- cgal-bindings
+- cvxpy
+
+All source code is contained in the .web file. If you modify the file, the 
+resulting code and corresponding description file can be weaved and tangled 
+with the script `weave-tangle.sh`. You will need the 
+
+- [pdflatex](https://linux.die.net/man/1/pdflatex)
+- [nuweb](http://nuweb.sourceforge.net/) 
+- [asymptote](http://asymptote.sourceforge.net/) 
+  
+executables to be somewhere on your system's path. 
+
+All source code is in the `src' directory. The asy2d,asy3d and docs
+folders can be neglected since they contain images and documents 
+referenced in the `packagehandoff.pdf' file. From the point of view of 
+_running_ the code they can be ignored. 
+
+
+
+@|  @}
+
+
+
 
 \chapter{\texttt{utils\char`_graphics.py}}
 

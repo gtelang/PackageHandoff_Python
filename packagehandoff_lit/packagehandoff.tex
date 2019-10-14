@@ -42,7 +42,7 @@ or different fuel capacity.
 In the simplest version of the category of problems, 
 we are given as input the initial locations of $n$  agents in $\mathbb{R}^2$ 
 each capable of a maximum speed $u_i >0$ (where $u_i$ need \textsl{not} be equal to $v_j$ for $i \neq j$). 
-Each agent can pick up the package and move to another point to \textit{rendezvous with} and 
+Each agent can pick up the package and move to another point to \textit{rendezvous with} \underline{and} 
 \textit{hand off} the 
 package to another agent. This other agent then either proceeds to $T$ or decides to meet with 
 and hand off the package to another agent, until the last agent decides to head directly to $T$. 
@@ -158,8 +158,8 @@ The \verb|pholib.py| file looks like
 \mbox{}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms}\nobreak\ {\footnotesize \NWlink{nuweb7}{7}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Experiments}\nobreak\ {\footnotesize ?}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb20}{20}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting}\nobreak\ {\footnotesize \NWlink{nuweb24}{24}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb23}{23}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting}\nobreak\ {\footnotesize \NWlink{nuweb27}{27}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -187,7 +187,10 @@ Unix / Windows terminal in the root folder of the project \footnote{This code ha
 machine running Linux Mint 18.3 (Sylvia) running the Linux Kernel version 4.10.0-38-generic with an 
 Intel(R) Core(TM) i7 CPU 960 @ 3.20GHz CPU}. 
 
-For a short overview of previous work on this problem see Appendix 
+For a short overview of previous work on this problem see Appendix. 
+
+The \verb|README| file containing instructions for running the source code and experiments is listed in the 
+appendix (also available on the Github repository)
 
 Each of the following sections correspond to a fixed variant of the package handoff problem and describe
 algorithms for that specific variant. Enough talk! Onto algorithms! 
@@ -202,7 +205,7 @@ of the section
 
 \begin{displayquote}
   We are given as input the initial locations $P_i$ of $n$  agents in $\mathbb{R}^2$ 
-each capable of a maximum speed $u_i >0$ (where $u_i$ need not be equal to $v_j$ for $i \neq j$).
+each capable of a maximum speed $u_i >0$ (where $u_i$ need not be equal to $u_j$ for $i \neq j$).
 Each agent can pick up the package and move to another point to \textit{rendezvous with} and 
 \textit{hand off} the 
 package to another agent. This other agent then either proceeds to $T$ or decides to meet with 
@@ -424,6 +427,21 @@ at $M$}
 \end{figure}
 
 \newpage
+
+
+
+\chapter{Multiple Package Handoff}
+
+\section{Section 1}
+
+\blindtext
+\section{Section 2}
+
+\blindtext
+\section{Section 3}
+
+\blindtext
+
 \nocite{*}
 \printbibliography
 \begin{appendices}
@@ -500,12 +518,59 @@ tiffins return to suburban homes by 6.00 pm.}
 
 See \url{https://youtu.be/dX-0el2wuEU} for a short video on the dabbawallas. 
 
+
+\chapter{\texttt{README}}
+
+This \verb|README| file can be read more clearly alongside its appropriate formatting at \url{https://github.com/gtelang/packagehandoff}
+
+\begin{flushleft} \small\label{scrap3}\raggedright\small
+\NWtarget{nuweb16}{} \verb@"README.md"@\nobreak\ {\footnotesize {16}}$\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@    @\\
+\mbox{}\verb@To run this code, you will need a distribution of Python 2.7.12 along @\\
+\mbox{}\verb@with the following libraries@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@- networkx@\\
+\mbox{}\verb@- matplotlib@\\
+\mbox{}\verb@- numpy @\\
+\mbox{}\verb@- scipy@\\
+\mbox{}\verb@- cgal-bindings@\\
+\mbox{}\verb@- cvxpy@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@All source code is contained in the .web file. If you modify the file, the @\\
+\mbox{}\verb@resulting code and corresponding description file can be weaved and tangled @\\
+\mbox{}\verb@with the script `weave-tangle.sh`. You will need the @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@- [pdflatex](https://linux.die.net/man/1/pdflatex)@\\
+\mbox{}\verb@- [nuweb](http://nuweb.sourceforge.net/) @\\
+\mbox{}\verb@- [asymptote](http://asymptote.sourceforge.net/) @\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@executables to be somewhere on your system's path. @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@All source code is in the `src' directory. The asy2d,asy3d and docs@\\
+\mbox{}\verb@folders can be neglected since they contain images and documents @\\
+\mbox{}\verb@referenced in the `packagehandoff.pdf' file. From the point of view of @\\
+\mbox{}\verb@_running_ the code they can be ignored. @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
 \chapter{\texttt{utils\char`_graphics.py}}
 
 This file contains useful functions for visualization and plotting functions described in the previous chapters.
 %{python-mode}%
-\begin{flushleft} \small\label{scrap3}\raggedright\small
-\NWtarget{nuweb15}{} \verb@"src/utils_graphics.py"@\nobreak\ {\footnotesize {15}}$\equiv$
+\begin{flushleft} \small\label{scrap4}\raggedright\small
+\NWtarget{nuweb18}{} \verb@"src/utils_graphics.py"@\nobreak\ {\footnotesize {18}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
@@ -558,8 +623,8 @@ This file contains useful functions for visualization and plotting functions des
 This file contains useful functions for writing algorithms described in the previous chapters.
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap4}\raggedright\small
-\NWtarget{nuweb17}{} \verb@"src/utils_algo.py"@\nobreak\ {\footnotesize {17}}$\equiv$
+\begin{flushleft} \small\label{scrap5}\raggedright\small
+\NWtarget{nuweb20}{} \verb@"src/utils_algo.py"@\nobreak\ {\footnotesize {20}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -659,8 +724,8 @@ This file contains useful functions for writing algorithms described in the prev
 This chunk contains code required for the interactive input of sites and agents onto the canvas. 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap5}\raggedright\small
-\NWtarget{nuweb20}{} $\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize {20}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap6}\raggedright\small
+\NWtarget{nuweb23}{} $\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize {23}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -831,8 +896,8 @@ An example output from the \verb|plot_tour| function is shown below.
 \end{figure}
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap6}\raggedright\small
-\NWtarget{nuweb24}{} $\langle\,${\itshape Plotting}\nobreak\ {\footnotesize {24}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap7}\raggedright\small
+\NWtarget{nuweb27}{} $\langle\,${\itshape Plotting}\nobreak\ {\footnotesize {27}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
