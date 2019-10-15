@@ -19,7 +19,7 @@ with the script `weave-tangle.sh`. You will need the
   
 executables to be somewhere on your system's path. 
 
-All source code is in the `src' directory. The asy2d,asy3d and docs
+All source code is in the `src' directory. The asy2d, asy3d and docs
 folders can be neglected since they contain images and documents 
 referenced in the `packagehandoff.pdf' file. From the point of view of 
 _running_ the code they can be ignored. 

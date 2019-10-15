@@ -50,9 +50,224 @@ def algo_pho_exact_given_order_of_drones ( drone_info, source, target ):
     package_trail = [ np.asarray(X[i].value) for i in range(r) ] + [ target ]
     return package_trail
 
-@<Experiments@>
+def makespan(drone_info, used_drones, package_trail):
+
+    assert len(package_trail) == len(used_drones)+1, ""
+    makespan = 0.0   
+    counter  = 0    
+    for idx in used_drones:
+         dronespeed    = drone_info[idx][1]          
+
+         makespan += time_of_travel(package_trail[counter],\
+                                    package_trail[counter+1],
+                                    dronespeed) 
+         counter += 1
+    
+    return makespan
+  
+
+def time_of_travel(start, stop, speed):
+     start = np.asarray(start)
+     stop  = np.asarray(stop)
+     return np.linalg.norm(stop-start)/speed
+
+ 
+def get_interception_time(s, us, p, up, t, t0) :
+    
+    t_m = t - s # the _m subscript stands for modify
+    t_m = t_m / np.linalg.norm(t_m) # normalize to unit
+
+    # For rotating a vector clockwise by theta, 
+    # to get the vector t_m into alignment with (1,0)
+    costh = t_m[0]/np.sqrt(t_m[0]**2 + t_m[1]**2)
+    sinth = t_m[1]/np.sqrt(t_m[0]**2 + t_m[1]**2)
+
+    rotmat = np.asarray([[costh, sinth],
+                         [-sinth, costh]])
+    
+    assert np.linalg.norm((rotmat.dot(t_m) - np.asarray([1,0]))) <= 1e-6,\
+           "Rotation matrix did not work properly. t_m should get rotated\
+            onto [1,0] after this transformation"
+
+    p_shift  = p - s
+    p_rot    = rotmat.dot(p_shift)
+    [alpha, beta] = p_rot
+
+    # Solve quadratic documented in the snippets above
+    qroots = np.roots([ (1.0/us**2 - 1.0/up**2), 
+               2*t0/us + 2*alpha/up**2 , 
+               t0**2 - alpha**2/up**2 - beta**2/up**2])
+
+    ## The quadratic should always a root. 
+    qroots = np.real(qroots) # in case the imaginary parts
+    qroots.sort()            # of the roots are really small
+
+    x = None
+    for root in qroots:
+        if root > 0.0:
+           x = root
+           break
+    assert abs(x/us+t0 - np.sqrt((x-alpha)**2 + beta**2)/up) <= 1e-6 , \
+           "Quadratic not solved perfectly"
+
+    tI = x/us + t0
+    return tI
+   
+def extract_coordinates(points):
+
+    xs, ys = [], []
+    for pt in points:
+        xs.append(pt[0])
+        ys.append(pt[1])
+    return np.asarray(xs), np.asarray(ys)
+
+def algo_odw(drone_info, source, target, 
+             plot_tour_p    = False):
+
+    from scipy.optimize import minimize
+
+    source = np.asarray(source)
+    target = np.asarray(target)
+    # unit vector pointing from source to target
+    sthat  = (target-source)/np.linalg.norm(target-source) 
+
+    numdrones  = len(drone_info)
+    clock_time = 0.0
+
+    # Find the drone which can get to the source the quickest
+    tmin = np.inf
+    imin = None
+    for idx in range(numdrones):
+         initdroneposn = drone_info[idx][0]
+         dronespeed    = drone_info[idx][1]
+         tmin_idx = time_of_travel(initdroneposn, source, dronespeed)
+
+         if tmin_idx < tmin:
+             tmin = tmin_idx
+             imin = idx 
+
+    clock_time = tmin
+
+    current_package_handler_idx = imin
+    current_package_position    = source
+
+    drone_pool = range(numdrones)
+    drone_pool.remove(imin) 
+    used_drones = [imin]
+
+    package_trail_straight = [current_package_position]
+
+    package_reached_p   = False
+    while not(package_reached_p):
+
+          time_to_target_without_help =\
+            np.linalg.norm((target-current_package_position))/ \
+              drone_info[current_package_handler_idx][1]
+
+          tI_min     = np.inf
+          idx_tI_min = None
+          for idx in drone_pool:
+              
+              us = drone_info[current_package_handler_idx][1]
+              up = drone_info[idx][1]
+
+              if up <= us: # slower drones are useless, so skip rest of the iteration
+                  continue 
+              else: 
+                s = current_package_position 
+                p = np.asarray(drone_info[idx][0]) 
+
+                tI = get_interception_time(s, us, p, up, target, clock_time)
+
+                if tI < tI_min:
+                   tI_min     = tI
+                   idx_tI_min = idx
+
+          if time_to_target_without_help < tI_min :
+              package_reached_p = True
+              package_trail_straight.append(target)
+
+          else:
+              package_handler_speed    = \
+                      drone_info[current_package_handler_idx][1] 
+              current_package_position = \
+                      current_package_position + \
+                          package_handler_speed * (tI_min - clock_time) *  sthat
+              package_trail_straight.append(current_package_position)
+    
+              clock_time                  = tI_min 
+              current_package_handler_idx = idx_tI_min
+
+              drone_pool.remove(idx_tI_min)
+              used_drones.append(idx_tI_min)  
+   
+    package_trail_cvx = \
+          algo_pho_exact_given_order_of_drones(\
+                 [drone_info[idx] for idx in used_drones],source,target)
+    mspan_straight = makespan(drone_info, used_drones, package_trail_straight)
+    mspan_cvx      = makespan(drone_info, used_drones, package_trail_cvx)
+    
+    if plot_tour_p:
+         fig0, ax0 = plt.subplots()
+         plot_tour(fig0, ax0, "ODW: Straight Line", source, target, \
+                   drone_info, used_drones, package_trail_straight)
+
+         fig1, ax1 = plt.subplots()
+         plot_tour(fig1, ax1, "ODW: Straight Line, Post Convex Optimization", source, target, \
+                   drone_info, used_drones, package_trail_cvx)
+         plt.show()
+
+    
+    return used_drones, package_trail_straight, mspan_straight, package_trail_cvx, mspan_cvx
+
 # Run Handlers
 
+
+
+# Set up logging information relevant to this module
+logger=logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
+
+def debug(msg):
+    frame,filename,line_number,function_name,lines,index=inspect.getouterframes(
+        inspect.currentframe())[1]
+    line=lines[0]
+    indentation_level=line.find(line.lstrip())
+    logger.debug('{i} [{m}]'.format(
+        i='.'*indentation_level, m=msg))
+
+
+def info(msg):
+    frame,filename,line_number,function_name,lines,index=inspect.getouterframes(
+        inspect.currentframe())[1]
+    line=lines[0]
+    indentation_level=line.find(line.lstrip())
+    logger.info('{i} [{m}]'.format(
+        i='.'*indentation_level, m=msg))
+
+xlim, ylim = [0,1], [0,1]
+
+def applyAxCorrection(ax):
+      ax.set_xlim([xlim[0], xlim[1]])
+      ax.set_ylim([ylim[0], ylim[1]])
+      ax.set_aspect(1.0)
+
+def clearPatches(ax):
+    # Get indices cooresponding to the polygon patches
+    for index , patch in zip(range(len(ax.patches)), ax.patches):
+        if isinstance(patch, mpl.patches.Polygon) == True:
+            patch.remove()
+    ax.lines[:]=[]
+    applyAxCorrection(ax)
+
+def clearAxPolygonPatches(ax):
+
+    # Get indices cooresponding to the polygon patches
+    for index , patch in zip(range(len(ax.patches)), ax.patches):
+        if isinstance(patch, mpl.patches.Polygon) == True:
+            patch.remove()
+    ax.lines[:]=[]
+    applyAxCorrection(ax)
 
 class Single_PHO_Input:
     def __init__(self, drone_info = [] , source = None, target=None):
@@ -66,11 +281,10 @@ class Single_PHO_Input:
     def get_drone_uis (self):
            return [self.drone_info[idx][1] for idx in range(len(self.drone_info)) ]
          
-    def get_tour(self, algo, animate_tour_p=False, plot_tour_p=False):
+    def get_tour(self, algo, plot_tour_p=False):
            return algo( self.drone_info, 
                         self.source, 
                         self.target, 
-                        animate_tour_p, 
                         plot_tour_p    )
 
     # Methods for \verb|ReverseHorseflyInput|
@@ -175,6 +389,9 @@ def single_pho_run_handler():
     plt.rcParams['font.family'] = 'sans-serif'
     plt.rcParams['font.sans-serif'] = 'Times New Roman'
 
+    xlim = utils_graphics.xlim
+    ylim = utils_graphics.ylim
+
     ax.set_xlim([xlim[0], xlim[1]])
     ax.set_ylim([ylim[0], ylim[1]])
     ax.set_aspect(1.0)
@@ -199,10 +416,10 @@ def plot_tour(fig, ax, figtitle, source, target,
               xlims=[0,1],
               ylims=[0,1],
               aspect_ratio=1.0,
-              speedfontsize=4,
-              speedmarkersize=10,
-              sourcetargetmarkerfontsize=4,
-              sourcetargetmarkersize=10 ):
+              speedfontsize=10,
+              speedmarkersize=20,
+              sourcetargetmarkerfontsize=15,
+              sourcetargetmarkersize=20 ):
 
     import matplotlib.ticker as ticker
     ax.set_aspect(aspect_ratio)
@@ -218,7 +435,7 @@ def plot_tour(fig, ax, figtitle, source, target,
           plt.arrow( xs[idx], ys[idx], xs[idx+1]-xs[idx], ys[idx+1]-ys[idx], 
                     **{'length_includes_head': True, 
                        'width': 0.007 , 
-                       'head_width':0.01, 
+                       'head_width':0.025, 
                        'fc': 'r', 
                        'ec': 'none',
                        'alpha': 0.8})
@@ -226,7 +443,7 @@ def plot_tour(fig, ax, figtitle, source, target,
 
     # Draw the source, target, and initial positions of the robots as bold dots
     xs,ys = extract_coordinates([source, target])
-    ax.plot(xs,ys, 'o', markersize=sourcetargetmarkersize, alpha=0.8, ms=10, mec='k', mfc='#F1AB30' )
+    ax.plot(xs,ys, 'o', markersize=sourcetargetmarkersize, alpha=1.0, ms=10, mec='k', mfc='#F1AB30' )
     #ax.plot(xs,ys, 'k--', alpha=0.6 ) # light line connecting source and target
 
     ax.text(source[0], source[1], 'S', fontsize=sourcetargetmarkerfontsize,\
@@ -235,11 +452,11 @@ def plot_tour(fig, ax, figtitle, source, target,
             horizontalalignment='center',verticalalignment='center')
 
     xs, ys = extract_coordinates( [ drone_info[idx][0] for idx in range(len(drone_info)) ]  )
-    ax.plot(xs,ys, 'o', markersize=speedmarkersize, alpha = 0.5, mec='None', mfc='#b7e8cc' )
+    ax.plot(xs,ys, 'o', markersize=speedmarkersize, alpha = 1.0, mec='None', mfc='#b7e8cc' )
 
     # Draw speed labels
     for idx in range(len(drone_info)):
-         ax.text( drone_info[idx][0][0], drone_info[idx][0][1], format(drone_info[idx][1],'.3f'),
+         ax.text( drone_info[idx][0][0], drone_info[idx][0][1], format(drone_info[idx][1],'.2f'),
                   fontsize=speedfontsize, horizontalalignment='center', verticalalignment='center' )
 
     # Draw drone path from initial position to interception point
@@ -256,7 +473,7 @@ def plot_tour(fig, ax, figtitle, source, target,
                        'ec': 'none'})
 
     fig.suptitle(figtitle, fontsize=15)
-    ax.set_title('\nMakespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=8)
+    ax.set_title('\nMakespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=16)
 
     startx, endx = ax.get_xlim()
     starty, endy = ax.get_ylim()

@@ -156,10 +156,9 @@ The \verb|pholib.py| file looks like
 \mbox{}\verb@import pprint as pp, randomcolor @\\
 \mbox{}\verb@import utils_algo, utils_graphics@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms}\nobreak\ {\footnotesize \NWlink{nuweb7}{7}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Experiments}\nobreak\ {\footnotesize ?}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb23}{23}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting}\nobreak\ {\footnotesize \NWlink{nuweb27}{27}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms}\nobreak\ {\footnotesize \NWlink{nuweb7}{7}, \ldots\ }$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb27}{27}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting}\nobreak\ {\footnotesize \NWlink{nuweb32}{32}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -346,6 +345,7 @@ as a black-box convex optimization solver.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7}{7}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
 
 \item{}
@@ -426,21 +426,253 @@ when a wavelet corresponding a drone faster than drone $i$ meets the wavelet exp
 at $M$}
 \end{figure}
 
-\newpage
+
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap3}\raggedright\small
+\NWtarget{nuweb10}{} $\langle\,${\itshape Algorithms}\nobreak\ {\footnotesize {10}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@def makespan(drone_info, used_drones, package_trail):@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    assert len(package_trail) == len(used_drones)+1, ""@\\
+\mbox{}\verb@    makespan = 0.0   @\\
+\mbox{}\verb@    counter  = 0    @\\
+\mbox{}\verb@    for idx in used_drones:@\\
+\mbox{}\verb@         dronespeed    = drone_info[idx][1]          @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         makespan += time_of_travel(package_trail[counter],\@\\
+\mbox{}\verb@                                    package_trail[counter+1],@\\
+\mbox{}\verb@                                    dronespeed) @\\
+\mbox{}\verb@         counter += 1@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    return makespan@\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def time_of_travel(start, stop, speed):@\\
+\mbox{}\verb@     start = np.asarray(start)@\\
+\mbox{}\verb@     stop  = np.asarray(stop)@\\
+\mbox{}\verb@     return np.linalg.norm(stop-start)/speed@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7}{7}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@makespan,@\nobreak\ \NWtxtIdentsNotUsed, \verb@time_of_travel@\nobreak\ \NWlink{nuweb12}{12}.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap4}\raggedright\small
+\NWtarget{nuweb11}{} $\langle\,${\itshape Algorithms}\nobreak\ {\footnotesize {11}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@ @\\
+\mbox{}\verb@def get_interception_time(s, us, p, up, t, t0) :@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    t_m = t - s # the _m subscript stands for modify@\\
+\mbox{}\verb@    t_m = t_m / np.linalg.norm(t_m) # normalize to unit@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # For rotating a vector clockwise by theta, @\\
+\mbox{}\verb@    # to get the vector t_m into alignment with (1,0)@\\
+\mbox{}\verb@    costh = t_m[0]/np.sqrt(t_m[0]**2 + t_m[1]**2)@\\
+\mbox{}\verb@    sinth = t_m[1]/np.sqrt(t_m[0]**2 + t_m[1]**2)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    rotmat = np.asarray([[costh, sinth],@\\
+\mbox{}\verb@                         [-sinth, costh]])@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    assert np.linalg.norm((rotmat.dot(t_m) - np.asarray([1,0]))) <= 1e-6,\@\\
+\mbox{}\verb@           "Rotation matrix did not work properly. t_m should get rotated\@\\
+\mbox{}\verb@            onto [1,0] after this transformation"@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    p_shift  = p - s@\\
+\mbox{}\verb@    p_rot    = rotmat.dot(p_shift)@\\
+\mbox{}\verb@    [alpha, beta] = p_rot@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Solve quadratic documented in the snippets above@\\
+\mbox{}\verb@    qroots = np.roots([ (1.0/us**2 - 1.0/up**2), @\\
+\mbox{}\verb@               2*t0/us + 2*alpha/up**2 , @\\
+\mbox{}\verb@               t0**2 - alpha**2/up**2 - beta**2/up**2])@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    ## The quadratic should always a root. @\\
+\mbox{}\verb@    qroots = np.real(qroots) # in case the imaginary parts@\\
+\mbox{}\verb@    qroots.sort()            # of the roots are really small@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    x = None@\\
+\mbox{}\verb@    for root in qroots:@\\
+\mbox{}\verb@        if root > 0.0:@\\
+\mbox{}\verb@           x = root@\\
+\mbox{}\verb@           break@\\
+\mbox{}\verb@    assert abs(x/us+t0 - np.sqrt((x-alpha)**2 + beta**2)/up) <= 1e-6 , \@\\
+\mbox{}\verb@           "Quadratic not solved perfectly"@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    tI = x/us + t0@\\
+\mbox{}\verb@    return tI@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7}{7}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@get_interception_time@\nobreak\ \NWlink{nuweb12}{12}.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
+
+
+%{python-mode}%
+\begin{flushleft} \small\label{scrap5}\raggedright\small
+\NWtarget{nuweb12}{} $\langle\,${\itshape Algorithms}\nobreak\ {\footnotesize {12}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@def extract_coordinates(points):@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    xs, ys = [], []@\\
+\mbox{}\verb@    for pt in points:@\\
+\mbox{}\verb@        xs.append(pt[0])@\\
+\mbox{}\verb@        ys.append(pt[1])@\\
+\mbox{}\verb@    return np.asarray(xs), np.asarray(ys)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def algo_odw(drone_info, source, target, @\\
+\mbox{}\verb@             plot_tour_p    = False):@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    from scipy.optimize import minimize@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    source = np.asarray(source)@\\
+\mbox{}\verb@    target = np.asarray(target)@\\
+\mbox{}\verb@    # unit vector pointing from source to target@\\
+\mbox{}\verb@    sthat  = (target-source)/np.linalg.norm(target-source) @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    numdrones  = len(drone_info)@\\
+\mbox{}\verb@    clock_time = 0.0@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Find the drone which can get to the source the quickest@\\
+\mbox{}\verb@    tmin = np.inf@\\
+\mbox{}\verb@    imin = None@\\
+\mbox{}\verb@    for idx in range(numdrones):@\\
+\mbox{}\verb@         initdroneposn = drone_info[idx][0]@\\
+\mbox{}\verb@         dronespeed    = drone_info[idx][1]@\\
+\mbox{}\verb@         tmin_idx = time_of_travel(initdroneposn, source, dronespeed)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         if tmin_idx < tmin:@\\
+\mbox{}\verb@             tmin = tmin_idx@\\
+\mbox{}\verb@             imin = idx @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    clock_time = tmin@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    current_package_handler_idx = imin@\\
+\mbox{}\verb@    current_package_position    = source@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    drone_pool = range(numdrones)@\\
+\mbox{}\verb@    drone_pool.remove(imin) @\\
+\mbox{}\verb@    used_drones = [imin]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    package_trail_straight = [current_package_position]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    package_reached_p   = False@\\
+\mbox{}\verb@    while not(package_reached_p):@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@          time_to_target_without_help =\@\\
+\mbox{}\verb@            np.linalg.norm((target-current_package_position))/ \@\\
+\mbox{}\verb@              drone_info[current_package_handler_idx][1]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@          tI_min     = np.inf@\\
+\mbox{}\verb@          idx_tI_min = None@\\
+\mbox{}\verb@          for idx in drone_pool:@\\
+\mbox{}\verb@              @\\
+\mbox{}\verb@              us = drone_info[current_package_handler_idx][1]@\\
+\mbox{}\verb@              up = drone_info[idx][1]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@              if up <= us: # slower drones are useless, so skip rest of the iteration@\\
+\mbox{}\verb@                  continue @\\
+\mbox{}\verb@              else: @\\
+\mbox{}\verb@                s = current_package_position @\\
+\mbox{}\verb@                p = np.asarray(drone_info[idx][0]) @\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                tI = get_interception_time(s, us, p, up, target, clock_time)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@                if tI < tI_min:@\\
+\mbox{}\verb@                   tI_min     = tI@\\
+\mbox{}\verb@                   idx_tI_min = idx@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@          if time_to_target_without_help < tI_min :@\\
+\mbox{}\verb@              package_reached_p = True@\\
+\mbox{}\verb@              package_trail_straight.append(target)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@          else:@\\
+\mbox{}\verb@              package_handler_speed    = \@\\
+\mbox{}\verb@                      drone_info[current_package_handler_idx][1] @\\
+\mbox{}\verb@              current_package_position = \@\\
+\mbox{}\verb@                      current_package_position + \@\\
+\mbox{}\verb@                          package_handler_speed * (tI_min - clock_time) *  sthat@\\
+\mbox{}\verb@              package_trail_straight.append(current_package_position)@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@              clock_time                  = tI_min @\\
+\mbox{}\verb@              current_package_handler_idx = idx_tI_min@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@              drone_pool.remove(idx_tI_min)@\\
+\mbox{}\verb@              used_drones.append(idx_tI_min)  @\\
+\mbox{}\verb@   @\\
+\mbox{}\verb@    package_trail_cvx = \@\\
+\mbox{}\verb@          algo_pho_exact_given_order_of_drones(\@\\
+\mbox{}\verb@                 [drone_info[idx] for idx in used_drones],source,target)@\\
+\mbox{}\verb@    mspan_straight = makespan(drone_info, used_drones, package_trail_straight)@\\
+\mbox{}\verb@    mspan_cvx      = makespan(drone_info, used_drones, package_trail_cvx)@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    if plot_tour_p:@\\
+\mbox{}\verb@         fig0, ax0 = plt.subplots()@\\
+\mbox{}\verb@         plot_tour(fig0, ax0, "ODW: Straight Line", source, target, \@\\
+\mbox{}\verb@                   drone_info, used_drones, package_trail_straight)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         fig1, ax1 = plt.subplots()@\\
+\mbox{}\verb@         plot_tour(fig1, ax1, "ODW: Straight Line, Post Convex Optimization", source, target, \@\\
+\mbox{}\verb@                   drone_info, used_drones, package_trail_cvx)@\\
+\mbox{}\verb@         plt.show()@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@    return used_drones, package_trail_straight, mspan_straight, package_trail_cvx, mspan_cvx@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroDefBy\ \NWlink{nuweb7}{7}\NWlink{nuweb10}{, 10}\NWlink{nuweb11}{, 11}\NWlink{nuweb12}{, 12}.
+\item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb27}{27}, \verb@extract_coordinates,@\nobreak\ \NWtxtIdentsNotUsed.\item \NWtxtIdentsUsed\nobreak\  \verb@get_interception_time@\nobreak\ \NWlink{nuweb11}{11}, \verb@time_of_travel@\nobreak\ \NWlink{nuweb10}{10}.
+\item{}
+\end{list}
+\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
 
 
 
 \chapter{Multiple Package Handoff}
 
-\section{Section 1}
 
-\blindtext
-\section{Section 2}
 
-\blindtext
-\section{Section 3}
+\begin{figure}[H]
+\centering
+\includegraphics[width=14cm]{asy2d/example.eps}
+\end{figure}
 
-\blindtext
+
 
 \nocite{*}
 \printbibliography
@@ -521,10 +753,11 @@ See \url{https://youtu.be/dX-0el2wuEU} for a short video on the dabbawallas.
 
 \chapter{\texttt{README}}
 
-This \verb|README| file can be read more clearly alongside its appropriate formatting at \url{https://github.com/gtelang/packagehandoff}
+This \verb|README| file can be read more clearly alongside its appropriate formatting at \\
+\url{https://github.com/gtelang/PackageHandoff_Python/tree/master/packagehandoff_lit}
 
-\begin{flushleft} \small\label{scrap3}\raggedright\small
-\NWtarget{nuweb16}{} \verb@"README.md"@\nobreak\ {\footnotesize {16}}$\equiv$
+\begin{flushleft} \small\label{scrap6}\raggedright\small
+\NWtarget{nuweb20}{} \verb@"README.md"@\nobreak\ {\footnotesize {20}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
@@ -548,7 +781,7 @@ This \verb|README| file can be read more clearly alongside its appropriate forma
 \mbox{}\verb@  @\\
 \mbox{}\verb@executables to be somewhere on your system's path. @\\
 \mbox{}\verb@@\\
-\mbox{}\verb@All source code is in the `src' directory. The asy2d,asy3d and docs@\\
+\mbox{}\verb@All source code is in the `src' directory. The asy2d, asy3d and docs@\\
 \mbox{}\verb@folders can be neglected since they contain images and documents @\\
 \mbox{}\verb@referenced in the `packagehandoff.pdf' file. From the point of view of @\\
 \mbox{}\verb@_running_ the code they can be ignored. @\\
@@ -569,8 +802,8 @@ This \verb|README| file can be read more clearly alongside its appropriate forma
 
 This file contains useful functions for visualization and plotting functions described in the previous chapters.
 %{python-mode}%
-\begin{flushleft} \small\label{scrap4}\raggedright\small
-\NWtarget{nuweb18}{} \verb@"src/utils_graphics.py"@\nobreak\ {\footnotesize {18}}$\equiv$
+\begin{flushleft} \small\label{scrap7}\raggedright\small
+\NWtarget{nuweb22}{} \verb@"src/utils_graphics.py"@\nobreak\ {\footnotesize {22}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
@@ -623,12 +856,12 @@ This file contains useful functions for visualization and plotting functions des
 This file contains useful functions for writing algorithms described in the previous chapters.
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap5}\raggedright\small
-\NWtarget{nuweb20}{} \verb@"src/utils_algo.py"@\nobreak\ {\footnotesize {20}}$\equiv$
+\begin{flushleft} \small\label{scrap8}\raggedright\small
+\NWtarget{nuweb24}{} \verb@"src/utils_algo.py"@\nobreak\ {\footnotesize {24}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
-\mbox{}\verb@ import numpy as np@\\
+\mbox{}\verb@import numpy as np@\\
 \mbox{}\verb@import random@\\
 \mbox{}\verb@from colorama import Fore@\\
 \mbox{}\verb@from colorama import Style@\\
@@ -724,11 +957,57 @@ This file contains useful functions for writing algorithms described in the prev
 This chunk contains code required for the interactive input of sites and agents onto the canvas. 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap6}\raggedright\small
-\NWtarget{nuweb23}{} $\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize {23}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap9}\raggedright\small
+\NWtarget{nuweb27}{} $\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize {27}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@# Set up logging information relevant to this module@\\
+\mbox{}\verb@logger=logging.getLogger(__name__)@\\
+\mbox{}\verb@logging.basicConfig(level=logging.DEBUG)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def debug(msg):@\\
+\mbox{}\verb@    frame,filename,line_number,function_name,lines,index=inspect.getouterframes(@\\
+\mbox{}\verb@        inspect.currentframe())[1]@\\
+\mbox{}\verb@    line=lines[0]@\\
+\mbox{}\verb@    indentation_level=line.find(line.lstrip())@\\
+\mbox{}\verb@    logger.debug('{i} [{m}]'.format(@\\
+\mbox{}\verb@        i='.'*indentation_level, m=msg))@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def info(msg):@\\
+\mbox{}\verb@    frame,filename,line_number,function_name,lines,index=inspect.getouterframes(@\\
+\mbox{}\verb@        inspect.currentframe())[1]@\\
+\mbox{}\verb@    line=lines[0]@\\
+\mbox{}\verb@    indentation_level=line.find(line.lstrip())@\\
+\mbox{}\verb@    logger.info('{i} [{m}]'.format(@\\
+\mbox{}\verb@        i='.'*indentation_level, m=msg))@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@xlim, ylim = [0,1], [0,1]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def applyAxCorrection(ax):@\\
+\mbox{}\verb@      ax.set_xlim([xlim[0], xlim[1]])@\\
+\mbox{}\verb@      ax.set_ylim([ylim[0], ylim[1]])@\\
+\mbox{}\verb@      ax.set_aspect(1.0)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def clearPatches(ax):@\\
+\mbox{}\verb@    # Get indices cooresponding to the polygon patches@\\
+\mbox{}\verb@    for index , patch in zip(range(len(ax.patches)), ax.patches):@\\
+\mbox{}\verb@        if isinstance(patch, mpl.patches.Polygon) == True:@\\
+\mbox{}\verb@            patch.remove()@\\
+\mbox{}\verb@    ax.lines[:]=[]@\\
+\mbox{}\verb@    applyAxCorrection(ax)@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def clearAxPolygonPatches(ax):@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    # Get indices cooresponding to the polygon patches@\\
+\mbox{}\verb@    for index , patch in zip(range(len(ax.patches)), ax.patches):@\\
+\mbox{}\verb@        if isinstance(patch, mpl.patches.Polygon) == True:@\\
+\mbox{}\verb@            patch.remove()@\\
+\mbox{}\verb@    ax.lines[:]=[]@\\
+\mbox{}\verb@    applyAxCorrection(ax)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@class Single_PHO_Input:@\\
 \mbox{}\verb@    def __init__(self, drone_info = [] , source = None, target=None):@\\
@@ -742,11 +1021,10 @@ This chunk contains code required for the interactive input of sites and agents 
 \mbox{}\verb@    def get_drone_uis (self):@\\
 \mbox{}\verb@           return [self.drone_info[idx][1] for idx in range(len(self.drone_info)) ]@\\
 \mbox{}\verb@         @\\
-\mbox{}\verb@    def get_tour(self, algo, animate_tour_p=False, plot_tour_p=False):@\\
+\mbox{}\verb@    def get_tour(self, algo, plot_tour_p=False):@\\
 \mbox{}\verb@           return algo( self.drone_info, @\\
 \mbox{}\verb@                        self.source, @\\
 \mbox{}\verb@                        self.target, @\\
-\mbox{}\verb@                        animate_tour_p, @\\
 \mbox{}\verb@                        plot_tour_p    )@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Methods for \verb|ReverseHorseflyInput|@\\
@@ -851,6 +1129,9 @@ This chunk contains code required for the interactive input of sites and agents 
 \mbox{}\verb@    plt.rcParams['font.family'] = 'sans-serif'@\\
 \mbox{}\verb@    plt.rcParams['font.sans-serif'] = 'Times New Roman'@\\
 \mbox{}\verb@@\\
+\mbox{}\verb@    xlim = utils_graphics.xlim@\\
+\mbox{}\verb@    ylim = utils_graphics.ylim@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@    ax.set_xlim([xlim[0], xlim[1]])@\\
 \mbox{}\verb@    ax.set_ylim([ylim[0], ylim[1]])@\\
 \mbox{}\verb@    ax.set_aspect(1.0)@\\
@@ -873,7 +1154,7 @@ This chunk contains code required for the interactive input of sites and agents 
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
-
+\item \NWtxtIdentsUsed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb12}{12}.
 \item{}
 \end{list}
 \vspace{4ex}
@@ -896,8 +1177,8 @@ An example output from the \verb|plot_tour| function is shown below.
 \end{figure}
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap7}\raggedright\small
-\NWtarget{nuweb27}{} $\langle\,${\itshape Plotting}\nobreak\ {\footnotesize {27}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap10}\raggedright\small
+\NWtarget{nuweb32}{} $\langle\,${\itshape Plotting}\nobreak\ {\footnotesize {32}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -906,10 +1187,10 @@ An example output from the \verb|plot_tour| function is shown below.
 \mbox{}\verb@              xlims=[0,1],@\\
 \mbox{}\verb@              ylims=[0,1],@\\
 \mbox{}\verb@              aspect_ratio=1.0,@\\
-\mbox{}\verb@              speedfontsize=4,@\\
-\mbox{}\verb@              speedmarkersize=10,@\\
-\mbox{}\verb@              sourcetargetmarkerfontsize=4,@\\
-\mbox{}\verb@              sourcetargetmarkersize=10 ):@\\
+\mbox{}\verb@              speedfontsize=10,@\\
+\mbox{}\verb@              speedmarkersize=20,@\\
+\mbox{}\verb@              sourcetargetmarkerfontsize=15,@\\
+\mbox{}\verb@              sourcetargetmarkersize=20 ):@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    import matplotlib.ticker as ticker@\\
 \mbox{}\verb@    ax.set_aspect(aspect_ratio)@\\
@@ -925,7 +1206,7 @@ An example output from the \verb|plot_tour| function is shown below.
 \mbox{}\verb@          plt.arrow( xs[idx], ys[idx], xs[idx+1]-xs[idx], ys[idx+1]-ys[idx], @\\
 \mbox{}\verb@                    **{'length_includes_head': True, @\\
 \mbox{}\verb@                       'width': 0.007 , @\\
-\mbox{}\verb@                       'head_width':0.01, @\\
+\mbox{}\verb@                       'head_width':0.025, @\\
 \mbox{}\verb@                       'fc': 'r', @\\
 \mbox{}\verb@                       'ec': 'none',@\\
 \mbox{}\verb@                       'alpha': 0.8})@\\
@@ -933,7 +1214,7 @@ An example output from the \verb|plot_tour| function is shown below.
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Draw the source, target, and initial positions of the robots as bold dots@\\
 \mbox{}\verb@    xs,ys = extract_coordinates([source, target])@\\
-\mbox{}\verb@    ax.plot(xs,ys, 'o', markersize=sourcetargetmarkersize, alpha=0.8, ms=10, mec='k', mfc='#F1AB30' )@\\
+\mbox{}\verb@    ax.plot(xs,ys, 'o', markersize=sourcetargetmarkersize, alpha=1.0, ms=10, mec='k', mfc='#F1AB30' )@\\
 \mbox{}\verb@    #ax.plot(xs,ys, 'k--', alpha=0.6 ) # light line connecting source and target@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    ax.text(source[0], source[1], 'S', fontsize=sourcetargetmarkerfontsize,\@\\
@@ -942,11 +1223,11 @@ An example output from the \verb|plot_tour| function is shown below.
 \mbox{}\verb@            horizontalalignment='center',verticalalignment='center')@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    xs, ys = extract_coordinates( [ drone_info[idx][0] for idx in range(len(drone_info)) ]  )@\\
-\mbox{}\verb@    ax.plot(xs,ys, 'o', markersize=speedmarkersize, alpha = 0.5, mec='None', mfc='#b7e8cc' )@\\
+\mbox{}\verb@    ax.plot(xs,ys, 'o', markersize=speedmarkersize, alpha = 1.0, mec='None', mfc='#b7e8cc' )@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Draw speed labels@\\
 \mbox{}\verb@    for idx in range(len(drone_info)):@\\
-\mbox{}\verb@         ax.text( drone_info[idx][0][0], drone_info[idx][0][1], format(drone_info[idx][1],'.3f'),@\\
+\mbox{}\verb@         ax.text( drone_info[idx][0][0], drone_info[idx][0][1], format(drone_info[idx][1],'.2f'),@\\
 \mbox{}\verb@                  fontsize=speedfontsize, horizontalalignment='center', verticalalignment='center' )@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Draw drone path from initial position to interception point@\\
@@ -963,7 +1244,7 @@ An example output from the \verb|plot_tour| function is shown below.
 \mbox{}\verb@                       'ec': 'none'})@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    fig.suptitle(figtitle, fontsize=15)@\\
-\mbox{}\verb@    ax.set_title('\nMakespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=8)@\\
+\mbox{}\verb@    ax.set_title('\nMakespan: ' + format(makespan(drone_info, used_drones, package_trail),'.5f'), fontsize=16)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    startx, endx = ax.get_xlim()@\\
 \mbox{}\verb@    starty, endy = ax.get_ylim()@\\

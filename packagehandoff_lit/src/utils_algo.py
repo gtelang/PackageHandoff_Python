@@ -1,5 +1,5 @@
 
- import numpy as np
+import numpy as np
 import random
 from colorama import Fore
 from colorama import Style
