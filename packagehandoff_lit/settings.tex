@@ -2,7 +2,7 @@
 \usepackage{marginnote}
 
 \setcounter{secnumdepth}{3} % default value for 'report' class is "2"
-
+\newcommand{\rnum}[1]{\uppercase\expandafter{\romannumeral #1\relax}} % from https://tex.stackexchange.com/a/23491
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -213,9 +213,16 @@ menucolor={linkcolor},%
 urlcolor={linkcolor}%
 ]{hyperref}
 
+
+\renewcommand{\ttdefault}{txtt}
+\usepackage{titling}
+\setlength{\droptitle}{-95pt}
+
+
+
 % taken from https://tex.stackexchange.com/a/371469 
-% fior drawing a nice rule across the page
-\newcommand\myrule{\par\noindent\rule{\textwidth}{0.4pt}}
+% for drawing a nice rule across the page
+\newcommand\myrule{\par\noindent \rule{\textwidth}{0.4pt}}
 
 %---------------------------------------------------------
 \usepackage{xcolor}

@@ -1,19 +1,20 @@
-\documentclass[12pt, english, oneside]{report}
+\documentclass[10pt, english, oneside]{report}
 \input{settings.tex}
 
-\renewcommand{\ttdefault}{txtt}
-\usepackage{titling}
-\setlength{\droptitle}{-95pt}
+
+\newcommand{\tss}{\textsuperscript}
+
 \title{\huge{\bfseries{Coordinating Heterogenous Agents for Fast Package Delivery --- The Package Handoff Problem}}}
-\author{Jie Gao $^1$, Kien Huynh $^1$, Joseph S.B. Mitchell $^2$, Gaurish Telang$^2$}
+\author{Jie Gao $^1$, 
+       Kien Huynh $^1$, 
+       Joseph S. B. Mitchell $^2$, 
+       Gaurish Telang$^2$}
 \date{
-   \small{$^1$ Department of Computer Science, Stony Brook University \\%
-   $^2$ Department of Applied Mathematics and Statistics, Stony Brook University} \\[2ex]% 
-   \today
+\small{$^1$ Department of Computer Science, Stony Brook University \\%
+$^2$ Department of Applied Mathematics and Statistics, Stony Brook University} \\[2ex]% 
 }
 
 \begin{document}
-
 \maketitle
 
 \begin{abstract}
@@ -58,7 +59,7 @@ This report is an algorithmic study of various heuristics developed to solve dif
 
 
 \newpage
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{2}
 \tableofcontents
 
 %--------------------------
@@ -166,7 +167,7 @@ appendix (also available on the Github repository)
 Each of the following sections correspond to a fixed variant of the package handoff problem and describe
 algorithms for that specific variant. Enough talk! Onto algorithms! 
 
-\section{Unlimited Fuel, Different Drone Speeds}
+\section{Problem: Unlimited Fuel, Different Drone Speeds}
 
 Much of the machinery developed in solving this basic basic basic question will be generalized and extended to 
 other variants of the package handoff problem. 
@@ -316,7 +317,7 @@ as a black-box convex optimization solver.
 We next describe a heuristic that use Continuous Dijkstra \cite{mitchell2000geometric} 
 type approach in computing approximate solutions to $OPT$.
 
-\subsection{One Dimensional Greedy Wavefront}
+\subsection{Algorithm: One Dimensional Greedy Wavefront}
 \label{ssec:odw}
 
 In this heuristic we first constrain the package to travel along the line $\vec{ST}$, then compute the 
@@ -578,22 +579,173 @@ def algo_odw(drone_info, source, target,
 
 \chapter{Multiple Package Handoff}
 
-
-
 \begin{figure}[H]
 \centering
-\includegraphics[width=14cm]{asy2d/example.eps}
+\includegraphics[width=10cm]{asy2d/example.eps}
 \end{figure}
 
+What's more fun than delivering a single package? Delivering multiple packages! The moment, we generalize 
+from a single to multiple packages the problem becomes enormously more interesting along with several 
+possible generlizations to the statement of the problem. Each section is dedicated to one such generalization
+along with a description of algorithms and heuristics to solve them. 
 
+
+\section{Problem: Drone Assignment To Packages}
+We are given as input the initial locations $P_i$ of $n$  agents in $\mathbb{R}^2$ 
+each capable of a maximum speed $u_i >0$.
+Also given are $k \leq n$ source target pairs $S_j, T_j$ where $S_j$ for $j \leq k$ 
+denotes the beginning position of a package that has to get to target point $T_j$.  
+
+Each agent is allowed to be involved in the transport of at most one package. More 
+than one agent is allowed to be assigned to a package. Agents  assigned to a package 
+can coordinate to rendezvous and relay the package from its source to its destination 
+(exactly as in the single package handoff case)
+
+The objective is to perform an assignment of agents to the packages so that the time 
+taken to deliver the last package to its target is minimized, i.e. the makespan of 
+the deliveries of the packages from sources to their destinations is minimized.  
+
+
+\subsection{Algorithm: Repeated Bottleneck Matching}
+\label{ssec:repbot}
+
+The approach taken here is again based on Continuous Dijkstra. 
+At the start of the algorithm, we assume each of the packages 
+are constrained to travel along the the straight line segment joining 
+its source and target.  We then imagine wavelets expanding at speed $u_i$ 
+from each of the drone positions and perform an incremental assignment of the 
+drones to the packages as the wavelet expansion proceeds. 
+The assignment is done via bottleneck matching in an appropriately 
+constructed bipartite graph. The matching algorithm is run everytime 
+a certain ``event'' is detected. 
+
+Once the final assignment of drones to packages has been performed, 
+we run the convex optimization solver desribed in \autoref{ssec:fixorder}
+to get the exact trajectory for each of the packages for the given assignment.
+
+The rest of this section is devoted to making the above description 
+more precise alongside the implementation for \verb|algo_repbot|. 
+Here is the main outline of the implementation. 
+
+%{python-mode}%
+@D Algorithms 
+@{import networkx as nx 
+
+def algo_repbot(drone_info, sources, targets, plot_tour_p = False):
+
+     @<Sanity checks on input for \verb|algo_repbot| @>
+     @<Basic setup@>
+    
+     package_delivered_p      = [ False for _ in range(numpackages) ] 
+     current_package_handler  = [ None  for _ in range(numpackages) ]
+     current_package_position = sources
+     current_package_speed    = [ 0.0   for _ in range(numpackages)]
+     drone_wavelet_info       = [{'wavelet_center': posn,'radius':0.0} 
+                                  for posn in drone_initposns]
+     drone_pool               = range(numdrones)
+
+     while not all(package_delivered_p):
+          @< Detect event type @>
+          @< Process event @>
+          @< Update drone pool @>
+@| algo_repbot @}
+%{/python-mode}%
+
+To start things off, we enforce the constraint that the number of drones 
+should be greater than the number of packages. Also the number of 
+packages is equal to the number of sources which in turn is equal to the 
+number of targets. These conditions are encoded as sanity checks 
+in the code chunk below that is incorporated at the beginning of the 
+function 
+
+%{python-mode}%
+@d Sanity checks on input for \verb|algo_repbot| @{   
+assert len(drone_info) >= len(sources), 
+   "Num drones should be >= the num source-target pairs"
+
+assert len(sources) == len(targets), 
+   "Num sources should be == Num targets"
+@| @}
+%{/python-mode}%
+
+
+
+The lists \verb|sources|, \verb|targets|, \verb|drone_initposns| and \verb|drone_speeds| 
+are all \textit{constant} throughout the execution of the algorithm. They denote the list of sources, 
+targets, initial position and speeds of the drones respectively. For package \verb|i|, its source and 
+destination are respectively \verb|source[i]| and \verb|target[i]|. 
+
+
+%{python-mode}%
+@d Basic setup @{ 
+sources    = [np.asarray(source) for source in sources] 
+targets    = [np.asarray(target) for target in targets] 
+
+drone_initposns = [ np.asarray(initposn) for (initposn, _) in drone_info ]
+drone_speeds    = [ speed                for (_,    speed) in drone_info ]
+
+numpackages = len(sources) 
+numdrones   = len(drone_info)
+@| @}
+%{/python-mode}%
+
+Then, we create some lists that keep track of various states in the 
+main \texttt{while} loop of the algorithm. 
+
+\begin{description}
+\item[\texttt{package\_delivered\_p}] is a Boolean list
+       where the \verb|i|\textsuperscript{th} element keeps track whether 
+       the package with id \verb|i| has been delivered to its destination. 
+       The main \verb|while| loop stops when all flags are set to \verb|True|. 
+\item[\texttt{current\_package\_handler}]  is a list of integer indices where 
+     the \verb|i|\textsuperscript{th} element indicates the id of the drone currently 
+     carrying the package along the straight line segment $S_iT_i$ enroute to $T_i$.
+\item[\texttt{current\_package\_position}]  is a list of $(x,y)$ 
+    coordinates where the \verb|i|\textsuperscript{th} element 
+    indicates the coordinates of the drone with id
+    \verb|current_package_handler[i]|. 
+\item[\texttt{current\_package\_speed}] is a list keeping track of the current speed
+     with which the package is moving. More precisely, the \verb|i|\textsuperscript{th} element is the 
+     speed of the currently handling the \verb|i|\tss{th} package. Since the packages
+     are initially not being handled by any of the drones, all package speeds are initialized to 0.0.
+\item[\texttt{drone\_wavelet\_info}] is a list of dictionaries, 
+     one dictionary per drone. Each such dictionary keeps track of 
+     information about a 
+     wavelet corresponding to every drone viz. the center of the wavelet about 
+     which the expansion is happening (by the \verb|wavelet_center| attribute), 
+     and the current radius of the wavelet (by the \verb|radius| attribute).  
+\item[\texttt{drone\_pool}] is a list of ids of drones that can be 
+     considered for the bottleneck matching process for the next iteration of 
+     the \verb|while| loop. In each iteration the size of this list goes down 
+     by \underline{exactly} one. 
+\end{description}
+
+
+\vspace{5mm}
+
+Each iteration corresponds to processing exactly one event. There are 
+exactly two types of (mutually exclusive) events in this algorithm. 
+
+\begin{description}
+\item[Type \rnum{1}:] A package gets delivered to its assigned destination
+\item[Type \rnum{2}:] A wavelet corresponding to a drone meets up with 
+   a drone currently handling a package enroute to its destination. 
+\end{description}
+
+In both event types, a drone gets taken out of the drone pool:  for 
+the Type \rnum{1} event the 
+drone that just delivered the package to the destination; for the Type 
+\rnum{2} event the drone that just handed off the package. 
+
+\subsubsection{Step: Detecting Event Type}
+\subsubsection{Step: Process Event}
+\subsubsection{Step: Update Drone Pool}
 
 \nocite{*}
 \printbibliography
 \begin{appendices}
 
 \chapter{History and Previous Work}
-
-
 \begin{wrapfigure}{L}{0.5\textwidth}
   \begin{center}
       \includegraphics[width=6cm]{docs/pony-express.png}
@@ -664,7 +816,7 @@ tiffins return to suburban homes by 6.00 pm.}
 See \url{https://youtu.be/dX-0el2wuEU} for a short video on the dabbawallas. 
 
 
-\chapter{\texttt{README}}
+\chapter{\texttt{README.md}}
 
 This \verb|README| file can be read more clearly alongside its appropriate formatting at \\
 \url{https://github.com/gtelang/PackageHandoff_Python/tree/master/packagehandoff_lit}
@@ -1027,23 +1179,152 @@ def single_pho_run_handler():
 
 
 
+class Multiple_PHO_Input:
+    def __init__(self, drone_info = [] , sources = [], targets=[]):
+           self.drone_info = drone_info 
+           self.sources     = sources
+           self.targets     = targets
+
+    def get_drone_pis (self):
+           return [self.drone_info[idx][0] for idx in range(len(self.drone_info)) ]
+           
+    def get_drone_uis (self):
+           return [self.drone_info[idx][1] for idx in range(len(self.drone_info)) ]
+         
+    def get_tour(self, algo, plot_tour_p=False):
+           return algo( self.drone_info, 
+                        self.sources, 
+                        self.targets, 
+                        plot_tour_p    )
+
+    # Methods for \verb|ReverseHorseflyInput|
+    def clearAllStates (self):
+          self.drone_info = []
+          self.sources = []
+          self.targets = []
 
 
 
+def multiple_pho_run_handler():
+    import random
+    def wrapperEnterRunPoints(fig, ax, run):
+      def _enterPoints(event):
+        if event.name      == 'button_press_event'          and \
+           (event.button   == 1 or event.button == 3)       and \
+            event.dblclick == True and event.xdata  != None and event.ydata  != None:
 
+             if event.button == 1:  
+                 # Insert circle representing the initial position of a drone
+                 print Fore.GREEN
+                 newPoint = (event.xdata, event.ydata)
+                 speed    = np.random.uniform() # float(raw_input('What speed do you want for the drone at '+str(newPoint)))
+                 run.drone_info.append( (newPoint, speed) ) 
+                 patchSize  = (xlim[1]-xlim[0])/40.0
+                 print Style.RESET_ALL
+                 
+                 ax.add_patch( mpl.patches.Circle( newPoint, radius = patchSize,
+                                                   facecolor='#EBEBEB', edgecolor='black'  ))
 
+                 ax.text( newPoint[0], newPoint[1], "{:.2f}".format(speed), fontsize=10, 
+                          horizontalalignment='center', verticalalignment='center' )
 
+                 ax.set_title('Number of drones inserted: ' +\
+                              str(len(run.drone_info)), fontdict={'fontsize':25})
+                 
+             elif event.button == 3:  
+                 # distinct colors, obtained from https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/
+                 cols = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', 
+                 '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', 
+                 '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', 
+                 '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080'] 
 
+                 # Insert big colored circles representing the source and target points
 
+                 patchSize  = (xlim[1]-xlim[0])/50.0
+                 if (len(run.sources) + len(run.targets)) % 2 == 0 : 
+                        run.sources.append((event.xdata, event.ydata))
+                        ax.add_patch( mpl.patches.Circle( run.sources[-1], radius = patchSize, 
+                                                   facecolor= cols[len(run.sources) % len(cols)], edgecolor='black', lw=1.0 ))
+                        ax.text( run.sources[-1][0], run.sources[-1][1], 'S'+str(len(run.sources)), fontsize=15, 
+                                 horizontalalignment='center', verticalalignment='center' )
 
+                 else :
+                      run.targets.append((event.xdata, event.ydata))
+                      ax.add_patch( mpl.patches.Circle( run.targets[-1], radius = patchSize, 
+                                                       facecolor= cols[len(run.sources)%len(cols)], edgecolor='black', lw=1.0 ))
+                      ax.text( run.targets[-1][0], run.targets[-1][1], 'T'+str(len(run.targets)), fontsize=15, 
+                               horizontalalignment='center', verticalalignment='center' )
 
+             # Clear polygon patches and set up last minute \verb|ax| tweaks
+             clearAxPolygonPatches(ax)
+             applyAxCorrection(ax)
+             fig.canvas.draw()
+      return _enterPoints
 
+    # The key-stack argument is mutable! I am using this hack to my advantage.
+    def wrapperkeyPressHandler(fig, ax, run): 
+           def _keyPressHandler(event):
+               if event.key in ['i', 'I']:  
 
+                    # Select algorithm to execute
+                    algo_str = raw_input(Fore.YELLOW                                             +\
+                            "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
+                            " (repbot)     Repeated bottleneck matching \n"                            +\
+                            Style.RESET_ALL)
 
+                    algo_str = algo_str.lstrip()
+                     
+                    # Incase there are patches present from the previous clustering, just clear them
+                    clearAxPolygonPatches(ax)
+                    if   algo_str == 'repbot':
+                          tour = run.get_tour( algo_repbot, plot_tour_p=True )
+                    else:
+                          print "Unknown option. No horsefly for you! ;-D "
+                          sys.exit()
+                    applyAxCorrection(ax)
+                    fig.canvas.draw()
+                    
+               elif event.key in ['c', 'C']: 
+                    # Clear canvas and states of all objects
+                    run.clearAllStates()
+                    ax.cla()
+                                  
+                    applyAxCorrection(ax)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                                     
+                    fig.texts = []
+                    fig.canvas.draw()
+           return _keyPressHandler
+    
+    # Set up interactive canvas
+    fig, ax =  plt.subplots()
+    run = Multiple_PHO_Input()
+        
+    from matplotlib import rc
+    
+    # specify the custom font to use
+    plt.rcParams['font.family'] = 'sans-serif'
+    plt.rcParams['font.sans-serif'] = 'Times New Roman'
 
+    xlim = utils_graphics.xlim
+    ylim = utils_graphics.ylim
 
+    ax.set_xlim([xlim[0], xlim[1]])
+    ax.set_ylim([ylim[0], ylim[1]])
+    ax.set_aspect(1.0)
+    ax.set_xticks([])
+    ax.set_yticks([])
+          
+    ax.set_title("Enter drone positions, sources and targets onto canvas.")
 
-
+    mouseClick   = wrapperEnterRunPoints (fig,ax, run)
+    fig.canvas.mpl_connect('button_press_event' , mouseClick)
+          
+    keyPress     = wrapperkeyPressHandler(fig,ax, run)
+    fig.canvas.mpl_connect('key_press_event', keyPress   )
+    
+    plt.show()
 
 
 

@@ -219,6 +219,42 @@ def algo_odw(drone_info, source, target,
 
     
     return used_drones, package_trail_straight, mspan_straight, package_trail_cvx, mspan_cvx
+import networkx as nx 
+
+def algo_repbot(drone_info, sources, targets, plot_tour_p = False):
+
+     # Sanity checks on input for \verb|algo_repbot|
+        
+     assert len(drone_info) >= len(sources), 
+        "Num drones should be >= the num source-target pairs"
+
+     assert len(sources) == len(targets), 
+        "Num sources should be == Num targets"
+     
+     # Basic setup
+      
+     sources    = [np.asarray(source) for source in sources] 
+     targets    = [np.asarray(target) for target in targets] 
+
+     drone_initposns = [ np.asarray(initposn) for (initposn, _) in drone_info ]
+     drone_speeds    = [ speed                for (_,    speed) in drone_info ]
+
+     numpackages = len(sources) 
+     numdrones   = len(drone_info)
+     
+    
+     package_delivered_p      = [ False for _ in range(numpackages) ] 
+     current_package_handler  = [ None  for _ in range(numpackages) ]
+     current_package_position = sources
+     current_package_speed    = [ 0.0   for _ in range(numpackages)]
+     drone_wavelet_info       = [{'wavelet_center': posn,'radius':0.0} 
+                                  for posn in drone_initposns]
+     drone_pool               = range(numdrones)
+
+     while not all(package_delivered_p):
+          @<Detect event type@>
+          @<Process event@>
+          @<Update drone pool@>
 
 # Run Handlers
 
@@ -408,6 +444,160 @@ def single_pho_run_handler():
     fig.canvas.mpl_connect('key_press_event', keyPress   )
     
     plt.show()
+
+
+
+
+
+class Multiple_PHO_Input:
+    def __init__(self, drone_info = [] , sources = [], targets=[]):
+           self.drone_info = drone_info 
+           self.sources     = sources
+           self.targets     = targets
+
+    def get_drone_pis (self):
+           return [self.drone_info[idx][0] for idx in range(len(self.drone_info)) ]
+           
+    def get_drone_uis (self):
+           return [self.drone_info[idx][1] for idx in range(len(self.drone_info)) ]
+         
+    def get_tour(self, algo, plot_tour_p=False):
+           return algo( self.drone_info, 
+                        self.sources, 
+                        self.targets, 
+                        plot_tour_p    )
+
+    # Methods for \verb|ReverseHorseflyInput|
+    def clearAllStates (self):
+          self.drone_info = []
+          self.sources = []
+          self.targets = []
+
+
+
+def multiple_pho_run_handler():
+    import random
+    def wrapperEnterRunPoints(fig, ax, run):
+      def _enterPoints(event):
+        if event.name      == 'button_press_event'          and \
+           (event.button   == 1 or event.button == 3)       and \
+            event.dblclick == True and event.xdata  != None and event.ydata  != None:
+
+             if event.button == 1:  
+                 # Insert circle representing the initial position of a drone
+                 print Fore.GREEN
+                 newPoint = (event.xdata, event.ydata)
+                 speed    = np.random.uniform() # float(raw_input('What speed do you want for the drone at '+str(newPoint)))
+                 run.drone_info.append( (newPoint, speed) ) 
+                 patchSize  = (xlim[1]-xlim[0])/40.0
+                 print Style.RESET_ALL
+                 
+                 ax.add_patch( mpl.patches.Circle( newPoint, radius = patchSize,
+                                                   facecolor='#EBEBEB', edgecolor='black'  ))
+
+                 ax.text( newPoint[0], newPoint[1], "{:.2f}".format(speed), fontsize=10, 
+                          horizontalalignment='center', verticalalignment='center' )
+
+                 ax.set_title('Number of drones inserted: ' +\
+                              str(len(run.drone_info)), fontdict={'fontsize':25})
+                 
+             elif event.button == 3:  
+                 # distinct colors, obtained from https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/
+                 cols = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', 
+                 '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', 
+                 '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', 
+                 '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080'] 
+
+                 # Insert big colored circles representing the source and target points
+
+                 patchSize  = (xlim[1]-xlim[0])/50.0
+                 if (len(run.sources) + len(run.targets)) % 2 == 0 : 
+                        run.sources.append((event.xdata, event.ydata))
+                        ax.add_patch( mpl.patches.Circle( run.sources[-1], radius = patchSize, 
+                                                   facecolor= cols[len(run.sources) % len(cols)], edgecolor='black', lw=1.0 ))
+                        ax.text( run.sources[-1][0], run.sources[-1][1], 'S'+str(len(run.sources)), fontsize=15, 
+                                 horizontalalignment='center', verticalalignment='center' )
+
+                 else :
+                      run.targets.append((event.xdata, event.ydata))
+                      ax.add_patch( mpl.patches.Circle( run.targets[-1], radius = patchSize, 
+                                                       facecolor= cols[len(run.sources)%len(cols)], edgecolor='black', lw=1.0 ))
+                      ax.text( run.targets[-1][0], run.targets[-1][1], 'T'+str(len(run.targets)), fontsize=15, 
+                               horizontalalignment='center', verticalalignment='center' )
+
+             # Clear polygon patches and set up last minute \verb|ax| tweaks
+             clearAxPolygonPatches(ax)
+             applyAxCorrection(ax)
+             fig.canvas.draw()
+      return _enterPoints
+
+    # The key-stack argument is mutable! I am using this hack to my advantage.
+    def wrapperkeyPressHandler(fig, ax, run): 
+           def _keyPressHandler(event):
+               if event.key in ['i', 'I']:  
+
+                    # Select algorithm to execute
+                    algo_str = raw_input(Fore.YELLOW                                             +\
+                            "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
+                            " (repbot)     Repeated bottleneck matching \n"                            +\
+                            Style.RESET_ALL)
+
+                    algo_str = algo_str.lstrip()
+                     
+                    # Incase there are patches present from the previous clustering, just clear them
+                    clearAxPolygonPatches(ax)
+                    if   algo_str == 'repbot':
+                          tour = run.get_tour( algo_repbot, plot_tour_p=True )
+                    else:
+                          print "Unknown option. No horsefly for you! ;-D "
+                          sys.exit()
+                    applyAxCorrection(ax)
+                    fig.canvas.draw()
+                    
+               elif event.key in ['c', 'C']: 
+                    # Clear canvas and states of all objects
+                    run.clearAllStates()
+                    ax.cla()
+                                  
+                    applyAxCorrection(ax)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                                     
+                    fig.texts = []
+                    fig.canvas.draw()
+           return _keyPressHandler
+    
+    # Set up interactive canvas
+    fig, ax =  plt.subplots()
+    run = Multiple_PHO_Input()
+        
+    from matplotlib import rc
+    
+    # specify the custom font to use
+    plt.rcParams['font.family'] = 'sans-serif'
+    plt.rcParams['font.sans-serif'] = 'Times New Roman'
+
+    xlim = utils_graphics.xlim
+    ylim = utils_graphics.ylim
+
+    ax.set_xlim([xlim[0], xlim[1]])
+    ax.set_ylim([ylim[0], ylim[1]])
+    ax.set_aspect(1.0)
+    ax.set_xticks([])
+    ax.set_yticks([])
+          
+    ax.set_title("Enter drone positions, sources and targets onto canvas.")
+
+    mouseClick   = wrapperEnterRunPoints (fig,ax, run)
+    fig.canvas.mpl_connect('button_press_event' , mouseClick)
+          
+    keyPress     = wrapperkeyPressHandler(fig,ax, run)
+    fig.canvas.mpl_connect('key_press_event', keyPress   )
+    
+    plt.show()
+
+
+
 
 # Plotting
 
