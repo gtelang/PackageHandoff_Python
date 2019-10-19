@@ -225,10 +225,10 @@ def algo_repbot(drone_info, sources, targets, plot_tour_p = False):
 
      # Sanity checks on input for \verb|algo_repbot|
         
-     assert len(drone_info) >= len(sources), 
+     assert len(drone_info) >= len(sources),\
         "Num drones should be >= the num source-target pairs"
 
-     assert len(sources) == len(targets), 
+     assert len(sources) == len(targets),\
         "Num sources should be == Num targets"
      
      # Basic setup

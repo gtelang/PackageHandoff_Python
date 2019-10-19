@@ -660,10 +660,10 @@ function
 
 %{python-mode}%
 @d Sanity checks on input for \verb|algo_repbot| @{   
-assert len(drone_info) >= len(sources), 
+assert len(drone_info) >= len(sources),\
    "Num drones should be >= the num source-target pairs"
 
-assert len(sources) == len(targets), 
+assert len(sources) == len(targets),\
    "Num sources should be == Num targets"
 @| @}
 %{/python-mode}%
@@ -728,8 +728,8 @@ exactly two types of (mutually exclusive) events in this algorithm.
 
 \begin{description}
 \item[Type \rnum{1}:] A package gets delivered to its assigned destination
-\item[Type \rnum{2}:] A wavelet corresponding to a drone meets up with 
-   a drone currently handling a package enroute to its destination. 
+\item[Type \rnum{2}:] A wavelet corresponding to a drone (not handling a package) meets up with 
+   a drone currently handling a package. 
 \end{description}
 
 In both event types, a drone gets taken out of the drone pool:  for 
