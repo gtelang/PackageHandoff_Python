@@ -327,7 +327,7 @@ program given in Lemma \autoref{lem:fixorder} to calculate the rendezvous points
 
 \begin{figure}[H]
 \centering
-   \includegraphics[width=14cm]{docs/straight-line-pho-ex.pdf}
+   \includegraphics[width=8cm]{docs/straight-line-pho-ex.pdf}
     \caption{The package travels along the straight line $\vec{ST}$. The point where drone $A$ hands off the 
      package to drone $B$ depicted as $H_B$, and similarly for other drones. Drones involved in the handoff 
      are marked in pink. Those not involved are marked in gray. Two drones may have different speed.}
@@ -379,16 +379,26 @@ $wavelets \gets [ (i, 0) \mid 0 \leq i \leq n ]$ \tcp*[h]{Active Wavelets: indic
 \begin{figure}[H]
 \centering
 \includegraphics[width=12cm]{docs/circular_wavelets_intersect_along_st.pdf}
-\caption{Intersection of two expanding wavelets along $\vec{H_iT}$. The figure shows  snapshots of two times;
-one at time $t$ when the package has just been handed off to drone $i$ at $H_i$ and another at time $t + \delta t$
-when a wavelet corresponding a drone faster than drone $i$ meets the wavelet expanding from $H_i$ with speed $u_i$ 
-at $M$}
+\caption{Intersection of two expanding wavelets along $\vec{H_iT}$. The figure shows an overlay of  snapshots of two times;
+one at time $t$ (when the package has just been handed off to drone $i$ at $H_i$) and another at time $t + \delta t$
+(when a wavelet corresponding a drone faster than drone $i$ meets it at at $M$)}
 \end{figure}
 
-
+The next chunk implements a function that computes the makespan of the delivery process, i.e. the time it takes
+for the package to get from the source to the destination. In the chunk below, the \verb|drone_info| is list of 
+tuples, where the \verb|i|\tss{th} tuple  gives the initial position and speed of the drone 
+in the zeroth and first position respectively. The function \verb|time_of_travel| is simply a function
+used to compute the time it takes for an agent with uniform speed to travel between a given \verb|source|
+and \verb|target|. Both \verb|source| and \verb|target| are numpy arrays of size two (if not, they are converted into 
+numpy arrays at the start of the function). 
 
 %{python-mode}%
 @D Algorithms @{
+def time_of_travel(start, stop, speed):
+     start = np.asarray(start)
+     stop  = np.asarray(stop)
+     return np.linalg.norm(stop-start)/speed
+
 def makespan(drone_info, used_drones, package_trail):
 
     assert len(package_trail) == len(used_drones)+1, ""
@@ -404,14 +414,43 @@ def makespan(drone_info, used_drones, package_trail):
     
     return makespan
   
-
-def time_of_travel(start, stop, speed):
-     start = np.asarray(start)
-     stop  = np.asarray(stop)
-     return np.linalg.norm(stop-start)/speed
-
 @| makespan, time_of_travel @}
 %{/python-mode}%
+
+This chunk implements the time on the global clock when two wavelets meet. More precisely, 
+The function computes the time on the global clock at which a wavelet that started expanding from 
+$P=(\alpha,\beta)$ at time 0, meets a wavelet that started expanding from $S$ at time $t_0$ along 
+the half-line $\vec{ST}$. We make a change of coordinages such that $\vec{ST}$ is horizontal and 
+pointing to the right, and $S=(0,0)$ as in \autoref{fig:getinterceptiontime}.
+
+
+
+\begin{figure}[H]
+\centering
+   \includegraphics[width=10cm]{docs/get_interception_time.pdf}
+\caption{Reference figure for the function \texttt{get\_interception\_time}.  Without loss of 
+generality (by changing the coordinate system) we can assume the line $\vec{ST}$ to be straight.}
+\end{figure}
+\label{fig:getinterceptiontime}
+
+
+
+\begin{IEEEeqnarray}{rCl}
+\frac{x-0}{u_S}   &=& \frac{\sqrt{(x-\alpha)^2 + \beta^2}}{u_P} - t_0  \nonumber \\
+\left(\frac{x}{u_S} + t_0 \right)^2 & = & \frac{(x-\alpha)^2 + \beta^2}{u_P^2}   \nonumber 
+\end{IEEEeqnarray}
+
+
+Rearranging the terms, we get a quadratic equation that we can solve for in $x$ using standard 
+non-linear solvers. 
+
+\begin{IEEEeqnarray}{rCl}
+x^2 \left( \frac{1}{u_S^2} + \frac{1}{u_P^2}\right)   + x\left( \frac{2t_0}{u_S} + \frac{2\alpha}{u_P^2}\right)
++ \left(   t_0^2 - \frac{\alpha^2}{u_P^2} - \frac{\beta^2}{u_P^2} \right)    &=& 0 
+\end{IEEEeqnarray}
+
+ Once we obtain $x$ getting the interception time $t_I$ (i.e. the time on the global clock 
+when the two wavelets meet) as $t_I = \frac{x}{u_S} + t_0$.
 
 
 %{python-mode}%
@@ -439,10 +478,10 @@ def get_interception_time(s, us, p, up, t, t0) :
 
     # Solve quadratic documented in the snippets above
     qroots = np.roots([ (1.0/us**2 - 1.0/up**2), 
-               2*t0/us + 2*alpha/up**2 , 
-               t0**2 - alpha**2/up**2 - beta**2/up**2])
+                        2*t0/us + 2*alpha/up**2 , 
+                        t0**2 - alpha**2/up**2 - beta**2/up**2])
 
-    ## The quadratic should always a root. 
+    # The quadratic should always have a root. 
     qroots = np.real(qroots) # in case the imaginary parts
     qroots.sort()            # of the roots are really small
 
@@ -460,7 +499,7 @@ def get_interception_time(s, us, p, up, t, t0) :
 %{/python-mode}%
 
 
-
+The next chunk contains the implementation of the algorithm \verb|algo_odw|. 
 
 %{python-mode}%
 @D Algorithms @{   

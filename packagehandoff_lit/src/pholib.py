@@ -50,6 +50,11 @@ def algo_pho_exact_given_order_of_drones ( drone_info, source, target ):
     package_trail = [ np.asarray(X[i].value) for i in range(r) ] + [ target ]
     return package_trail
 
+def time_of_travel(start, stop, speed):
+     start = np.asarray(start)
+     stop  = np.asarray(stop)
+     return np.linalg.norm(stop-start)/speed
+
 def makespan(drone_info, used_drones, package_trail):
 
     assert len(package_trail) == len(used_drones)+1, ""
@@ -65,12 +70,6 @@ def makespan(drone_info, used_drones, package_trail):
     
     return makespan
   
-
-def time_of_travel(start, stop, speed):
-     start = np.asarray(start)
-     stop  = np.asarray(stop)
-     return np.linalg.norm(stop-start)/speed
-
  
 def get_interception_time(s, us, p, up, t, t0) :
     
@@ -95,10 +94,10 @@ def get_interception_time(s, us, p, up, t, t0) :
 
     # Solve quadratic documented in the snippets above
     qroots = np.roots([ (1.0/us**2 - 1.0/up**2), 
-               2*t0/us + 2*alpha/up**2 , 
-               t0**2 - alpha**2/up**2 - beta**2/up**2])
+                        2*t0/us + 2*alpha/up**2 , 
+                        t0**2 - alpha**2/up**2 - beta**2/up**2])
 
-    ## The quadratic should always a root. 
+    # The quadratic should always have a root. 
     qroots = np.real(qroots) # in case the imaginary parts
     qroots.sort()            # of the roots are really small
 
