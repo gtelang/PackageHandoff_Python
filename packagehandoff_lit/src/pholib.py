@@ -50,29 +50,114 @@ def algo_pho_exact_given_order_of_drones ( drone_info, source, target ):
     package_trail = [ np.asarray(X[i].value) for i in range(r) ] + [ target ]
     return package_trail
 
-def time_of_travel(start, stop, speed):
-     start = np.asarray(start)
-     stop  = np.asarray(stop)
-     return np.linalg.norm(stop-start)/speed
+def algo_odw(drone_info, source, target, plot_tour_p = False):
 
-def makespan(drone_info, used_drones, package_trail):
+    from scipy.optimize import minimize
+    source     = np.asarray(source)
+    target     = np.asarray(target)
+    sthat      = (target-source)/np.linalg.norm(target-source)
+    numdrones  = len(drone_info)
+    clock_time = 0.0  # time on the global clock
 
-    assert len(package_trail) == len(used_drones)+1, ""
-    makespan = 0.0   
-    counter  = 0    
-    for idx in used_drones:
-         dronespeed    = drone_info[idx][1]          
-
-         makespan += time_of_travel(package_trail[counter],\
-                                    package_trail[counter+1],
-                                    dronespeed) 
-         counter += 1
+    # Find the drone which can get to the source the quickest
     
-    return makespan
-  
+    tmin = np.inf
+    imin = None
+    for idx in range(numdrones):
+             initdroneposn = drone_info[idx][0]
+             dronespeed    = drone_info[idx][1]
+             tmin_idx = time_of_travel(initdroneposn, source, dronespeed)
+
+             if tmin_idx < tmin:
+                 tmin = tmin_idx
+                 imin = idx 
+
+    clock_time = tmin
+
+    current_package_handler_idx = imin
+    current_package_position    = source
+
+    drone_pool = range(numdrones)
+    drone_pool.remove(imin) 
+    used_drones = [imin]
+    package_trail_straight = [current_package_position]
+    
+    package_reached_p      = False
+
+    while not(package_reached_p):
+         # Find a faster wavelet that meets up with the package wavelet along line $\vec{ST}$ at the earliest
+            
+         tI_min     = np.inf
+         idx_tI_min = None
+         for idx in drone_pool:
+
+               us = drone_info[current_package_handler_idx][1]
+               up = drone_info[idx][1]
+
+               if up <= us: # slower drones are useless, so skip rest of the iteration
+                   continue 
+               else: 
+                 s = current_package_position 
+                 p = np.asarray(drone_info[idx][0]) 
+
+                 tI = get_interception_time(s, us, p, up, target, clock_time)
+
+                 if tI < tI_min:
+                    tI_min     = tI
+                    idx_tI_min = idx
+                 
+         # Check if package wavelet reaches target before meeting wavelet computed above. Update states accordingly
+            
+         time_to_target_without_handoff = np.linalg.norm((target-current_package_position))/ \
+                                          drone_info[current_package_handler_idx][1]
+
+         if time_to_target_without_handoff < tI_min : 
+              package_reached_p = True
+              package_trail_straight.append(target)
+
+         else:
+              # Update package information (current speed, position etc.) and drone information (available and used drones)
+                 
+              package_handler_speed    = drone_info[current_package_handler_idx][1] 
+              current_package_position = current_package_position + \
+                                          package_handler_speed * (tI_min - clock_time) *  sthat
+              package_trail_straight.append(current_package_position)
+
+              clock_time                  = tI_min 
+              current_package_handler_idx = idx_tI_min
+
+              drone_pool.remove(idx_tI_min)
+              used_drones.append(idx_tI_min)  
+              
+         
+
+    # Run the convex optimization solver to retrieve the exact tour \verb|package_trail_cvx| for given drone order
+       
+    package_trail_cvx =  algo_pho_exact_given_order_of_drones(\
+                                 [drone_info[idx] for idx in used_drones],source,target)
+
+    mspan_straight    = makespan(drone_info, used_drones, package_trail_straight)
+    mspan_cvx         = makespan(drone_info, used_drones, package_trail_cvx)
+          
+    # Plot tour if \verb|plot_tour_p == True|
+       
+    if plot_tour_p:
+         fig0, ax0 = plt.subplots()
+         plot_tour(fig0, ax0, "ODW: Straight Line", source, target, \
+                   drone_info, used_drones, package_trail_straight)
+
+         fig1, ax1 = plt.subplots()
+         plot_tour(fig1, ax1, "ODW: Straight Line, Post Convex Optimization", source, target, \
+                   drone_info, used_drones, package_trail_cvx)
+         plt.show()
+    
+
+    return used_drones, package_trail_straight, mspan_straight, package_trail_cvx, mspan_cvx
  
 def get_interception_time(s, us, p, up, t, t0) :
     
+    # Change coordinates to make $s=(0,0)$ and $t$ to lie along X-axis as in \autoref{fig:getinterceptiontime}
+       
     t_m = t - s # the _m subscript stands for modify
     t_m = t_m / np.linalg.norm(t_m) # normalize to unit
 
@@ -83,7 +168,7 @@ def get_interception_time(s, us, p, up, t, t0) :
 
     rotmat = np.asarray([[costh, sinth],
                          [-sinth, costh]])
-    
+
     assert np.linalg.norm((rotmat.dot(t_m) - np.asarray([1,0]))) <= 1e-6,\
            "Rotation matrix did not work properly. t_m should get rotated\
             onto [1,0] after this transformation"
@@ -91,8 +176,9 @@ def get_interception_time(s, us, p, up, t, t0) :
     p_shift  = p - s
     p_rot    = rotmat.dot(p_shift)
     [alpha, beta] = p_rot
+    
 
-    # Solve quadratic documented in the snippets above
+    # Solve quadratic equation as documented in main text
     qroots = np.roots([ (1.0/us**2 - 1.0/up**2), 
                         2*t0/us + 2*alpha/up**2 , 
                         t0**2 - alpha**2/up**2 - beta**2/up**2])
@@ -111,7 +197,12 @@ def get_interception_time(s, us, p, up, t, t0) :
 
     tI = x/us + t0
     return tI
-   
+
+def time_of_travel(start, stop, speed):
+     start = np.asarray(start)
+     stop  = np.asarray(stop)
+     return np.linalg.norm(stop-start)/speed
+
 def extract_coordinates(points):
 
     xs, ys = [], []
@@ -120,109 +211,26 @@ def extract_coordinates(points):
         ys.append(pt[1])
     return np.asarray(xs), np.asarray(ys)
 
-def algo_odw(drone_info, source, target, 
-             plot_tour_p    = False):
+def makespan(drone_info, used_drones, package_trail):
 
-    from scipy.optimize import minimize
+    assert len(package_trail) == len(used_drones)+1, ""
+    makespan = 0.0   
+    counter  = 0    
+    for idx in used_drones:
+         dronespeed    = drone_info[idx][1]          
 
-    source = np.asarray(source)
-    target = np.asarray(target)
-    # unit vector pointing from source to target
-    sthat  = (target-source)/np.linalg.norm(target-source) 
-
-    numdrones  = len(drone_info)
-    clock_time = 0.0
-
-    # Find the drone which can get to the source the quickest
-    tmin = np.inf
-    imin = None
-    for idx in range(numdrones):
-         initdroneposn = drone_info[idx][0]
-         dronespeed    = drone_info[idx][1]
-         tmin_idx = time_of_travel(initdroneposn, source, dronespeed)
-
-         if tmin_idx < tmin:
-             tmin = tmin_idx
-             imin = idx 
-
-    clock_time = tmin
-
-    current_package_handler_idx = imin
-    current_package_position    = source
-
-    drone_pool = range(numdrones)
-    drone_pool.remove(imin) 
-    used_drones = [imin]
-
-    package_trail_straight = [current_package_position]
-
-    package_reached_p   = False
-    while not(package_reached_p):
-
-          time_to_target_without_help =\
-            np.linalg.norm((target-current_package_position))/ \
-              drone_info[current_package_handler_idx][1]
-
-          tI_min     = np.inf
-          idx_tI_min = None
-          for idx in drone_pool:
-              
-              us = drone_info[current_package_handler_idx][1]
-              up = drone_info[idx][1]
-
-              if up <= us: # slower drones are useless, so skip rest of the iteration
-                  continue 
-              else: 
-                s = current_package_position 
-                p = np.asarray(drone_info[idx][0]) 
-
-                tI = get_interception_time(s, us, p, up, target, clock_time)
-
-                if tI < tI_min:
-                   tI_min     = tI
-                   idx_tI_min = idx
-
-          if time_to_target_without_help < tI_min :
-              package_reached_p = True
-              package_trail_straight.append(target)
-
-          else:
-              package_handler_speed    = \
-                      drone_info[current_package_handler_idx][1] 
-              current_package_position = \
-                      current_package_position + \
-                          package_handler_speed * (tI_min - clock_time) *  sthat
-              package_trail_straight.append(current_package_position)
+         makespan += time_of_travel(package_trail[counter],\
+                                    package_trail[counter+1],
+                                    dronespeed) 
+         counter += 1
     
-              clock_time                  = tI_min 
-              current_package_handler_idx = idx_tI_min
-
-              drone_pool.remove(idx_tI_min)
-              used_drones.append(idx_tI_min)  
-   
-    package_trail_cvx = \
-          algo_pho_exact_given_order_of_drones(\
-                 [drone_info[idx] for idx in used_drones],source,target)
-    mspan_straight = makespan(drone_info, used_drones, package_trail_straight)
-    mspan_cvx      = makespan(drone_info, used_drones, package_trail_cvx)
-    
-    if plot_tour_p:
-         fig0, ax0 = plt.subplots()
-         plot_tour(fig0, ax0, "ODW: Straight Line", source, target, \
-                   drone_info, used_drones, package_trail_straight)
-
-         fig1, ax1 = plt.subplots()
-         plot_tour(fig1, ax1, "ODW: Straight Line, Post Convex Optimization", source, target, \
-                   drone_info, used_drones, package_trail_cvx)
-         plt.show()
-
-    
-    return used_drones, package_trail_straight, mspan_straight, package_trail_cvx, mspan_cvx
+    return makespan
+  
 import networkx as nx 
 
-def algo_repbot(drone_info, sources, targets, plot_tour_p = False):
+def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
 
-     # Sanity checks on input for \verb|algo_repbot|
+     # Sanity checks on input for \verb|algo_matchmove|
         
      assert len(drone_info) >= len(sources),\
         "Num drones should be >= the num source-target pairs"
@@ -240,24 +248,26 @@ def algo_repbot(drone_info, sources, targets, plot_tour_p = False):
 
      numpackages = len(sources) 
      numdrones   = len(drone_info)
-     
-    
+
      package_delivered_p      = [ False for _ in range(numpackages) ] 
+     drone_pool               = range(numdrones)
+
      current_package_handler  = [ None  for _ in range(numpackages) ]
      current_package_position = sources
      current_package_speed    = [ 0.0   for _ in range(numpackages)]
-     drone_wavelet_info       = [{'wavelet_center': posn,'radius':0.0} 
-                                  for posn in drone_initposns]
-     drone_pool               = range(numdrones)
-
+     drone_wavelet_info       = [ [{'wavelet_center': posn,'clock_time':0.0}] for posn in drone_initposns]
+     
+    
      while not all(package_delivered_p):
-          @<Detect event type@>
-          @<Process event@>
-          @<Update drone pool@>
+          @<Construct bipartite graph $G$ on drone wavelets and package wavelets@>
+          @<Get an exact / approximate bottleneck matching on $G$@>
+          @<Expand drone wavelets till an event of either Type \rnum{1} or \rnum{2} is detected@>
+          @<Update drone pool and package states@>
+
+     @<Plot movement of packages and drones if \verb|plot_tour_p| == True@> 
+     return pass pass pass pass pass 
 
 # Run Handlers
-
-
 
 # Set up logging information relevant to this module
 logger=logging.getLogger(__name__)
@@ -538,15 +548,15 @@ def multiple_pho_run_handler():
                     # Select algorithm to execute
                     algo_str = raw_input(Fore.YELLOW                                             +\
                             "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
-                            " (repbot)     Repeated bottleneck matching \n"                            +\
+                            " (matchmove)     Repeated bottleneck matching \n"                            +\
                             Style.RESET_ALL)
 
                     algo_str = algo_str.lstrip()
                      
                     # Incase there are patches present from the previous clustering, just clear them
                     clearAxPolygonPatches(ax)
-                    if   algo_str == 'repbot':
-                          tour = run.get_tour( algo_repbot, plot_tour_p=True )
+                    if   algo_str == 'matchmove':
+                          tour = run.get_tour( algo_matchmove, plot_tour_p=True )
                     else:
                           print "Unknown option. No horsefly for you! ;-D "
                           sys.exit()

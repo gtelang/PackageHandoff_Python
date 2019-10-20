@@ -1,7 +1,6 @@
 \documentclass[10pt, english, oneside]{report}
 \input{settings.tex}
 
-
 \newcommand{\tss}{\textsuperscript}
 
 \title{\huge{\bfseries{Coordinating Heterogenous Agents for Fast Package Delivery --- The Package Handoff Problem}}}
@@ -260,9 +259,6 @@ t_i + \frac{||X_{i+1}-X_i||}{u_i} &\leq t_{i+1} \qquad \qquad \qquad \;\;\;\; 0 
 
 \end{flem}
 
-\begin{proof}
-\todo[inline]{TODO!}
-\end{proof}
 
 The following function is just an implentation of the convex program just described. 
 Here \verb|drone_info| is a list 
@@ -272,7 +268,7 @@ are just coordinate locations of $S$ and $T$ respectively. We use the CVXPY \cit
 as a black-box convex optimization solver. 
 
 %{python-mode}%
-@D Algorithms 
+@d Algorithms 
 @{def algo_pho_exact_given_order_of_drones ( drone_info, source, target ):
     import cvxpy as cp
 
@@ -325,111 +321,170 @@ subset of the drones involved in the schedule, and finally pass of the list of d
 program given in Lemma \autoref{lem:fixorder} to calculate the rendezvous points. 
 
 
-\begin{figure}[H]
-\centering
-   \includegraphics[width=8cm]{docs/straight-line-pho-ex.pdf}
-    \caption{The package travels along the straight line $\vec{ST}$. The point where drone $A$ hands off the 
-     package to drone $B$ depicted as $H_B$, and similarly for other drones. Drones involved in the handoff 
-     are marked in pink. Those not involved are marked in gray. Two drones may have different speed.}
+% \begin{algorithm}[H]
+% \DontPrintSemicolon % Some LaTeX compilers require you to use \dontprintsemicolon instead 
+% \KwIn{
+% \begin{enumerate}
+% \item Coordinates of initial position of source $S$ and target $T$ of the package.
+% \item Coordinates of the onitial positions $P_i$ of each drone $1 \leq i \leq n$.
+% \item Maximum possible speed $u_i$ of each drone $1 \leq i \leq n$. 
+% \end{enumerate}
+
+% }
+% \KwOut{
+
+% \begin{enumerate}
+%  \item  \myblue{$t^*$}: The time required for the package to get from $S$ to $T$.
+%  \item  \myblue{$L = (i_1, i_2, \ldots, i_k)$} : An ordered list of indices of the drones involved in the handoff. 
+%  \item \myblue{$\mathcal{H} =  \{ \, S \, \} \cup \{ \, H_{i_j} \mid j\geq 2  \, \}$}:  An ordered list of handoff points.
+% $H_{i_j} \in \RR^2$ is where the drone with index $i_j$ picks up the package 
+%        \textit{from} drone $i_{j-1}$. 
+% \end{enumerate}
+% }
+
+% \vspace{4mm}
+
+% $t \gets 0$ \tcp*[h]{Time on the global clock} \;
+% $wavelets \gets [ (i, 0) \mid 0 \leq i \leq n ]$ \tcp*[h]{Active Wavelets: indices and current radius}\;
+
+% \vspace{2mm}
+% \tcc*[h]{Find first wavelet to reach $S$ and update $wavelets$} \;
+
+% \tcc*[h]{Start wavelet expansion from $S$} \;
+% \For{$i \gets 1$ \textbf{to} $r$}{
+%   \While{$n \geq c_i$} {
+%     $C \gets C \cup \{c_i\}$   \;
+%     $n \gets n - c_i$ 
+%   }
+% }
+% \Return{$t^*, L, \mathcal{H}$}\;
+% \caption{{\sc One dimensional greedy wavefront}}
+% \label{algo:odgw}
+% \end{algorithm}
+
+\begin{figure}
+    \centering
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=8cm]{docs/straight-line-pho-ex.pdf}
+        \caption{first figure}
+     \caption{The package travels along the straight line $\vec{ST}$. The point where drone $A$ hands off the 
+              package to drone $B$ depicted as $H_B$, and similarly for other drones. Drones involved in the handoff 
+              are marked in pink. Those not involved are marked in gray. Two drones may have different speed.}
+
+    \end{minipage}\hfill
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=8cm]{docs/circular_wavelets_intersect_along_st.pdf}
+        \caption{second figure}
+     \caption{Intersection of two expanding wavelets along $\vec{H_iT}$. The figure shows an overlay of  
+              snapshots of two times; one at time $t$ (when the package has just been handed off to drone 
+              $i$ at $H_i$) and another at time $t + \delta t$ (when a wavelet corresponding a drone faster 
+              than drone $i$ meets it at at $M$)}
+    \end{minipage}
 \end{figure}
+\label{fig:refalgoodw}
 
-
-
-\begin{algorithm}[H]
-\DontPrintSemicolon % Some LaTeX compilers require you to use \dontprintsemicolon instead 
-\KwIn{
-\begin{enumerate}
-\item Coordinates of initial position of source $S$ and target $T$ of the package.
-\item Coordinates of the onitial positions $P_i$ of each drone $1 \leq i \leq n$.
-\item Maximum possible speed $u_i$ of each drone $1 \leq i \leq n$. 
-\end{enumerate}
-
-}
-\KwOut{
-
-\begin{enumerate}
- \item  \myblue{$t^*$}: The time required for the package to get from $S$ to $T$.
- \item  \myblue{$L = (i_1, i_2, \ldots, i_k)$} : An ordered list of indices of the drones involved in the handoff. 
- \item \myblue{$\mathcal{H} =  \{ \, S \, \} \cup \{ \, H_{i_j} \mid j\geq 2  \, \}$}:  An ordered list of handoff points.
-$H_{i_j} \in \RR^2$ is where the drone with index $i_j$ picks up the package 
-       \textit{from} drone $i_{j-1}$. 
-\end{enumerate}
-}
-
-\vspace{4mm}
-
-$t \gets 0$ \tcp*[h]{Time on the global clock} \;
-$wavelets \gets [ (i, 0) \mid 0 \leq i \leq n ]$ \tcp*[h]{Active Wavelets: indices and current radius}\;
-
-\vspace{2mm}
-\tcc*[h]{Find first wavelet to reach $S$ and update $wavelets$} \;
-
-\tcc*[h]{Start wavelet expansion from $S$} \;
-\For{$i \gets 1$ \textbf{to} $r$}{
-  \While{$n \geq c_i$} {
-    $C \gets C \cup \{c_i\}$   \;
-    $n \gets n - c_i$ 
-  }
-}
-\Return{$t^*, L, \mathcal{H}$}\;
-\caption{{\sc One dimensional greedy wavefront}}
-\label{algo:odgw}
-\end{algorithm}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=12cm]{docs/circular_wavelets_intersect_along_st.pdf}
-\caption{Intersection of two expanding wavelets along $\vec{H_iT}$. The figure shows an overlay of  snapshots of two times;
-one at time $t$ (when the package has just been handed off to drone $i$ at $H_i$) and another at time $t + \delta t$
-(when a wavelet corresponding a drone faster than drone $i$ meets it at at $M$)}
-\end{figure}
-
-The next chunk implements a function that computes the makespan of the delivery process, i.e. the time it takes
-for the package to get from the source to the destination. In the chunk below, the \verb|drone_info| is list of 
-tuples, where the \verb|i|\tss{th} tuple  gives the initial position and speed of the drone 
-in the zeroth and first position respectively. The function \verb|time_of_travel| is simply a function
-used to compute the time it takes for an agent with uniform speed to travel between a given \verb|source|
-and \verb|target|. Both \verb|source| and \verb|target| are numpy arrays of size two (if not, they are converted into 
-numpy arrays at the start of the function). 
+Here is a sketch of the implementation of \verb|algo_odw|. Use \autoref{fig:refalgoodw} as a reference while reading the
+description below. 
 
 %{python-mode}%
-@D Algorithms @{
-def time_of_travel(start, stop, speed):
-     start = np.asarray(start)
-     stop  = np.asarray(stop)
-     return np.linalg.norm(stop-start)/speed
+@d Algorithms @{
+def algo_odw(drone_info, source, target, plot_tour_p = False):
 
-def makespan(drone_info, used_drones, package_trail):
+    from scipy.optimize import minimize
+    source     = np.asarray(source)
+    target     = np.asarray(target)
+    sthat      = (target-source)/np.linalg.norm(target-source)
+    numdrones  = len(drone_info)
+    clock_time = 0.0  # time on the global clock
 
-    assert len(package_trail) == len(used_drones)+1, ""
-    makespan = 0.0   
-    counter  = 0    
-    for idx in used_drones:
-         dronespeed    = drone_info[idx][1]          
+    @< Find the drone which can get to the source the quickest @>
+    package_reached_p      = False
 
-         makespan += time_of_travel(package_trail[counter],\
-                                    package_trail[counter+1],
-                                    dronespeed) 
-         counter += 1
-    
-    return makespan
-  
-@| makespan, time_of_travel @}
+    while not(package_reached_p):
+         @< Find a faster wavelet that meets up with the package wavelet along line $\vec{ST}$ at the earliest @>        
+         @< Check if package wavelet reaches target before meeting wavelet computed above. Update states accordingly@>
+
+    @<Run the convex optimization solver to retrieve the exact tour \verb|package_trail_cvx| for given drone order@>      
+    @<Plot tour if \verb|plot_tour_p == True|@>
+
+    return used_drones, package_trail_straight, mspan_straight, package_trail_cvx, mspan_cvx
+@| algo_odw @}
+%{/python-mode}%
+ 
+At the start of the algorithm, the package is stationary. We find the drone which can reach it at the earliest, 
+and update the time on the global clock. It is easy to see that this drone must be involved in the optimal handoff 
+schedule. 
+
+%{python-mode}%
+@d   Find the drone which can get to the source the quickest @{
+tmin = np.inf
+imin = None
+for idx in range(numdrones):
+         initdroneposn = drone_info[idx][0]
+         dronespeed    = drone_info[idx][1]
+         tmin_idx = time_of_travel(initdroneposn, source, dronespeed)
+
+         if tmin_idx < tmin:
+             tmin = tmin_idx
+             imin = idx 
+
+clock_time = tmin
+
+current_package_handler_idx = imin
+current_package_position    = source
+
+drone_pool = range(numdrones)
+drone_pool.remove(imin) 
+used_drones = [imin]
+package_trail_straight = [current_package_position]
+@| @}
 %{/python-mode}%
 
-This chunk implements the time on the global clock when two wavelets meet. More precisely, 
-The function computes the time on the global clock at which a wavelet that started expanding from 
+In the optimal handoff order, as we have already noted, the handoff happens from a slower to a faster robot. 
+In the next chunk, we calculate the wavelet that meets the package wavelet at the earliest, subject to the 
+constraint that the wavelet should be faster than the package wavelet. 
+
+
+%{python-mode}%
+@d Find a faster wavelet that meets up with the package wavelet along line $\vec{ST}$  at the earliest @{   
+tI_min     = np.inf
+idx_tI_min = None
+for idx in drone_pool:
+
+      us = drone_info[current_package_handler_idx][1]
+      up = drone_info[idx][1]
+
+      if up <= us: # slower drones are useless, so skip rest of the iteration
+          continue 
+      else: 
+        s = current_package_position 
+        p = np.asarray(drone_info[idx][0]) 
+
+        tI = get_interception_time(s, us, p, up, target, clock_time)
+
+        if tI < tI_min:
+           tI_min     = tI
+           idx_tI_min = idx
+@| @}
+%{/python-mode}%
+
+
+
+We now implement \verb|get_interception_time|, the time on the global clock when two wavelets meet. More precisely, 
+the function computes the time on the global clock at which a wavelet that started expanding from 
 $P=(\alpha,\beta)$ at time 0, meets a wavelet that started expanding from $S$ at time $t_0$ along 
 the half-line $\vec{ST}$. We make a change of coordinages such that $\vec{ST}$ is horizontal and 
 pointing to the right, and $S=(0,0)$ as in \autoref{fig:getinterceptiontime}.
 
 
-
 \begin{figure}[H]
 \centering
-   \includegraphics[width=10cm]{docs/get_interception_time.pdf}
-\caption{Reference figure for the function \texttt{get\_interception\_time}.  Without loss of 
-generality (by changing the coordinate system) we can assume the line $\vec{ST}$ to be straight.}
+   \includegraphics[width=8cm]{docs/get_interception_time.pdf}
+\caption{Reference figure for the function \texttt{get\_interception\_time}.  
+         Without loss of generality (by changing the coordinate system) we can assume 
+         the line $\vec{ST}$ to be horizontal.}
 \end{figure}
 \label{fig:getinterceptiontime}
 
@@ -441,42 +496,26 @@ generality (by changing the coordinate system) we can assume the line $\vec{ST}$
 \end{IEEEeqnarray}
 
 
-Rearranging the terms, we get a quadratic equation that we can solve for in $x$ using standard 
-non-linear solvers. 
+Rearranging the terms, we get a quadratic equation in $x$ that we can solve solve using standard 
+non-linear solvers \footnote{Using the exact formula for solving the quadratic equation is unstable
+in computer arithmetic as is well known from numerical analysis. To avoid such tricky issues, it is best
+to use the standard \texttt{roots} solver for polynomials available from numpy \url{https://docs.scipy.org/doc/numpy/reference/generated/numpy.roots.html}}. 
 
 \begin{IEEEeqnarray}{rCl}
-x^2 \left( \frac{1}{u_S^2} + \frac{1}{u_P^2}\right)   + x\left( \frac{2t_0}{u_S} + \frac{2\alpha}{u_P^2}\right)
+x^2 \left( \frac{1}{u_S^2} - \frac{1}{u_P^2}\right)   + x\left( \frac{2t_0}{u_S} + \frac{2\alpha}{u_P^2}\right)
 + \left(   t_0^2 - \frac{\alpha^2}{u_P^2} - \frac{\beta^2}{u_P^2} \right)    &=& 0 
 \end{IEEEeqnarray}
 
- Once we obtain $x$ getting the interception time $t_I$ (i.e. the time on the global clock 
+Once we obtain $x$ getting the interception time $t_I$ (i.e. the time on the global clock 
 when the two wavelets meet) as $t_I = \frac{x}{u_S} + t_0$.
 
-
 %{python-mode}%
-@D Algorithms @{ 
+@d Algorithms @{ 
 def get_interception_time(s, us, p, up, t, t0) :
     
-    t_m = t - s # the _m subscript stands for modify
-    t_m = t_m / np.linalg.norm(t_m) # normalize to unit
+    @<Change coordinates to make $s=(0,0)$ and $t$ to lie along X-axis as in \autoref{fig:getinterceptiontime} @>
 
-    # For rotating a vector clockwise by theta, 
-    # to get the vector t_m into alignment with (1,0)
-    costh = t_m[0]/np.sqrt(t_m[0]**2 + t_m[1]**2)
-    sinth = t_m[1]/np.sqrt(t_m[0]**2 + t_m[1]**2)
-
-    rotmat = np.asarray([[costh, sinth],
-                         [-sinth, costh]])
-    
-    assert np.linalg.norm((rotmat.dot(t_m) - np.asarray([1,0]))) <= 1e-6,\
-           "Rotation matrix did not work properly. t_m should get rotated\
-            onto [1,0] after this transformation"
-
-    p_shift  = p - s
-    p_rot    = rotmat.dot(p_shift)
-    [alpha, beta] = p_rot
-
-    # Solve quadratic documented in the snippets above
+    # Solve quadratic equation as documented in main text
     qroots = np.roots([ (1.0/us**2 - 1.0/up**2), 
                         2*t0/us + 2*alpha/up**2 , 
                         t0**2 - alpha**2/up**2 - beta**2/up**2])
@@ -498,11 +537,104 @@ def get_interception_time(s, us, p, up, t, t0) :
 @| get_interception_time @}
 %{/python-mode}%
 
-
-The next chunk contains the implementation of the algorithm \verb|algo_odw|. 
+Massage the input into such that $\vec{ST}$ lies along the positive X-axis as in \autoref{fig:getinterceptiontime}. 
 
 %{python-mode}%
-@D Algorithms @{   
+@d Change coordinates to make $s=(0,0)$ and $t$ to lie along X-axis as in \autoref{fig:getinterceptiontime}  @{   
+t_m = t - s # the _m subscript stands for modify
+t_m = t_m / np.linalg.norm(t_m) # normalize to unit
+
+# For rotating a vector clockwise by theta, 
+# to get the vector t_m into alignment with (1,0)
+costh = t_m[0]/np.sqrt(t_m[0]**2 + t_m[1]**2)
+sinth = t_m[1]/np.sqrt(t_m[0]**2 + t_m[1]**2)
+
+rotmat = np.asarray([[costh, sinth],
+                     [-sinth, costh]])
+
+assert np.linalg.norm((rotmat.dot(t_m) - np.asarray([1,0]))) <= 1e-6,\
+       "Rotation matrix did not work properly. t_m should get rotated\
+        onto [1,0] after this transformation"
+
+p_shift  = p - s
+p_rot    = rotmat.dot(p_shift)
+[alpha, beta] = p_rot
+@| @}
+%{/python-mode}%
+
+
+
+
+If the package reaches the target before it meets any other wavelet along the line $\vec{ST}$, then there is no point in 
+handing off the package to some other drone. Just terminate the handoff! Otherwise handoff the package and update
+variables accordingly.  
+
+
+%{python-mode}%
+@d Check if package wavelet reaches target before meeting wavelet computed above. Update states accordingly @{   
+time_to_target_without_handoff = np.linalg.norm((target-current_package_position))/ \
+                                 drone_info[current_package_handler_idx][1]
+
+if time_to_target_without_handoff < tI_min : 
+     package_reached_p = True
+     package_trail_straight.append(target)
+
+else:
+     @< Update package information (current speed, position etc.) and drone information (available and used drones)  @>
+@| @}
+%{/python-mode}%
+
+
+
+
+%{python-mode}%
+@d Update package information (current speed, position etc.) and drone information (available and used drones) @{   
+package_handler_speed    = drone_info[current_package_handler_idx][1] 
+current_package_position = current_package_position + \
+                            package_handler_speed * (tI_min - clock_time) *  sthat
+package_trail_straight.append(current_package_position)
+
+clock_time                  = tI_min 
+current_package_handler_idx = idx_tI_min
+
+drone_pool.remove(idx_tI_min)
+used_drones.append(idx_tI_min)  
+@| @}
+%{/python-mode}%
+
+
+Now that we have a list of drones involved in the handoff, (along with an approximate trail for the package) 
+we use the convex optimization solver to extract the exact tour for the given set of drones. We plot both tours
+for a visual comparison, if \verb|plot_tour_p| is set to \verb|True|.
+
+%{python-mode}%
+@d Run the convex optimization solver to retrieve the exact tour \verb|package_trail_cvx|  for given drone order @{   
+package_trail_cvx =  algo_pho_exact_given_order_of_drones(\
+                             [drone_info[idx] for idx in used_drones],source,target)
+
+mspan_straight    = makespan(drone_info, used_drones, package_trail_straight)
+mspan_cvx         = makespan(drone_info, used_drones, package_trail_cvx)
+@| @}
+%{/python-mode}%
+
+
+
+The next chunk implements a function that computes the makespan of the delivery process, i.e. the time it takes
+for the package to get from the source to the destination, given the points on the trajectory of the package
+and the drones involved alongwith the handoff order. The variable \verb|drone_info| is list of 
+tuples, where the \verb|i|\tss{th} tuple  gives the initial position and speed of the drone 
+in the zeroth and first position respectively. The function \verb|time_of_travel| is simply a function
+used to compute the time it takes for an agent with uniform speed to travel between a given \verb|source|
+and \verb|target|. Both \verb|source| and \verb|target| are numpy arrays of size two (if not, they are converted into 
+numpy arrays at the start of the function). 
+
+%{python-mode}%
+@d Algorithms @{
+def time_of_travel(start, stop, speed):
+     start = np.asarray(start)
+     stop  = np.asarray(stop)
+     return np.linalg.norm(stop-start)/speed
+
 def extract_coordinates(points):
 
     xs, ys = [], []
@@ -511,106 +643,45 @@ def extract_coordinates(points):
         ys.append(pt[1])
     return np.asarray(xs), np.asarray(ys)
 
-def algo_odw(drone_info, source, target, 
-             plot_tour_p    = False):
+def makespan(drone_info, used_drones, package_trail):
 
-    from scipy.optimize import minimize
+    assert len(package_trail) == len(used_drones)+1, ""
+    makespan = 0.0   
+    counter  = 0    
+    for idx in used_drones:
+         dronespeed    = drone_info[idx][1]          
 
-    source = np.asarray(source)
-    target = np.asarray(target)
-    # unit vector pointing from source to target
-    sthat  = (target-source)/np.linalg.norm(target-source) 
-
-    numdrones  = len(drone_info)
-    clock_time = 0.0
-
-    # Find the drone which can get to the source the quickest
-    tmin = np.inf
-    imin = None
-    for idx in range(numdrones):
-         initdroneposn = drone_info[idx][0]
-         dronespeed    = drone_info[idx][1]
-         tmin_idx = time_of_travel(initdroneposn, source, dronespeed)
-
-         if tmin_idx < tmin:
-             tmin = tmin_idx
-             imin = idx 
-
-    clock_time = tmin
-
-    current_package_handler_idx = imin
-    current_package_position    = source
-
-    drone_pool = range(numdrones)
-    drone_pool.remove(imin) 
-    used_drones = [imin]
-
-    package_trail_straight = [current_package_position]
-
-    package_reached_p   = False
-    while not(package_reached_p):
-
-          time_to_target_without_help =\
-            np.linalg.norm((target-current_package_position))/ \
-              drone_info[current_package_handler_idx][1]
-
-          tI_min     = np.inf
-          idx_tI_min = None
-          for idx in drone_pool:
-              
-              us = drone_info[current_package_handler_idx][1]
-              up = drone_info[idx][1]
-
-              if up <= us: # slower drones are useless, so skip rest of the iteration
-                  continue 
-              else: 
-                s = current_package_position 
-                p = np.asarray(drone_info[idx][0]) 
-
-                tI = get_interception_time(s, us, p, up, target, clock_time)
-
-                if tI < tI_min:
-                   tI_min     = tI
-                   idx_tI_min = idx
-
-          if time_to_target_without_help < tI_min :
-              package_reached_p = True
-              package_trail_straight.append(target)
-
-          else:
-              package_handler_speed    = \
-                      drone_info[current_package_handler_idx][1] 
-              current_package_position = \
-                      current_package_position + \
-                          package_handler_speed * (tI_min - clock_time) *  sthat
-              package_trail_straight.append(current_package_position)
+         makespan += time_of_travel(package_trail[counter],\
+                                    package_trail[counter+1],
+                                    dronespeed) 
+         counter += 1
     
-              clock_time                  = tI_min 
-              current_package_handler_idx = idx_tI_min
-
-              drone_pool.remove(idx_tI_min)
-              used_drones.append(idx_tI_min)  
-   
-    package_trail_cvx = \
-          algo_pho_exact_given_order_of_drones(\
-                 [drone_info[idx] for idx in used_drones],source,target)
-    mspan_straight = makespan(drone_info, used_drones, package_trail_straight)
-    mspan_cvx      = makespan(drone_info, used_drones, package_trail_cvx)
-    
-    if plot_tour_p:
-         fig0, ax0 = plt.subplots()
-         plot_tour(fig0, ax0, "ODW: Straight Line", source, target, \
-                   drone_info, used_drones, package_trail_straight)
-
-         fig1, ax1 = plt.subplots()
-         plot_tour(fig1, ax1, "ODW: Straight Line, Post Convex Optimization", source, target, \
-                   drone_info, used_drones, package_trail_cvx)
-         plt.show()
-
-    
-    return used_drones, package_trail_straight, mspan_straight, package_trail_cvx, mspan_cvx
-@| extract_coordinates, algo_odw @}
+    return makespan
+  
+@| makespan, extract_coordinates time_of_travel @}
 %{/python-mode}%
+
+
+
+
+%{python-mode}%
+@d Plot tour if \verb|plot_tour_p == True| @{   
+if plot_tour_p:
+     fig0, ax0 = plt.subplots()
+     plot_tour(fig0, ax0, "ODW: Straight Line", source, target, \
+               drone_info, used_drones, package_trail_straight)
+
+     fig1, ax1 = plt.subplots()
+     plot_tour(fig1, ax1, "ODW: Straight Line, Post Convex Optimization", source, target, \
+               drone_info, used_drones, package_trail_cvx)
+     plt.show()
+@| @}
+%{/python-mode}%
+
+
+
+
+
 
 
 
@@ -618,10 +689,12 @@ def algo_odw(drone_info, source, target,
 
 \chapter{Multiple Package Handoff}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=10cm]{asy2d/example.eps}
-\end{figure}
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=10cm]{asy2d/example.eps}
+% \end{figure}
+
+
 
 What's more fun than delivering a single package? Delivering multiple packages! The moment, we generalize 
 from a single to multiple packages the problem becomes enormously more interesting along with several 
@@ -629,12 +702,18 @@ possible generlizations to the statement of the problem. Each section is dedicat
 along with a description of algorithms and heuristics to solve them. 
 
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=6cm]{example-grid-100x100pt}
+\end{figure}
+\label{fig:multiplepho-assignment}
+
+
 \section{Problem: Drone Assignment To Packages}
 We are given as input the initial locations $P_i$ of $n$  agents in $\mathbb{R}^2$ 
 each capable of a maximum speed $u_i >0$.
 Also given are $k \leq n$ source target pairs $S_j, T_j$ where $S_j$ for $j \leq k$ 
 denotes the beginning position of a package that has to get to target point $T_j$.  
-
 Each agent is allowed to be involved in the transport of at most one package. More 
 than one agent is allowed to be assigned to a package. Agents  assigned to a package 
 can coordinate to rendezvous and relay the package from its source to its destination 
@@ -643,10 +722,11 @@ can coordinate to rendezvous and relay the package from its source to its destin
 The objective is to perform an assignment of agents to the packages so that the time 
 taken to deliver the last package to its target is minimized, i.e. the makespan of 
 the deliveries of the packages from sources to their destinations is minimized.  
+See \label{fig:multiplepho-assignment} for an example instance (alongside tours computed
+for the packages and drones by the ``match and move'' algorithm to be described next.)
 
-
-\subsection{Algorithm: Repeated Bottleneck Matching}
-\label{ssec:repbot}
+\subsection{Algorithm: Match-and-Move}
+\label{ssec:matchmove}
 
 The approach taken here is again based on Continuous Dijkstra. 
 At the start of the algorithm, we assume each of the packages 
@@ -663,33 +743,31 @@ we run the convex optimization solver desribed in \autoref{ssec:fixorder}
 to get the exact trajectory for each of the packages for the given assignment.
 
 The rest of this section is devoted to making the above description 
-more precise alongside the implementation for \verb|algo_repbot|. 
-Here is the main outline of the implementation. 
+more precise. First we give an outline of  \verb|algo_matchmove| that will be 
+fleshed out in subsequent subsections. 
 
 %{python-mode}%
-@D Algorithms 
+@d Algorithms 
 @{import networkx as nx 
 
-def algo_repbot(drone_info, sources, targets, plot_tour_p = False):
+def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
 
-     @<Sanity checks on input for \verb|algo_repbot| @>
+     @<Sanity checks on input for \verb|algo_matchmove| @>
      @<Basic setup@>
     
-     package_delivered_p      = [ False for _ in range(numpackages) ] 
-     current_package_handler  = [ None  for _ in range(numpackages) ]
-     current_package_position = sources
-     current_package_speed    = [ 0.0   for _ in range(numpackages)]
-     drone_wavelet_info       = [{'wavelet_center': posn,'radius':0.0} 
-                                  for posn in drone_initposns]
-     drone_pool               = range(numdrones)
-
      while not all(package_delivered_p):
-          @< Detect event type @>
-          @< Process event @>
-          @< Update drone pool @>
-@| algo_repbot @}
+          @< Construct bipartite graph $G$ on drone wavelets and package wavelets @>
+          @< Get an exact / approximate bottleneck matching on $G$ @>
+          @< Expand drone wavelets till an event of either Type \rnum{1} or \rnum{2} is detected @>
+          @< Update drone pool and package states@>
+
+     @<Plot movement of packages and drones if \verb|plot_tour_p| == True @> 
+     return pass pass pass pass pass 
+@| algo_matchmove @}
 %{/python-mode}%
 
+\subsubsection{Sanity Checks, and Basic Setup}
+\label{ssec:sancheck}
 To start things off, we enforce the constraint that the number of drones 
 should be greater than the number of packages. Also the number of 
 packages is equal to the number of sources which in turn is equal to the 
@@ -698,7 +776,7 @@ in the code chunk below that is incorporated at the beginning of the
 function 
 
 %{python-mode}%
-@d Sanity checks on input for \verb|algo_repbot| @{   
+@d Sanity checks on input for \verb|algo_matchmove| @{   
 assert len(drone_info) >= len(sources),\
    "Num drones should be >= the num source-target pairs"
 
@@ -708,11 +786,67 @@ assert len(sources) == len(targets),\
 %{/python-mode}%
 
 
-
 The lists \verb|sources|, \verb|targets|, \verb|drone_initposns| and \verb|drone_speeds| 
 are all \textit{constant} throughout the execution of the algorithm. They denote the list of sources, 
 targets, initial position and speeds of the drones respectively. For package \verb|i|, its source and 
 destination are respectively \verb|source[i]| and \verb|target[i]|. 
+
+
+Then, we create some lists that keep track of various states in the 
+main \texttt{while} loop of the algorithm. 
+
+\begin{description}
+\item[A. \texttt{package\_delivered\_p}] is a Boolean list
+       where the \verb|i|\textsuperscript{th} element keeps track whether 
+       the package with id \verb|i| has been delivered to its destination. 
+       The main \verb|while| loop stops when all flags are set to \verb|True|. 
+\item[B. \texttt{current\_package\_handler}]  is a list of integer indices where 
+     the \verb|i|\textsuperscript{th} element indicates the id of the drone currently 
+     carrying the package along the straight line segment $S_iT_i$ enroute to $T_i$.
+\item[C. \texttt{current\_package\_position}]  is a list of $(x,y)$ 
+    coordinates where the \verb|i|\textsuperscript{th} element 
+    indicates the coordinates of the drone with id
+    \verb|current_package_handler[i]|. 
+\item[D. \texttt{current\_package\_speed}] is a list keeping track of the current speed
+     with which the package is moving. More precisely, the \verb|i|\textsuperscript{th} element is the 
+     speed of the currently handling the \verb|i|\tss{th} package. Since the packages
+     are initially not being handled by any of the drones, all package speeds are initialized to 0.0.
+
+
+\item[E. \texttt{drone\_wavelet\_info}] is a list of list of dictionaries. Each outer list 
+     corresponds to a list of wavelets corresponding to each drone. Every wavelet is represented
+     by a dictionary, with two attributes
+\begin{description}
+  \item[1. \texttt{wavelet\_center}] The cartesian coordinates of the center $H$ of the wavelet about which the wavelet expands
+  \item[2. \texttt{clock\_time}] The time on the global clock at which the wavelet started expanding around the 
+         wavelet center $H$
+\end{description}
+     wavelet corresponding to every drone viz. the center of the wavelet about 
+     which the expansion is happening (by the \verb|wavelet_center| attribute), 
+     and the time on the global clock (by the \verb|clock_time| attribute) 
+     when the wavelet started expanding about the wavelet center.
+     
+     See \autoref{fig:wavelet_dict} to see a sequence of wavelets corresponding 
+     to a single drone.   
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=10cm]{docs/wavelet_dict.pdf}
+\caption{A sequence of wavelets corresponding to a drone. Each wavelet expands around $H_i$ at speed $u_i$
+ starting at time $t_i$ on the global clock. Every drone has a sequence of wavelets. The $H_i$ also represent 
+ handoff points where the drone either hands a package off to another drone or is handed a package by another 
+ drone. Note that the usage of the letter $H$ to represent the center of
+     a drone wavelet is suggestive of it also being a point where a package is handed to 
+     the drone or a package is handed off to another drone.}
+\end{figure}
+\label{fig:wavelet_dict}
+
+
+\item[F. \texttt{drone\_pool}] is a list of ids of drones that can be 
+     considered for the bottleneck matching process for the next iteration of 
+     the \verb|while| loop. In each iteration the size of this list goes down 
+     by \underline{exactly} one. 
+\end{description}
 
 
 %{python-mode}%
@@ -725,48 +859,26 @@ drone_speeds    = [ speed                for (_,    speed) in drone_info ]
 
 numpackages = len(sources) 
 numdrones   = len(drone_info)
+
+package_delivered_p      = [ False for _ in range(numpackages) ] 
+drone_pool               = range(numdrones)
+
+current_package_handler  = [ None  for _ in range(numpackages) ]
+current_package_position = sources
+current_package_speed    = [ 0.0   for _ in range(numpackages)]
+drone_wavelet_info       = [ [{'wavelet_center': posn,'clock_time':0.0}] for posn in drone_initposns]
 @| @}
 %{/python-mode}%
 
-Then, we create some lists that keep track of various states in the 
-main \texttt{while} loop of the algorithm. 
 
-\begin{description}
-\item[\texttt{package\_delivered\_p}] is a Boolean list
-       where the \verb|i|\textsuperscript{th} element keeps track whether 
-       the package with id \verb|i| has been delivered to its destination. 
-       The main \verb|while| loop stops when all flags are set to \verb|True|. 
-\item[\texttt{current\_package\_handler}]  is a list of integer indices where 
-     the \verb|i|\textsuperscript{th} element indicates the id of the drone currently 
-     carrying the package along the straight line segment $S_iT_i$ enroute to $T_i$.
-\item[\texttt{current\_package\_position}]  is a list of $(x,y)$ 
-    coordinates where the \verb|i|\textsuperscript{th} element 
-    indicates the coordinates of the drone with id
-    \verb|current_package_handler[i]|. 
-\item[\texttt{current\_package\_speed}] is a list keeping track of the current speed
-     with which the package is moving. More precisely, the \verb|i|\textsuperscript{th} element is the 
-     speed of the currently handling the \verb|i|\tss{th} package. Since the packages
-     are initially not being handled by any of the drones, all package speeds are initialized to 0.0.
-\item[\texttt{drone\_wavelet\_info}] is a list of dictionaries, 
-     one dictionary per drone. Each such dictionary keeps track of 
-     information about a 
-     wavelet corresponding to every drone viz. the center of the wavelet about 
-     which the expansion is happening (by the \verb|wavelet_center| attribute), 
-     and the current radius of the wavelet (by the \verb|radius| attribute).  
-\item[\texttt{drone\_pool}] is a list of ids of drones that can be 
-     considered for the bottleneck matching process for the next iteration of 
-     the \verb|while| loop. In each iteration the size of this list goes down 
-     by \underline{exactly} one. 
-\end{description}
-
-
-\vspace{5mm}
+\subsubsection{Main Loop}
+\label{ssec:mainloopmatchmove}
 
 Each iteration corresponds to processing exactly one event. There are 
 exactly two types of (mutually exclusive) events in this algorithm. 
 
 \begin{description}
-\item[Type \rnum{1}:] A package gets delivered to its assigned destination
+\item[Type \rnum{1}:] A package gets delivered to its assigned destination. 
 \item[Type \rnum{2}:] A wavelet corresponding to a drone (not handling a package) meets up with 
    a drone currently handling a package. 
 \end{description}
@@ -775,10 +887,6 @@ In both event types, a drone gets taken out of the drone pool:  for
 the Type \rnum{1} event the 
 drone that just delivered the package to the destination; for the Type 
 \rnum{2} event the drone that just handed off the package. 
-
-\subsubsection{Step: Detecting Event Type}
-\subsubsection{Step: Process Event}
-\subsubsection{Step: Update Drone Pool}
 
 \nocite{*}
 \printbibliography
@@ -801,7 +909,6 @@ Sacramento, California.
 To quote the Wikipedia article
 
 \begin{quote}
-
 \textit{``Operated by Central Overland California and Pike's Peak Express Company, the Pony Express was a great 
 financial investment to the U.S. During its 18 months of operation, it reduced the time for messages to travel 
 between the Atlantic and Pacific coasts to about 10 days. It became the West's most direct means of east-west 
@@ -823,7 +930,6 @@ are involved in building networks of drones for precisely such missions.
   \includegraphics[width=12cm]{docs/dabba.jpg}
   \caption{Dabbawallas exchanging lunchboxes (dabbas) at a relay point. Image from \cite{Magazine2019Oct} }
 \end{figure}
-
 
 Another relay system for package deliveries (135 years old and still functioning!) is that of 
 the \textit{dabbawallas} \footnote{literally: lunchbox carriers} used for transporting lunch boxes from 
@@ -1027,8 +1133,6 @@ This chunk contains code required for the interactive input of sites and agents 
 
 %{python-mode}%
 @D Run Handlers @{
-
-
 # Set up logging information relevant to this module
 logger=logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -1308,15 +1412,15 @@ def multiple_pho_run_handler():
                     # Select algorithm to execute
                     algo_str = raw_input(Fore.YELLOW                                             +\
                             "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
-                            " (repbot)     Repeated bottleneck matching \n"                            +\
+                            " (matchmove)     Repeated bottleneck matching \n"                            +\
                             Style.RESET_ALL)
 
                     algo_str = algo_str.lstrip()
                      
                     # Incase there are patches present from the previous clustering, just clear them
                     clearAxPolygonPatches(ax)
-                    if   algo_str == 'repbot':
-                          tour = run.get_tour( algo_repbot, plot_tour_p=True )
+                    if   algo_str == 'matchmove':
+                          tour = run.get_tour( algo_matchmove, plot_tour_p=True )
                     else:
                           print "Unknown option. No horsefly for you! ;-D "
                           sys.exit()
