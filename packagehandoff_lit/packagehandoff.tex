@@ -157,8 +157,8 @@ The \verb|pholib.py| file looks like
 \mbox{}\verb@import utils_algo, utils_graphics@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms}\nobreak\ {\footnotesize \NWlink{nuweb6}{6}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb25}{25}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting}\nobreak\ {\footnotesize \NWlink{nuweb32}{32}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb26}{26}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting}\nobreak\ {\footnotesize \NWlink{nuweb33}{33}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -465,7 +465,7 @@ description below.
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb6}{6}\NWlink{nuweb7}{, 7}\NWlink{nuweb10a}{, 10a}\NWlink{nuweb12a}{, 12a}\NWlink{nuweb14a}{, 14a}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb25}{25}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb26}{26}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -635,7 +635,7 @@ when the two wavelets meet) as $t_I = \frac{x}{u_S} + t_0$.
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb6}{6}\NWlink{nuweb7}{, 7}\NWlink{nuweb10a}{, 10a}\NWlink{nuweb12a}{, 12a}\NWlink{nuweb14a}{, 14a}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@get_interception_time@\nobreak\ \NWlink{nuweb8b}{8b}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@get_interception_time@\nobreak\ \NWlink{nuweb8b}{8b}\NWlink{nuweb17a}{, 17a}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -835,7 +835,7 @@ numpy arrays at the start of the function).
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb6}{6}\NWlink{nuweb7}{, 7}\NWlink{nuweb10a}{, 10a}\NWlink{nuweb12a}{, 12a}\NWlink{nuweb14a}{, 14a}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@extract_coordinates@\nobreak\ \NWlink{nuweb32}{32}, \verb@makespan,@\nobreak\ \NWtxtIdentsNotUsed, \verb@time_of_travel@\nobreak\ \NWlink{nuweb8a}{8a}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@extract_coordinates@\nobreak\ \NWlink{nuweb33}{33}, \verb@makespan,@\nobreak\ \NWtxtIdentsNotUsed, \verb@time_of_travel@\nobreak\ \NWlink{nuweb8a}{8a}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -958,12 +958,12 @@ fleshed out in subsequent subsections.
 \mbox{}\verb@     while not all(package_delivered_p):@\\
 \mbox{}\verb@          @\hbox{$\langle\,${\itshape Construct bipartite graph $G$ on drone wavelets and package wavelets}\nobreak\ {\footnotesize \NWlink{nuweb17a}{17a}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@          @\hbox{$\langle\,${\itshape Get a bottleneck matching on $G$}\nobreak\ {\footnotesize \NWlink{nuweb17b}{17b}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@          @\hbox{$\langle\,${\itshape Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected}\nobreak\ {\footnotesize \NWlink{nuweb17c}{17c}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@          @\hbox{$\langle\,${\itshape Update drone pool and package states}\nobreak\ {\footnotesize \NWlink{nuweb17d}{17d}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@          @\hbox{$\langle\,${\itshape Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected}\nobreak\ {\footnotesize \NWlink{nuweb18a}{18a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@          @\hbox{$\langle\,${\itshape Update drone pool and package states}\nobreak\ {\footnotesize \NWlink{nuweb18b}{18b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@     @\hbox{$\langle\,${\itshape Run convex optimization solver to get improved tours for drones and packages}\nobreak\ {\footnotesize \NWlink{nuweb17e}{17e}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@     @\hbox{$\langle\,${\itshape Plot movement of packages and drones if \verb|plot_tour_p == True |}\nobreak\ {\footnotesize \NWlink{nuweb17f}{17f}}$\,\rangle$}\verb@ @\\
-\mbox{}\verb@     return pass pass pass pass pass @\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Run convex optimization solver to get improved tours for drones and packages}\nobreak\ {\footnotesize \NWlink{nuweb18c}{18c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Plot movement of packages and drones if \verb|plot_tour_p == True |}\nobreak\ {\footnotesize \NWlink{nuweb18d}{18d}}$\,\rangle$}\verb@ @\\
+\mbox{}\verb@     #return pass pass pass pass pass @\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -971,7 +971,7 @@ fleshed out in subsequent subsections.
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb6}{6}\NWlink{nuweb7}{, 7}\NWlink{nuweb10a}{, 10a}\NWlink{nuweb12a}{, 12a}\NWlink{nuweb14a}{, 14a}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@algo_matchmove@\nobreak\ \NWlink{nuweb25}{25}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@algo_matchmove@\nobreak\ \NWlink{nuweb26}{26}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -1071,7 +1071,7 @@ main \texttt{while} loop of the algorithm.
      $\varepsilon$ being an arbitrarily small positive number. 
 
      Two helper functions \verb|get_current_position_of_package| and \verb|get_current_speed_of_package| to extract 
-     information conveniently from \verb|package_trail_info|. Again like \verb|get_last_wavelet_of_ith_drone| the 
+     information conveniently from \verb|package_trail_info|. Again like \verb|get_last_wavelet_of_drone| the 
      result returned depends on the state of \verb|package_trail_info| at the time the function is called. 
 
 \end{description}
@@ -1103,7 +1103,7 @@ main \texttt{while} loop of the algorithm.
 \mbox{}\verb@                          'matched_package_ids'   : []}] @\\
 \mbox{}\verb@                        for posn in drone_initposns ]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@def get_last_wavelet_of_ith_drone(i):@\\
+\mbox{}\verb@def get_last_wavelet_of_drone(i):@\\
 \mbox{}\verb@         return drone_wavelets_info[i][-1]@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@#.............................................................................@\\
@@ -1129,7 +1129,7 @@ main \texttt{while} loop of the algorithm.
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb14a}{14a}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@get_current_position_of_package,@\nobreak\ \NWtxtIdentsNotUsed, \verb@get_current_speed_of_package@\nobreak\ \NWtxtIdentsNotUsed, \verb@get_last_wavelet_of_ith_drone,@\nobreak\ \NWtxtIdentsNotUsed.
+\item \NWtxtIdentsDefed\nobreak\  \verb@get_current_position_of_package,@\nobreak\ \NWtxtIdentsNotUsed, \verb@get_current_speed_of_package@\nobreak\ \NWlink{nuweb17a}{17a}, \verb@get_last_wavelet_of_drone,@\nobreak\ \NWtxtIdentsNotUsed.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -1165,14 +1165,46 @@ main \texttt{while} loop of the algorithm.
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
-\mbox{}\verb@pass         @\\
+\mbox{}\verb@# Create nodes of the graph@\\
+\mbox{}\verb@G = nx.Graph()@\\
+\mbox{}\verb@G.add_nodes_from(['drone_'  +str(didx) for didx in range(numdrones)])@\\
+\mbox{}\verb@G.add_nodes_from(['package_'+str(pidx) for pidx in range(numpackages)])@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@# Add edges between nodes@\\
+\mbox{}\verb@for didx in range(numdrones):@\\
+\mbox{}\verb@    for pidx in range(numpackages):@\\
+\mbox{}\verb@         target = targets[pidx]@\\
+\mbox{}\verb@         pkg    = get_current_position_of_package(pidx)@\\
+\mbox{}\verb@         upkg   = get_current_speed_of_package(pidx)@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@         wav    = get_last_wavelet_of_drone(didx)['wavelet_center']@\\
+\mbox{}\verb@         dro    = wav['wavelet_center']@\\
+\mbox{}\verb@         udro   = drone_speeds[didx]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@          if upkg < 1e-7: # zero testing for upkg@\\
+\mbox{}\verb@             # Add edge to G@\\
+\mbox{}\verb@             pass@\\
+\mbox{}\verb@ @\\
+\mbox{}\verb@          elif udro > upkg: # It is critical that the zero testing for upkg @\\
+\mbox{}\verb@                            # has been done for time_target_to_solo to be @\\
+\mbox{}\verb@                            # computed safely@\\
+\mbox{}\verb@             time_to_target_solo = np.linalg.norm((target-pkg))/ upkg@\\
+\mbox{}\verb@             tI                  = get_interception_time(pkg, upkg, dro, udro, @\\
+\mbox{}\verb@                                                         target, wav['clock_time'])@\\
+\mbox{}\verb@             if tI < time_to_target_solo:@\\
+\mbox{}\verb@                   # Add edge to G@\\
+\mbox{}\verb@                   pass@\\
+\mbox{}\verb@          else:@\\
+\mbox{}\verb@              continue@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@sys.exit()@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroRefIn\ \NWlink{nuweb14a}{14a}.
-
+\item \NWtxtIdentsUsed\nobreak\  \verb@get_current_speed_of_package@\nobreak\ \NWlink{nuweb16}{16}, \verb@get_interception_time@\nobreak\ \NWlink{nuweb10a}{10a}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -1211,7 +1243,7 @@ There are exactly two types of (mutually exclusive) events in this algorithm.
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap18}\raggedright\small
-\NWtarget{nuweb17c}{} $\langle\,${\itshape Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected}\nobreak\ {\footnotesize {17c}}$\,\rangle\equiv$
+\NWtarget{nuweb18a}{} $\langle\,${\itshape Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected}\nobreak\ {\footnotesize {18a}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -1232,7 +1264,7 @@ There are exactly two types of (mutually exclusive) events in this algorithm.
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap19}\raggedright\small
-\NWtarget{nuweb17d}{} $\langle\,${\itshape Update drone pool and package states}\nobreak\ {\footnotesize {17d}}$\,\rangle\equiv$
+\NWtarget{nuweb18b}{} $\langle\,${\itshape Update drone pool and package states}\nobreak\ {\footnotesize {18b}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -1254,7 +1286,7 @@ There are exactly two types of (mutually exclusive) events in this algorithm.
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap20}\raggedright\small
-\NWtarget{nuweb17e}{} $\langle\,${\itshape Run convex optimization solver to get improved tours for drones and packages}\nobreak\ {\footnotesize {17e}}$\,\rangle\equiv$
+\NWtarget{nuweb18c}{} $\langle\,${\itshape Run convex optimization solver to get improved tours for drones and packages}\nobreak\ {\footnotesize {18c}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -1276,7 +1308,7 @@ There are exactly two types of (mutually exclusive) events in this algorithm.
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap21}\raggedright\small
-\NWtarget{nuweb17f}{} $\langle\,${\itshape Plot movement of packages and drones if \verb|plot_tour_p == True |}\nobreak\ {\footnotesize {17f}}$\,\rangle\equiv$
+\NWtarget{nuweb18d}{} $\langle\,${\itshape Plot movement of packages and drones if \verb|plot_tour_p == True |}\nobreak\ {\footnotesize {18d}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -1375,7 +1407,7 @@ This \verb|README| file can be read more clearly alongside its appropriate forma
 \url{https://github.com/gtelang/PackageHandoff_Python/tree/master/packagehandoff_lit}
 
 \begin{flushleft} \small\label{scrap22}\raggedright\small
-\NWtarget{nuweb21}{} \verb@"README.md"@\nobreak\ {\footnotesize {21}}$\equiv$
+\NWtarget{nuweb22}{} \verb@"README.md"@\nobreak\ {\footnotesize {22}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
@@ -1421,7 +1453,7 @@ This \verb|README| file can be read more clearly alongside its appropriate forma
 This file contains useful functions for visualization and plotting functions described in the previous chapters.
 %{python-mode}%
 \begin{flushleft} \small\label{scrap23}\raggedright\small
-\NWtarget{nuweb22}{} \verb@"src/utils_graphics.py"@\nobreak\ {\footnotesize {22}}$\equiv$
+\NWtarget{nuweb23}{} \verb@"src/utils_graphics.py"@\nobreak\ {\footnotesize {23}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
@@ -1475,7 +1507,7 @@ This file contains useful functions for writing algorithms described in the prev
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap24}\raggedright\small
-\NWtarget{nuweb23}{} \verb@"src/utils_algo.py"@\nobreak\ {\footnotesize {23}}$\equiv$
+\NWtarget{nuweb24}{} \verb@"src/utils_algo.py"@\nobreak\ {\footnotesize {24}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -1576,7 +1608,7 @@ This chunk contains code required for the interactive input of sites and agents 
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap25}\raggedright\small
-\NWtarget{nuweb25}{} $\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize {25}}$\,\rangle\equiv$
+\NWtarget{nuweb26}{} $\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize {26}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -1948,7 +1980,7 @@ An example output from the \verb|plot_tour| function is shown below.
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap26}\raggedright\small
-\NWtarget{nuweb32}{} $\langle\,${\itshape Plotting}\nobreak\ {\footnotesize {32}}$\,\rangle\equiv$
+\NWtarget{nuweb33}{} $\langle\,${\itshape Plotting}\nobreak\ {\footnotesize {33}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\

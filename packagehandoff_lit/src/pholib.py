@@ -316,7 +316,7 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                     else:
                         continue
               
-
+          sys.exit()
           
           # Get a bottleneck matching on $G$
           

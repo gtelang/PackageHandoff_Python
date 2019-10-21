@@ -951,7 +951,7 @@ for didx in range(numdrones):
           else:
               continue
     
-
+sys.exit()
 @| @}
 %{/python-mode}%
 
