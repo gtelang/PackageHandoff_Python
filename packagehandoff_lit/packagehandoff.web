@@ -929,24 +929,40 @@ def packagelabel(idx):
 % drone that just delivered the package to the destination; for the Type 
 % \rnum{2} event the drone that just handed off the package. 
 
-
 It is critical that the zero testing for upkg has 
 been done for \verb|time_target_to_solo| to be computed safely 
 without worrying about \verb|ZeroDivisionError|.
 
-%{python-mode}%
-@d Construct bipartite graph $G$ on drone wavelets and package wavelets @{   
-G = nx.Graph()
-G.add_nodes_from([  dronelabel(didx) for didx in drone_pool        ])
-G.add_nodes_from([packagelabel(pidx) for pidx in remaining_packages])
+Note that the graph bipartite $G$ is encoded as a matrix of weights as shown in the 
+figure \autoref{fig:bipart}
 
-for didx in drone_pool:       
+\begin{figure}[H]
+\centering
+\includegraphics[width=17cm]{docs/bipartgraph_demo.pdf}
+\caption{A bipartite graph $G$ constructed between the drones 
+and packages, along witht the asosciated weight matrix. Edges between
+drones and packages not in the graph are represented by infinite edge 
+weights. A minimum weight bipartite matching algorithm from SciPy (\url{http://bit.ly/2MAWHPn}) will 
+be used as a replacement for bottleneck matching (SciPy / NetworkX do not 
+have such a solver) The matrix shown in the right half of the above figure is 
+built inside the code, one column at a time. }
+\end{figure}
+\label{fig:bipart}
+
+%{python-mode}%
+@d Construct bipartite graph $G$ on drone wavelets and package wavelets @{  
+infty    = np.inf 
+G_mat = np.full((len(remaining_packages),len(drone_pool)), infty)
+
+for didx in drone_pool:
     dlabel = dronelabel(didx)
 
     for pidx in remaining_packages: 
         current_handler_of_package = get_current_handler_of_package(pidx)
 
-        if current_handler_of_package != didx and not(drone_locked_p[didx]):
+        # CASE 1
+        if current_handler_of_package != didx and \
+           not(drone_locked_p[didx]):
 
                 plabel = packagelabel(pidx)
                 target = targets[pidx]
@@ -962,8 +978,8 @@ for didx in drone_pool:
                 if upkg < zerotol :
                       weight = np.linalg.norm(pkg-dro)/udro +\
                                np.linalg.norm(target-pkg)/udro
-                      G.add_edge(dlabel, plabel)
-                      G.edges[dlabel, plabel]['weight'] = weight
+
+                      G_mat[pidx, didx] = weight
 
                 elif udro > upkg and abs(upkg-udro) > zerotol:
 
@@ -974,46 +990,50 @@ for didx in drone_pool:
                           pthat = (target-pkg)/np.linalg.norm(target-pkg)
                           interception_pt = pkg + x * pthat
 
-                          weight = tI + (target-interception_pt)/udro
-                          G.add_edge(dlabel,plabel)
-                          G.edges[dlabel, plabel]['weight'] = weight
-
-        elif current_handler_of_package == didx and drone_locked_p[didx]:
+                          weight = tI + np.linalg.norm((target-interception_pt))/udro
+                          G_mat[pidx, didx] = weight
+        # CASE 2
+        elif current_handler_of_package == didx and \
+             drone_locked_p[didx]:
                assert abs(udro-upkg) < zerotol , "udro should be equal to upkg"
-               weight = (target-pkg)/udro
-               G.add_edge(dlabel,plabel)
-               G.edges[dlabel,plabel]['weight'] = weight 
-
-        elif current_handler_of_package != didx and drone_locked_p[didx]:
-               pass  # "Nothing to do here, didx is busy!"
+               weight = np.linalg.norm((target-pkg))/udro
+               G_mat[pidx, didx] = weight
+    
+        # CASE 3
+        elif current_handler_of_package != didx and \
+             drone_locked_p[didx]:
+               G_mat[pidx, didx] = infty # effectively saying there is not edge between the two
         else : 
-               assert (current_handler_of_package == didx and not(drone_locked_p[didx])) ,
-                       "This else branch should not be executed. This means didx is \
-                        handling a package and is NOT locked"
-
-print "\nEdges are "
-utils_algo.print_list(G.edges.data())
+               # the outer not negates the inner condition which is true if this branch is executed
+               assert not(current_handler_of_package == didx and \
+                           not(drone_locked_p[didx])) ,\
+                       "This else branch should not be executed. This\
+                        means didx is handling a package and is NOT locked"
 @| @}
 %{/python-mode}%
 
 Since NetworkX does not have a native bottleneck matching solver, we use a minimum-weight matching solver
 \footnote{by negating the edgeweights and using the maximum weighted matching solver described in 
-\url{https://networkx.github.io/documentation/stable/reference/algorithms/matching.html}. } as a replacement
+\url{https://networkx.github.io/documentation/stable/reference/algorithms/matching.html} or \url{http://bit.ly/2MAWHPn}.  } as a replacement
 /approximation to bottleneck matching. 
 
-%{python-mode}%
-@d Get a bottleneck matching on $G$ @{
-pass
-@| @}
-%{/python-mode}%
 
-There are exactly two types of (mutually exclusive) events in this algorithm. 
+There are exactly two types of (mutually exclusive) 
+events in this algorithm. 
 
 \begin{description}
 \item[Type \rnum{1}:] A package gets delivered to its assigned destination. 
 \item[Type \rnum{2}:] A wavelet corresponding to a drone (not handling a package) meets up with 
    a drone currently handling a package. 
 \end{description}
+
+
+%{python-mode}%
+@d Get a bottleneck matching on $G$ @{
+from scipy.optimize import linear_sum_assignment
+pkg_ind, dro_ind = linear_sum_assignment(G_mat)
+@| @}
+%{/python-mode}%
 
 %{python-mode}%
 @d Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected @{   
@@ -1040,8 +1060,6 @@ pass
 pass
 @| @}
 %{/python-mode}%
-
-
 
 \nocite{*}
 \printbibliography

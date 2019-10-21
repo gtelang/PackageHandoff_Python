@@ -293,18 +293,19 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
     
      while not all(package_delivered_p):
           # Construct bipartite graph $G$ on drone wavelets and package wavelets
-             
-          G = nx.Graph()
-          G.add_nodes_from([  dronelabel(didx) for didx in drone_pool        ])
-          G.add_nodes_from([packagelabel(pidx) for pidx in remaining_packages])
+            
+          infty    = np.inf 
+          G_mat = np.full((len(remaining_packages),len(drone_pool)), infty)
 
-          for didx in drone_pool:       
+          for didx in drone_pool:
               dlabel = dronelabel(didx)
 
               for pidx in remaining_packages: 
                   current_handler_of_package = get_current_handler_of_package(pidx)
 
-                  if current_handler_of_package != didx and not(drone_locked_p[didx]):
+                  # CASE 1
+                  if current_handler_of_package != didx and \
+                     not(drone_locked_p[didx]):
 
                           plabel = packagelabel(pidx)
                           target = targets[pidx]
@@ -320,8 +321,8 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                           if upkg < zerotol :
                                 weight = np.linalg.norm(pkg-dro)/udro +\
                                          np.linalg.norm(target-pkg)/udro
-                                G.add_edge(dlabel, plabel)
-                                G.edges[dlabel, plabel]['weight'] = weight
+
+                                G_mat[pidx, didx] = weight
 
                           elif udro > upkg and abs(upkg-udro) > zerotol:
 
@@ -332,29 +333,35 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                                     pthat = (target-pkg)/np.linalg.norm(target-pkg)
                                     interception_pt = pkg + x * pthat
 
-                                    weight = tI + (target-interception_pt)/udro
-                                    G.add_edge(dlabel,plabel)
-                                    G.edges[dlabel, plabel]['weight'] = weight
-
-                  elif current_handler_of_package == didx and drone_locked_p[didx]:
+                                    weight = tI + np.linalg.norm((target-interception_pt))/udro
+                                    G_mat[pidx, didx] = weight
+                  # CASE 2
+                  elif current_handler_of_package == didx and \
+                       drone_locked_p[didx]:
                          assert abs(udro-upkg) < zerotol , "udro should be equal to upkg"
-                         weight = (target-pkg)/udro
-                         G.add_edge(dlabel,plabel)
-                         G.edges[dlabel,plabel]['weight'] = weight 
-
-                  elif current_handler_of_package != didx and drone_locked_p[didx]:
-                         pass  # "Nothing to do here, didx is busy!"
+                         weight = np.linalg.norm((target-pkg))/udro
+                         G_mat[pidx, didx] = weight
+              
+                  # CASE 3
+                  elif current_handler_of_package != didx and \
+                       drone_locked_p[didx]:
+                         G_mat[pidx, didx] = infty # effectively saying there is not edge between the two
                   else : 
-                         assert (current_handler_of_package == didx and not(drone_locked_p[didx])) ,
-                                 "This else branch should not be executed. This means didx is \
-                                  handling a package and is NOT locked"
-
-          print "\nEdges are "
-          utils_algo.print_list(G.edges.data())
+                         # the outer not negates the inner condition which is true if this branch is executed
+                         assert not(current_handler_of_package == didx and \
+                                     not(drone_locked_p[didx])) ,\
+                                 "This else branch should not be executed. This\
+                                  means didx is handling a package and is NOT locked"
           
           # Get a bottleneck matching on $G$
           
-          pass
+          from scipy.optimize import linear_sum_assignment
+          pkg_ind, dro_ind = linear_sum_assignment(G_mat)
+
+          print Fore.RED, "G_mat is \n", G_mat, Style.RESET_ALL
+          utils_algo.print_list(zip(pkg_ind, dro_ind))
+          print Fore.GREEN, G_mat[pkg_ind, dro_ind], Style.RESET_ALL
+          sys.exit()
           
           # Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected
              

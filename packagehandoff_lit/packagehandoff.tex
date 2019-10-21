@@ -1169,10 +1169,25 @@ main \texttt{while} loop of the algorithm.
 % drone that just delivered the package to the destination; for the Type 
 % \rnum{2} event the drone that just handed off the package. 
 
-
 It is critical that the zero testing for upkg has 
 been done for \verb|time_target_to_solo| to be computed safely 
 without worrying about \verb|ZeroDivisionError|.
+
+Note that the graph bipartite $G$ is encoded as a matrix of weights as shown in the 
+figure \autoref{fig:bipart}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=17cm]{docs/bipartgraph_demo.pdf}
+\caption{A bipartite graph $G$ constructed between the drones 
+and packages, along witht the asosciated weight matrix. Edges between
+drones and packages not in the graph are represented by infinite edge 
+weights. A minimum weight bipartite matching algorithm from SciPy (\url{http://bit.ly/2MAWHPn}) will 
+be used as a replacement for bottleneck matching (SciPy / NetworkX do not 
+have such a solver) The matrix shown in the right half of the above figure is 
+built inside the code, one column at a time. }
+\end{figure}
+\label{fig:bipart}
 
 %{python-mode}%
 \begin{flushleft} \small
@@ -1180,18 +1195,17 @@ without worrying about \verb|ZeroDivisionError|.
 \NWtarget{nuweb18}{} $\langle\,${\itshape Construct bipartite graph $G$ on drone wavelets and package wavelets}\nobreak\ {\footnotesize {18}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
-\mbox{}\verb@   @\\
-\mbox{}\verb@G = nx.Graph()@\\
-\mbox{}\verb@G.add_nodes_from([  dronelabel(didx) for didx in drone_pool        ])@\\
-\mbox{}\verb@G.add_nodes_from([packagelabel(pidx) for pidx in remaining_packages])@\\
+\mbox{}\verb@  @\\
 \mbox{}\verb@@\\
-\mbox{}\verb@for didx in drone_pool:       @\\
+\mbox{}\verb@for didx in drone_pool:@\\
 \mbox{}\verb@    dlabel = dronelabel(didx)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    for pidx in remaining_packages: @\\
 \mbox{}\verb@        current_handler_of_package = get_current_handler_of_package(pidx)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@        if current_handler_of_package != didx and not(drone_locked_p[didx]):@\\
+\mbox{}\verb@        # CASE 1@\\
+\mbox{}\verb@        if current_handler_of_package != didx and \@\\
+\mbox{}\verb@           not(drone_locked_p[didx]):@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@                plabel = packagelabel(pidx)@\\
 \mbox{}\verb@                target = targets[pidx]@\\
@@ -1207,8 +1221,8 @@ without worrying about \verb|ZeroDivisionError|.
 \mbox{}\verb@                if upkg < zerotol :@\\
 \mbox{}\verb@                      weight = np.linalg.norm(pkg-dro)/udro +\@\\
 \mbox{}\verb@                               np.linalg.norm(target-pkg)/udro@\\
-\mbox{}\verb@                      G.add_edge(dlabel, plabel)@\\
-\mbox{}\verb@                      G.edges[dlabel, plabel]['weight'] = weight@\\
+\mbox{}\verb@                      #### G.add_edge(dlabel, plabel)@\\
+\mbox{}\verb@                      #### G.edges[dlabel, plabel]['weight'] = weight@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@                elif udro > upkg and abs(upkg-udro) > zerotol:@\\
 \mbox{}\verb@@\\
@@ -1220,24 +1234,27 @@ without worrying about \verb|ZeroDivisionError|.
 \mbox{}\verb@                          interception_pt = pkg + x * pthat@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@                          weight = tI + (target-interception_pt)/udro@\\
-\mbox{}\verb@                          G.add_edge(dlabel,plabel)@\\
-\mbox{}\verb@                          G.edges[dlabel, plabel]['weight'] = weight@\\
+\mbox{}\verb@                          #### G.add_edge(dlabel,plabel)@\\
+\mbox{}\verb@                          #### G.edges[dlabel, plabel]['weight'] = weight@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@        elif current_handler_of_package == didx and drone_locked_p[didx]:@\\
+\mbox{}\verb@        # CASE 2@\\
+\mbox{}\verb@        elif current_handler_of_package == didx and \@\\
+\mbox{}\verb@             drone_locked_p[didx]:@\\
 \mbox{}\verb@               assert abs(udro-upkg) < zerotol , "udro should be equal to upkg"@\\
 \mbox{}\verb@               weight = (target-pkg)/udro@\\
-\mbox{}\verb@               G.add_edge(dlabel,plabel)@\\
-\mbox{}\verb@               G.edges[dlabel,plabel]['weight'] = weight @\\
-\mbox{}\verb@@\\
-\mbox{}\verb@        elif current_handler_of_package != didx and drone_locked_p[didx]:@\\
-\mbox{}\verb@               pass  # "Nothing to do here, didx is busy!"@\\
+\mbox{}\verb@               #### G.add_edge(dlabel,plabel)@\\
+\mbox{}\verb@               #### G.edges[dlabel,plabel]['weight'] = weight @\\
+\mbox{}\verb@  @\\
+\mbox{}\verb@        # CASE 3@\\
+\mbox{}\verb@        elif current_handler_of_package != didx and \@\\
+\mbox{}\verb@             drone_locked_p[didx]:@\\
+\mbox{}\verb@               pass  # "No edge to add here, didx is busy!"@\\
 \mbox{}\verb@        else : @\\
-\mbox{}\verb@               assert (current_handler_of_package == didx and not(drone_locked_p[didx])) ,@\\
-\mbox{}\verb@                       "This else branch should not be executed. This means didx is \@\\
-\mbox{}\verb@                        handling a package and is NOT locked"@\\
-\mbox{}\verb@@\\
-\mbox{}\verb@print "\nEdges are "@\\
-\mbox{}\verb@utils_algo.print_list(G.edges.data())@\\
+\mbox{}\verb@               # the outer not negates the inner condition which is true if this branch is executed@\\
+\mbox{}\verb@               assert not(current_handler_of_package == didx and \@\\
+\mbox{}\verb@                           not(drone_locked_p[didx])) ,\@\\
+\mbox{}\verb@                       "This else branch should not be executed. This\@\\
+\mbox{}\verb@                        means didx is handling a package and is NOT locked"@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -1253,7 +1270,7 @@ without worrying about \verb|ZeroDivisionError|.
 
 Since NetworkX does not have a native bottleneck matching solver, we use a minimum-weight matching solver
 \footnote{by negating the edgeweights and using the maximum weighted matching solver described in 
-\url{https://networkx.github.io/documentation/stable/reference/algorithms/matching.html}. } as a replacement
+\url{https://networkx.github.io/documentation/stable/reference/algorithms/matching.html} or \url{http://bit.ly/2MAWHPn}.  } as a replacement
 /approximation to bottleneck matching. 
 
 %{python-mode}%
@@ -1263,7 +1280,7 @@ Since NetworkX does not have a native bottleneck matching solver, we use a minim
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
-\mbox{}\verb@pass@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
