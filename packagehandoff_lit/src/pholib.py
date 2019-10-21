@@ -240,32 +240,106 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
      
      # Basic setup
       
-     sources    = [np.asarray(source) for source in sources] 
-     targets    = [np.asarray(target) for target in targets] 
+     sources             = [np.asarray(source) for source in sources] 
+     targets             = [np.asarray(target) for target in targets] 
 
-     drone_initposns = [ np.asarray(initposn) for (initposn, _) in drone_info ]
-     drone_speeds    = [ speed                for (_,    speed) in drone_info ]
+     drone_initposns     = [ np.asarray(initposn) for (initposn, _) in drone_info ]
+     drone_speeds        = [ speed                for (_,    speed) in drone_info ]
 
-     numpackages = len(sources) 
-     numdrones   = len(drone_info)
+     numpackages         = len(sources) 
+     numdrones           = len(drone_info)
 
-     package_delivered_p      = [ False for _ in range(numpackages) ] 
-     drone_pool               = range(numdrones)
+     package_delivered_p = [ False for _ in range(numpackages) ] 
+     drone_pool          = range(numdrones)
+     global_clock_time   = 0.0
 
-     current_package_handler  = [ None  for _ in range(numpackages) ]
-     current_package_position = sources
-     current_package_speed    = [ 0.0   for _ in range(numpackages)]
-     drone_wavelet_info       = [ [{'wavelet_center': posn,'clock_time':0.0}] for posn in drone_initposns]
+     #.............................................................................
+     drone_wavelets_info = [ [{'wavelet_center'        : posn,
+                               'clock_time'            : 0.0,
+                               'matched_package_ids'   : []}] 
+                             for posn in drone_initposns ]
+
+     def get_last_wavelet_of_drone(i):
+              return drone_wavelets_info[i][-1]
+
+     #.............................................................................
+     package_trail_info  = [ [{'current_position'   : source, 
+                               'clock_time'         : 0.0,
+                               'current_handler_id' : None }] 
+                             for source in sources ]
+
+     def get_current_position_of_package(i):
+              return package_trail_info[i][-1]['current_position']
+         
+     def get_current_speed_of_package(i):
+              current_handler_id = package_trail_info[i][-1]['current_handler_id']
+
+              if current_handler_id is None:
+                   return 0.0
+              else:
+                   return drone_speeds[current_handler_id]
+
      
     
      while not all(package_delivered_p):
-          @<Construct bipartite graph $G$ on drone wavelets and package wavelets@>
-          @<Get an exact / approximate bottleneck matching on $G$@>
-          @<Expand drone wavelets till an event of either Type \rnum{1} or \rnum{2} is detected@>
-          @<Update drone pool and package states@>
+          # Construct bipartite graph $G$ on drone wavelets and package wavelets
+             
+          # Create nodes of the graph
+          G = nx.Graph()
+          G.add_nodes_from(['drone_'  +str(didx) for didx in range(numdrones)])
+          G.add_nodes_from(['package_'+str(pidx) for pidx in range(numpackages)])
 
-     @<Plot movement of packages and drones if \verb|plot_tour_p| == True@> 
-     return pass pass pass pass pass 
+          # Add edges between nodes
+          for didx in range(numdrones):
+              for pidx in range(numpackages):
+                   target = targets[pidx]
+                   pkg    = get_current_position_of_package(pidx)
+                   upkg   = get_current_speed_of_package(pidx)
+              
+                   wav    = get_last_wavelet_of_drone(didx)['wavelet_center']
+                   dro    = wav['wavelet_center']
+                   udro   = drone_speeds[didx]
+
+                    if upkg < 1e-7: # zero testing for upkg
+                       # Add edge to G
+                       pass
+           
+                    elif udro > upkg: # It is critical that the zero testing for upkg 
+                                      # has been done for time_target_to_solo to be 
+                                      # computed safely
+                       time_to_target_solo = np.linalg.norm((target-pkg))/ upkg
+                       tI                  = get_interception_time(pkg, upkg, dro, udro, 
+                                                                   target, wav['clock_time'])
+                       if tI < time_to_target_solo:
+                             # Add edge to G
+                             pass
+                    else:
+                        continue
+              
+
+          
+          # Get a bottleneck matching on $G$
+          
+          pass
+          
+          # Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected
+             
+          pass
+          
+          # Update drone pool and package states
+             
+          pass
+          
+
+     # Run convex optimization solver to get improved tours for drones and packages
+        
+     pass
+     
+     # Plot movement of packages and drones if \verb|plot_tour_p == True |
+        
+     pass
+      
+     #return pass pass pass pass pass 
 
 # Run Handlers
 

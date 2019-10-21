@@ -757,12 +757,13 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
     
      while not all(package_delivered_p):
           @< Construct bipartite graph $G$ on drone wavelets and package wavelets @>
-          @< Get an exact / approximate bottleneck matching on $G$ @>
-          @< Expand drone wavelets till an event of either Type \rnum{1} or \rnum{2} is detected @>
+          @< Get a bottleneck matching on $G$ @>
+          @< Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected @>
           @< Update drone pool and package states@>
 
-     @<Plot movement of packages and drones if \verb|plot_tour_p| == True @> 
-     return pass pass pass pass pass 
+     @< Run convex optimization solver to get improved tours for drones and packages @>
+     @< Plot movement of packages and drones if \verb|plot_tour_p == True | @> 
+     #return pass pass pass pass pass 
 @| algo_matchmove @}
 %{/python-mode}%
 
@@ -800,31 +801,23 @@ main \texttt{while} loop of the algorithm.
        where the \verb|i|\textsuperscript{th} element keeps track whether 
        the package with id \verb|i| has been delivered to its destination. 
        The main \verb|while| loop stops when all flags are set to \verb|True|. 
-\item[B. \texttt{current\_package\_handler}]  is a list of integer indices where 
-     the \verb|i|\textsuperscript{th} element indicates the id of the drone currently 
-     carrying the package along the straight line segment $S_iT_i$ enroute to $T_i$.
-\item[C. \texttt{current\_package\_position}]  is a list of $(x,y)$ 
-    coordinates where the \verb|i|\textsuperscript{th} element 
-    indicates the coordinates of the drone with id
-    \verb|current_package_handler[i]|. 
-\item[D. \texttt{current\_package\_speed}] is a list keeping track of the current speed
-     with which the package is moving. More precisely, the \verb|i|\textsuperscript{th} element is the 
-     speed of the currently handling the \verb|i|\tss{th} package. Since the packages
-     are initially not being handled by any of the drones, all package speeds are initialized to 0.0.
+     
+\item[B. \texttt{drone\_pool}] is a list of ids of drones that can be 
+     considered for the bottleneck matching process for the next iteration of 
+     the \verb|while| loop.  
 
-
-\item[E. \texttt{drone\_wavelet\_info}] is a list of list of dictionaries. Each outer list 
+\item[C. \texttt{drone\_wavelet\_info}] is a list of list of dictionaries. Each outer list 
      corresponds to a list of wavelets corresponding to each drone. Every wavelet is represented
-     by a dictionary, with two attributes
+     by a dictionary, with three attributes
+     
 \begin{description}
-  \item[1. \texttt{wavelet\_center}] The cartesian coordinates of the center $H$ of the wavelet about which the wavelet expands
+  \item[1. \texttt{wavelet\_center}] The cartesian coordinates of the center $H$ of the 
+          wavelet about which the wavelet expands.
   \item[2. \texttt{clock\_time}] The time on the global clock at which the wavelet started expanding around the 
-         wavelet center $H$
+         wavelet center $H$.
+  \item[3. \texttt{matched\_package\_ids}] A list of the ids of the packages that were assigned to the wavelet 
+     during its expansion around center $H$. Each such list is initialized as the empty list. 
 \end{description}
-     wavelet corresponding to every drone viz. the center of the wavelet about 
-     which the expansion is happening (by the \verb|wavelet_center| attribute), 
-     and the time on the global clock (by the \verb|clock_time| attribute) 
-     when the wavelet started expanding about the wavelet center.
      
      See \autoref{fig:wavelet_dict} to see a sequence of wavelets corresponding 
      to a single drone.   
@@ -832,7 +825,10 @@ main \texttt{while} loop of the algorithm.
 \begin{figure}[H]
 \centering
 \includegraphics[width=10cm]{docs/wavelet_dict.pdf}
-\caption{A sequence of wavelets corresponding to a drone. Each wavelet expands around $H_i$ at speed $u_i$
+\caption{A sequence of wavelets corresponding to a drone which is stored as a list of dictionaries 
+(each dictionary corresponding to a wavelet) 
+\texttt{[\{'wavelet\_center':$H_i$, 'clock\_time':$t_i$, 'matched\_package\_ids': $M_i$\}]}.
+ Each wavelet expands around $H_i$ at speed $u_i$
  starting at time $t_i$ on the global clock. Every drone has a sequence of wavelets. The $H_i$ also represent 
  handoff points where the drone either hands a package off to another drone or is handed a package by another 
  drone. Note that the usage of the letter $H$ to represent the center of
@@ -842,40 +838,130 @@ main \texttt{while} loop of the algorithm.
 \label{fig:wavelet_dict}
 
 
-\item[F. \texttt{drone\_pool}] is a list of ids of drones that can be 
-     considered for the bottleneck matching process for the next iteration of 
-     the \verb|while| loop. In each iteration the size of this list goes down 
-     by \underline{exactly} one. 
+\item[D. \texttt{package\_trail\_info}]  is a list of list of dictionaries, similar to \verb|drone_wavelet_info|.  
+     The \verb|i|\tss{th} element of the outer list corresponds to the trail of a package. In each trail (itself a list), we 
+     record the positions of a package as well as the time on the clock $t$ at which that position was recorded. 
+     We also note the id of the last drone known to have handled the package at time $t - \varepsilon$ for 
+     $\varepsilon$ being an arbitrarily small positive number. 
+
+     Two helper functions \verb|get_current_position_of_package| and \verb|get_current_speed_of_package| to extract 
+     information conveniently from \verb|package_trail_info|. Again like \verb|get_last_wavelet_of_drone| the 
+     result returned depends on the state of \verb|package_trail_info| at the time the function is called. 
+
 \end{description}
 
 
 %{python-mode}%
 @d Basic setup @{ 
-sources    = [np.asarray(source) for source in sources] 
-targets    = [np.asarray(target) for target in targets] 
+sources             = [np.asarray(source) for source in sources] 
+targets             = [np.asarray(target) for target in targets] 
 
-drone_initposns = [ np.asarray(initposn) for (initposn, _) in drone_info ]
-drone_speeds    = [ speed                for (_,    speed) in drone_info ]
+drone_initposns     = [ np.asarray(initposn) for (initposn, _) in drone_info ]
+drone_speeds        = [ speed                for (_,    speed) in drone_info ]
 
-numpackages = len(sources) 
-numdrones   = len(drone_info)
+numpackages         = len(sources) 
+numdrones           = len(drone_info)
 
-package_delivered_p      = [ False for _ in range(numpackages) ] 
-drone_pool               = range(numdrones)
+package_delivered_p = [ False for _ in range(numpackages) ] 
+drone_pool          = range(numdrones)
+global_clock_time   = 0.0
 
-current_package_handler  = [ None  for _ in range(numpackages) ]
-current_package_position = sources
-current_package_speed    = [ 0.0   for _ in range(numpackages)]
-drone_wavelet_info       = [ [{'wavelet_center': posn,'clock_time':0.0}] for posn in drone_initposns]
-@| @}
+#.............................................................................
+drone_wavelets_info = [ [{'wavelet_center'        : posn,
+                          'clock_time'            : 0.0,
+                          'matched_package_ids'   : []}] 
+                        for posn in drone_initposns ]
+
+def get_last_wavelet_of_drone(i):
+         return drone_wavelets_info[i][-1]
+
+#.............................................................................
+package_trail_info  = [ [{'current_position'   : source, 
+                          'clock_time'         : 0.0,
+                          'current_handler_id' : None }] 
+                        for source in sources ]
+
+def get_current_position_of_package(i):
+         return package_trail_info[i][-1]['current_position']
+    
+def get_current_speed_of_package(i):
+         current_handler_id = package_trail_info[i][-1]['current_handler_id']
+
+         if current_handler_id is None:
+              return 0.0
+         else:
+              return drone_speeds[current_handler_id]
+
+@| get_last_wavelet_of_drone, get_current_position_of_package, get_current_speed_of_package @}
 %{/python-mode}%
 
+ The \verb|get_wavelet_of_ith_drone| function defined at the end of the above chunk is a convenience function 
+ for returning the center of the last wavelet and the associated clock time recorded at that center
+ for an arbitrary drone.  \textbf{Note:} The result of calling this function depends on the time at which it 
+ is called because \verb|drone_wavelet_info| list is mutated during the main while loop
 
 \subsubsection{Main Loop}
 \label{ssec:mainloopmatchmove}
 
-Each iteration corresponds to processing exactly one event. There are 
-exactly two types of (mutually exclusive) events in this algorithm. 
+% Each iteration corresponds to processing exactly one event. There are 
+% exactly two types of (mutually exclusive) events in this algorithm. 
+
+% \begin{description}
+% \item[Type \rnum{1}:] A package gets delivered to its assigned destination. 
+% \item[Type \rnum{2}:] A wavelet corresponding to a drone (not handling a package) meets up with 
+%    a drone currently handling a package. 
+% \end{description}
+
+% In both event types, a drone gets taken out of the drone pool:  for 
+% the Type \rnum{1} event the 
+% drone that just delivered the package to the destination; for the Type 
+% \rnum{2} event the drone that just handed off the package. 
+
+%{python-mode}%
+@d Construct bipartite graph $G$ on drone wavelets and package wavelets @{   
+# Create nodes of the graph
+G = nx.Graph()
+G.add_nodes_from(['drone_'  +str(didx) for didx in range(numdrones)])
+G.add_nodes_from(['package_'+str(pidx) for pidx in range(numpackages)])
+
+# Add edges between nodes
+for didx in range(numdrones):
+    for pidx in range(numpackages):
+         target = targets[pidx]
+         pkg    = get_current_position_of_package(pidx)
+         upkg   = get_current_speed_of_package(pidx)
+    
+         wav    = get_last_wavelet_of_drone(didx)['wavelet_center']
+         dro    = wav['wavelet_center']
+         udro   = drone_speeds[didx]
+
+          if upkg < 1e-7: # zero testing for upkg
+             # Add edge to G
+             pass
+ 
+          elif udro > upkg: # It is critical that the zero testing for upkg 
+                            # has been done for time_target_to_solo to be 
+                            # computed safely
+             time_to_target_solo = np.linalg.norm((target-pkg))/ upkg
+             tI                  = get_interception_time(pkg, upkg, dro, udro, 
+                                                         target, wav['clock_time'])
+             if tI < time_to_target_solo:
+                   # Add edge to G
+                   pass
+          else:
+              continue
+    
+
+@| @}
+%{/python-mode}%
+
+%{python-mode}%
+@d Get a bottleneck matching on $G$ @{
+pass
+@| @}
+%{/python-mode}%
+
+There are exactly two types of (mutually exclusive) events in this algorithm. 
 
 \begin{description}
 \item[Type \rnum{1}:] A package gets delivered to its assigned destination. 
@@ -883,10 +969,33 @@ exactly two types of (mutually exclusive) events in this algorithm.
    a drone currently handling a package. 
 \end{description}
 
-In both event types, a drone gets taken out of the drone pool:  for 
-the Type \rnum{1} event the 
-drone that just delivered the package to the destination; for the Type 
-\rnum{2} event the drone that just handed off the package. 
+%{python-mode}%
+@d Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected @{   
+pass
+@| @}
+%{/python-mode}%
+
+%{python-mode}%
+@d Update drone pool and package states @{   
+pass
+@| @}
+%{/python-mode}%
+
+
+%{python-mode}%
+@d Run convex optimization solver to get improved tours for drones and packages @{   
+pass
+@| @}
+%{/python-mode}%
+
+
+%{python-mode}%
+@d Plot movement of packages and drones if \verb|plot_tour_p == True | @{   
+pass
+@| @}
+%{/python-mode}%
+
+
 
 \nocite{*}
 \printbibliography

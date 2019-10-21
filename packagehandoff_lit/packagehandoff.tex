@@ -157,8 +157,8 @@ The \verb|pholib.py| file looks like
 \mbox{}\verb@import utils_algo, utils_graphics@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms}\nobreak\ {\footnotesize \NWlink{nuweb6}{6}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb24}{24}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting}\nobreak\ {\footnotesize \NWlink{nuweb31}{31}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb25}{25}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting}\nobreak\ {\footnotesize \NWlink{nuweb32}{32}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -465,7 +465,7 @@ description below.
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb6}{6}\NWlink{nuweb7}{, 7}\NWlink{nuweb10a}{, 10a}\NWlink{nuweb12a}{, 12a}\NWlink{nuweb14a}{, 14a}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb24}{24}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb25}{25}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -835,7 +835,7 @@ numpy arrays at the start of the function).
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb6}{6}\NWlink{nuweb7}{, 7}\NWlink{nuweb10a}{, 10a}\NWlink{nuweb12a}{, 12a}\NWlink{nuweb14a}{, 14a}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@extract_coordinates@\nobreak\ \NWlink{nuweb31}{31}, \verb@makespan,@\nobreak\ \NWtxtIdentsNotUsed, \verb@time_of_travel@\nobreak\ \NWlink{nuweb8a}{8a}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@extract_coordinates@\nobreak\ \NWlink{nuweb32}{32}, \verb@makespan,@\nobreak\ \NWtxtIdentsNotUsed, \verb@time_of_travel@\nobreak\ \NWlink{nuweb8a}{8a}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -956,12 +956,13 @@ fleshed out in subsequent subsections.
 \mbox{}\verb@     @\hbox{$\langle\,${\itshape Basic setup}\nobreak\ {\footnotesize \NWlink{nuweb16}{16}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@    @\\
 \mbox{}\verb@     while not all(package_delivered_p):@\\
-\mbox{}\verb@          @\hbox{$\langle\,${\itshape Construct bipartite graph $G$ on drone wavelets and package wavelets}\nobreak\ {\footnotesize ?}$\,\rangle$}\verb@@\\
-\mbox{}\verb@          @\hbox{$\langle\,${\itshape Get an exact / approximate bottleneck matching on $G$}\nobreak\ {\footnotesize ?}$\,\rangle$}\verb@@\\
-\mbox{}\verb@          @\hbox{$\langle\,${\itshape Expand drone wavelets till an event of either Type \rnum{1} or \rnum{2} is detected}\nobreak\ {\footnotesize ?}$\,\rangle$}\verb@@\\
-\mbox{}\verb@          @\hbox{$\langle\,${\itshape Update drone pool and package states}\nobreak\ {\footnotesize ?}$\,\rangle$}\verb@@\\
+\mbox{}\verb@          @\hbox{$\langle\,${\itshape Construct bipartite graph $G$ on drone wavelets and package wavelets}\nobreak\ {\footnotesize \NWlink{nuweb17a}{17a}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@          @\hbox{$\langle\,${\itshape Get a bottleneck matching on $G$}\nobreak\ {\footnotesize \NWlink{nuweb17b}{17b}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@          @\hbox{$\langle\,${\itshape Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected}\nobreak\ {\footnotesize \NWlink{nuweb17c}{17c}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@          @\hbox{$\langle\,${\itshape Update drone pool and package states}\nobreak\ {\footnotesize \NWlink{nuweb17d}{17d}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@     @\hbox{$\langle\,${\itshape Plot movement of packages and drones if \verb|plot_tour_p| == True}\nobreak\ {\footnotesize ?}$\,\rangle$}\verb@ @\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Run convex optimization solver to get improved tours for drones and packages}\nobreak\ {\footnotesize \NWlink{nuweb17e}{17e}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Plot movement of packages and drones if \verb|plot_tour_p == True |}\nobreak\ {\footnotesize \NWlink{nuweb17f}{17f}}$\,\rangle$}\verb@ @\\
 \mbox{}\verb@     return pass pass pass pass pass @\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
@@ -970,7 +971,7 @@ fleshed out in subsequent subsections.
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb6}{6}\NWlink{nuweb7}{, 7}\NWlink{nuweb10a}{, 10a}\NWlink{nuweb12a}{, 12a}\NWlink{nuweb14a}{, 14a}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@algo_matchmove@\nobreak\ \NWlink{nuweb24}{24}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@algo_matchmove@\nobreak\ \NWlink{nuweb25}{25}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -1026,31 +1027,23 @@ main \texttt{while} loop of the algorithm.
        where the \verb|i|\textsuperscript{th} element keeps track whether 
        the package with id \verb|i| has been delivered to its destination. 
        The main \verb|while| loop stops when all flags are set to \verb|True|. 
-\item[B. \texttt{current\_package\_handler}]  is a list of integer indices where 
-     the \verb|i|\textsuperscript{th} element indicates the id of the drone currently 
-     carrying the package along the straight line segment $S_iT_i$ enroute to $T_i$.
-\item[C. \texttt{current\_package\_position}]  is a list of $(x,y)$ 
-    coordinates where the \verb|i|\textsuperscript{th} element 
-    indicates the coordinates of the drone with id
-    \verb|current_package_handler[i]|. 
-\item[D. \texttt{current\_package\_speed}] is a list keeping track of the current speed
-     with which the package is moving. More precisely, the \verb|i|\textsuperscript{th} element is the 
-     speed of the currently handling the \verb|i|\tss{th} package. Since the packages
-     are initially not being handled by any of the drones, all package speeds are initialized to 0.0.
+     
+\item[B. \texttt{drone\_pool}] is a list of ids of drones that can be 
+     considered for the bottleneck matching process for the next iteration of 
+     the \verb|while| loop.  
 
-
-\item[E. \texttt{drone\_wavelet\_info}] is a list of list of dictionaries. Each outer list 
+\item[C. \texttt{drone\_wavelet\_info}] is a list of list of dictionaries. Each outer list 
      corresponds to a list of wavelets corresponding to each drone. Every wavelet is represented
-     by a dictionary, with two attributes
+     by a dictionary, with three attributes
+     
 \begin{description}
-  \item[1. \texttt{wavelet\_center}] The cartesian coordinates of the center $H$ of the wavelet about which the wavelet expands
+  \item[1. \texttt{wavelet\_center}] The cartesian coordinates of the center $H$ of the 
+          wavelet about which the wavelet expands.
   \item[2. \texttt{clock\_time}] The time on the global clock at which the wavelet started expanding around the 
-         wavelet center $H$
+         wavelet center $H$.
+  \item[3. \texttt{matched\_package\_ids}] A list of the ids of the packages that were assigned to the wavelet 
+     during its expansion around center $H$. Each such list is initialized as the empty list. 
 \end{description}
-     wavelet corresponding to every drone viz. the center of the wavelet about 
-     which the expansion is happening (by the \verb|wavelet_center| attribute), 
-     and the time on the global clock (by the \verb|clock_time| attribute) 
-     when the wavelet started expanding about the wavelet center.
      
      See \autoref{fig:wavelet_dict} to see a sequence of wavelets corresponding 
      to a single drone.   
@@ -1058,7 +1051,10 @@ main \texttt{while} loop of the algorithm.
 \begin{figure}[H]
 \centering
 \includegraphics[width=10cm]{docs/wavelet_dict.pdf}
-\caption{A sequence of wavelets corresponding to a drone. Each wavelet expands around $H_i$ at speed $u_i$
+\caption{A sequence of wavelets corresponding to a drone which is stored as a list of dictionaries 
+(each dictionary corresponding to a wavelet) 
+\texttt{[\{'wavelet\_center':$H_i$, 'clock\_time':$t_i$, 'matched\_package\_ids': $M_i$\}]}.
+ Each wavelet expands around $H_i$ at speed $u_i$
  starting at time $t_i$ on the global clock. Every drone has a sequence of wavelets. The $H_i$ also represent 
  handoff points where the drone either hands a package off to another drone or is handed a package by another 
  drone. Note that the usage of the letter $H$ to represent the center of
@@ -1068,10 +1064,16 @@ main \texttt{while} loop of the algorithm.
 \label{fig:wavelet_dict}
 
 
-\item[F. \texttt{drone\_pool}] is a list of ids of drones that can be 
-     considered for the bottleneck matching process for the next iteration of 
-     the \verb|while| loop. In each iteration the size of this list goes down 
-     by \underline{exactly} one. 
+\item[D. \texttt{package\_trail\_info}]  is a list of list of dictionaries, similar to \verb|drone_wavelet_info|.  
+     The \verb|i|\tss{th} element of the outer list corresponds to the trail of a package. In each trail (itself a list), we 
+     record the positions of a package as well as the time on the clock $t$ at which that position was recorded. 
+     We also note the id of the last drone known to have handled the package at time $t - \varepsilon$ for 
+     $\varepsilon$ being an arbitrarily small positive number. 
+
+     Two helper functions \verb|get_current_position_of_package| and \verb|get_current_speed_of_package| to extract 
+     information conveniently from \verb|package_trail_info|. Again like \verb|get_last_wavelet_of_ith_drone| the 
+     result returned depends on the state of \verb|package_trail_info| at the time the function is called. 
+
 \end{description}
 
 
@@ -1082,22 +1084,159 @@ main \texttt{while} loop of the algorithm.
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@ @\\
-\mbox{}\verb@sources    = [np.asarray(source) for source in sources] @\\
-\mbox{}\verb@targets    = [np.asarray(target) for target in targets] @\\
+\mbox{}\verb@sources             = [np.asarray(source) for source in sources] @\\
+\mbox{}\verb@targets             = [np.asarray(target) for target in targets] @\\
 \mbox{}\verb@@\\
-\mbox{}\verb@drone_initposns = [ np.asarray(initposn) for (initposn, _) in drone_info ]@\\
-\mbox{}\verb@drone_speeds    = [ speed                for (_,    speed) in drone_info ]@\\
+\mbox{}\verb@drone_initposns     = [ np.asarray(initposn) for (initposn, _) in drone_info ]@\\
+\mbox{}\verb@drone_speeds        = [ speed                for (_,    speed) in drone_info ]@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@numpackages = len(sources) @\\
-\mbox{}\verb@numdrones   = len(drone_info)@\\
+\mbox{}\verb@numpackages         = len(sources) @\\
+\mbox{}\verb@numdrones           = len(drone_info)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@package_delivered_p      = [ False for _ in range(numpackages) ] @\\
-\mbox{}\verb@drone_pool               = range(numdrones)@\\
+\mbox{}\verb@package_delivered_p = [ False for _ in range(numpackages) ] @\\
+\mbox{}\verb@drone_pool          = range(numdrones)@\\
+\mbox{}\verb@global_clock_time   = 0.0@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@current_package_handler  = [ None  for _ in range(numpackages) ]@\\
-\mbox{}\verb@current_package_position = sources@\\
-\mbox{}\verb@current_package_speed    = [ 0.0   for _ in range(numpackages)]@\\
-\mbox{}\verb@drone_wavelet_info       = [ [{'wavelet_center': posn,'clock_time':0.0}] for posn in drone_initposns]@\\
+\mbox{}\verb@#.............................................................................@\\
+\mbox{}\verb@drone_wavelets_info = [ [{'wavelet_center'        : posn,@\\
+\mbox{}\verb@                          'clock_time'            : 0.0,@\\
+\mbox{}\verb@                          'matched_package_ids'   : []}] @\\
+\mbox{}\verb@                        for posn in drone_initposns ]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def get_last_wavelet_of_ith_drone(i):@\\
+\mbox{}\verb@         return drone_wavelets_info[i][-1]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@#.............................................................................@\\
+\mbox{}\verb@package_trail_info  = [ [{'current_position'   : source, @\\
+\mbox{}\verb@                          'clock_time'         : 0.0,@\\
+\mbox{}\verb@                          'current_handler_id' : None }] @\\
+\mbox{}\verb@                        for source in sources ]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@def get_current_position_of_package(i):@\\
+\mbox{}\verb@         return package_trail_info[i][-1]['current_position']@\\
+\mbox{}\verb@    @\\
+\mbox{}\verb@def get_current_speed_of_package(i):@\\
+\mbox{}\verb@         current_handler_id = package_trail_info[i][-1]['current_handler_id']@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@         if current_handler_id is None:@\\
+\mbox{}\verb@              return 0.0@\\
+\mbox{}\verb@         else:@\\
+\mbox{}\verb@              return drone_speeds[current_handler_id]@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb14a}{14a}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@get_current_position_of_package,@\nobreak\ \NWtxtIdentsNotUsed, \verb@get_current_speed_of_package@\nobreak\ \NWtxtIdentsNotUsed, \verb@get_last_wavelet_of_ith_drone,@\nobreak\ \NWtxtIdentsNotUsed.
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+ The \verb|get_wavelet_of_ith_drone| function defined at the end of the above chunk is a convenience function 
+ for returning the center of the last wavelet and the associated clock time recorded at that center
+ for an arbitrary drone.  \textbf{Note:} The result of calling this function depends on the time at which it 
+ is called because \verb|drone_wavelet_info| list is mutated during the main while loop
+
+\subsubsection{Main Loop}
+\label{ssec:mainloopmatchmove}
+
+% Each iteration corresponds to processing exactly one event. There are 
+% exactly two types of (mutually exclusive) events in this algorithm. 
+
+% \begin{description}
+% \item[Type \rnum{1}:] A package gets delivered to its assigned destination. 
+% \item[Type \rnum{2}:] A wavelet corresponding to a drone (not handling a package) meets up with 
+%    a drone currently handling a package. 
+% \end{description}
+
+% In both event types, a drone gets taken out of the drone pool:  for 
+% the Type \rnum{1} event the 
+% drone that just delivered the package to the destination; for the Type 
+% \rnum{2} event the drone that just handed off the package. 
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap16}\raggedright\small
+\NWtarget{nuweb17a}{} $\langle\,${\itshape Construct bipartite graph $G$ on drone wavelets and package wavelets}\nobreak\ {\footnotesize {17a}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@pass         @\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb14a}{14a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap17}\raggedright\small
+\NWtarget{nuweb17b}{} $\langle\,${\itshape Get a bottleneck matching on $G$}\nobreak\ {\footnotesize {17b}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@@\\
+\mbox{}\verb@pass@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb14a}{14a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+There are exactly two types of (mutually exclusive) events in this algorithm. 
+
+\begin{description}
+\item[Type \rnum{1}:] A package gets delivered to its assigned destination. 
+\item[Type \rnum{2}:] A wavelet corresponding to a drone (not handling a package) meets up with 
+   a drone currently handling a package. 
+\end{description}
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap18}\raggedright\small
+\NWtarget{nuweb17c}{} $\langle\,${\itshape Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected}\nobreak\ {\footnotesize {17c}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@pass@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb14a}{14a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap19}\raggedright\small
+\NWtarget{nuweb17d}{} $\langle\,${\itshape Update drone pool and package states}\nobreak\ {\footnotesize {17d}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@pass@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -1112,30 +1251,54 @@ main \texttt{while} loop of the algorithm.
 %{/python-mode}%
 
 
-\subsubsection{Main Loop}
-\label{ssec:mainloopmatchmove}
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap20}\raggedright\small
+\NWtarget{nuweb17e}{} $\langle\,${\itshape Run convex optimization solver to get improved tours for drones and packages}\nobreak\ {\footnotesize {17e}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@pass@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb14a}{14a}.
 
-Each iteration corresponds to processing exactly one event. There are 
-exactly two types of (mutually exclusive) events in this algorithm. 
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
 
-\begin{description}
-\item[Type \rnum{1}:] A package gets delivered to its assigned destination. 
-\item[Type \rnum{2}:] A wavelet corresponding to a drone (not handling a package) meets up with 
-   a drone currently handling a package. 
-\end{description}
 
-In both event types, a drone gets taken out of the drone pool:  for 
-the Type \rnum{1} event the 
-drone that just delivered the package to the destination; for the Type 
-\rnum{2} event the drone that just handed off the package. 
+%{python-mode}%
+\begin{flushleft} \small
+\begin{minipage}{\linewidth}\label{scrap21}\raggedright\small
+\NWtarget{nuweb17f}{} $\langle\,${\itshape Plot movement of packages and drones if \verb|plot_tour_p == True |}\nobreak\ {\footnotesize {17f}}$\,\rangle\equiv$
+\vspace{-1ex}
+\begin{list}{}{} \item
+\mbox{}\verb@   @\\
+\mbox{}\verb@pass@\\
+\mbox{}\verb@@{\NWsep}
+\end{list}
+\vspace{-1.5ex}
+\footnotesize
+\begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
+\item \NWtxtMacroRefIn\ \NWlink{nuweb14a}{14a}.
+
+\item{}
+\end{list}
+\end{minipage}\vspace{4ex}
+\end{flushleft}
+%{/python-mode}%
+
+
 
 \nocite{*}
 \printbibliography
 \begin{appendices}
-
-
-
-
 
 \chapter{History and Previous Work}
 \begin{wrapfigure}{L}{0.5\textwidth}
@@ -1154,7 +1317,6 @@ Sacramento, California.
 To quote the Wikipedia article
 
 \begin{quote}
-
 \textit{``Operated by Central Overland California and Pike's Peak Express Company, the Pony Express was a great 
 financial investment to the U.S. During its 18 months of operation, it reduced the time for messages to travel 
 between the Atlantic and Pacific coasts to about 10 days. It became the West's most direct means of east-west 
@@ -1176,7 +1338,6 @@ are involved in building networks of drones for precisely such missions.
   \includegraphics[width=12cm]{docs/dabba.jpg}
   \caption{Dabbawallas exchanging lunchboxes (dabbas) at a relay point. Image from \cite{Magazine2019Oct} }
 \end{figure}
-
 
 Another relay system for package deliveries (135 years old and still functioning!) is that of 
 the \textit{dabbawallas} \footnote{literally: lunchbox carriers} used for transporting lunch boxes from 
@@ -1213,8 +1374,8 @@ See \url{https://youtu.be/dX-0el2wuEU} for a short video on the dabbawallas.
 This \verb|README| file can be read more clearly alongside its appropriate formatting at \\
 \url{https://github.com/gtelang/PackageHandoff_Python/tree/master/packagehandoff_lit}
 
-\begin{flushleft} \small\label{scrap16}\raggedright\small
-\NWtarget{nuweb20}{} \verb@"README.md"@\nobreak\ {\footnotesize {20}}$\equiv$
+\begin{flushleft} \small\label{scrap22}\raggedright\small
+\NWtarget{nuweb21}{} \verb@"README.md"@\nobreak\ {\footnotesize {21}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
@@ -1259,8 +1420,8 @@ This \verb|README| file can be read more clearly alongside its appropriate forma
 
 This file contains useful functions for visualization and plotting functions described in the previous chapters.
 %{python-mode}%
-\begin{flushleft} \small\label{scrap17}\raggedright\small
-\NWtarget{nuweb21}{} \verb@"src/utils_graphics.py"@\nobreak\ {\footnotesize {21}}$\equiv$
+\begin{flushleft} \small\label{scrap23}\raggedright\small
+\NWtarget{nuweb22}{} \verb@"src/utils_graphics.py"@\nobreak\ {\footnotesize {22}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
@@ -1313,8 +1474,8 @@ This file contains useful functions for visualization and plotting functions des
 This file contains useful functions for writing algorithms described in the previous chapters.
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap18}\raggedright\small
-\NWtarget{nuweb22}{} \verb@"src/utils_algo.py"@\nobreak\ {\footnotesize {22}}$\equiv$
+\begin{flushleft} \small\label{scrap24}\raggedright\small
+\NWtarget{nuweb23}{} \verb@"src/utils_algo.py"@\nobreak\ {\footnotesize {23}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -1414,8 +1575,8 @@ This file contains useful functions for writing algorithms described in the prev
 This chunk contains code required for the interactive input of sites and agents onto the canvas. 
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap19}\raggedright\small
-\NWtarget{nuweb24}{} $\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize {24}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap25}\raggedright\small
+\NWtarget{nuweb25}{} $\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize {25}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -1786,8 +1947,8 @@ An example output from the \verb|plot_tour| function is shown below.
 \end{figure}
 
 %{python-mode}%
-\begin{flushleft} \small\label{scrap20}\raggedright\small
-\NWtarget{nuweb31}{} $\langle\,${\itshape Plotting}\nobreak\ {\footnotesize {31}}$\,\rangle\equiv$
+\begin{flushleft} \small\label{scrap26}\raggedright\small
+\NWtarget{nuweb32}{} $\langle\,${\itshape Plotting}\nobreak\ {\footnotesize {32}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
