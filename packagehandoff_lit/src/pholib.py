@@ -100,7 +100,7 @@ def algo_odw(drone_info, source, target, plot_tour_p = False):
                  s = current_package_position 
                  p = np.asarray(drone_info[idx][0]) 
 
-                 tI = get_interception_time(s, us, p, up, target, clock_time)
+                 tI, x = get_interception_time_and_x(s, us, p, up, target, clock_time)
 
                  if tI < tI_min:
                     tI_min     = tI
@@ -154,7 +154,7 @@ def algo_odw(drone_info, source, target, plot_tour_p = False):
 
     return used_drones, package_trail_straight, mspan_straight, package_trail_cvx, mspan_cvx
  
-def get_interception_time(s, us, p, up, t, t0) :
+def get_interception_time_and_x(s, us, p, up, t, t0) :
     
     # Change coordinates to make $s=(0,0)$ and $t$ to lie along X-axis as in \autoref{fig:getinterceptiontime}
        
@@ -196,7 +196,7 @@ def get_interception_time(s, us, p, up, t, t0) :
            "Quadratic not solved perfectly"
 
     tI = x/us + t0
-    return tI
+    return tI, x
 
 def time_of_travel(start, stop, speed):
      start = np.asarray(start)
@@ -250,9 +250,11 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
      numdrones           = len(drone_info)
 
      package_delivered_p = [ False for _ in range(numpackages) ] 
-     drone_pool          = range(numdrones)
-     global_clock_time   = 0.0
+     drone_locked_p      = [ False for _ in range(numdrones)   ]
 
+     drone_pool          = range(numdrones)
+     remaining_packages  = range(numpackages)
+     global_clock_time   = 0.0
      #.............................................................................
      drone_wavelets_info = [ [{'wavelet_center'        : posn,
                                'clock_time'            : 0.0,
@@ -261,7 +263,6 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
 
      def get_last_wavelet_of_drone(i):
               return drone_wavelets_info[i][-1]
-
      #.............................................................................
      package_trail_info  = [ [{'current_position'   : source, 
                                'clock_time'         : 0.0,
@@ -279,44 +280,77 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
               else:
                    return drone_speeds[current_handler_id]
 
+     def get_current_handler_of_package(i):
+              return package_trail_info[i][-1]['current_handler_id']
+
+     def dronelabel(idx):
+         return 'drone_' + str(idx)
+
+     def packagelabel(idx):
+         return 'package_' + str(idx)
+
      
     
      while not all(package_delivered_p):
           # Construct bipartite graph $G$ on drone wavelets and package wavelets
              
-          # Create nodes of the graph
           G = nx.Graph()
-          G.add_nodes_from(['drone_'  +str(didx) for didx in range(numdrones)])
-          G.add_nodes_from(['package_'+str(pidx) for pidx in range(numpackages)])
+          G.add_nodes_from([  dronelabel(didx) for didx in drone_pool        ])
+          G.add_nodes_from([packagelabel(pidx) for pidx in remaining_packages])
 
-          # Add edges between nodes
-          for didx in range(numdrones):
-              for pidx in range(numpackages):
-                   target = targets[pidx]
-                   pkg    = get_current_position_of_package(pidx)
-                   upkg   = get_current_speed_of_package(pidx)
-              
-                   wav    = get_last_wavelet_of_drone(didx)['wavelet_center']
-                   dro    = wav['wavelet_center']
-                   udro   = drone_speeds[didx]
+          for didx in drone_pool:       
+              dlabel = dronelabel(didx)
 
-                    if upkg < 1e-7: # zero testing for upkg
-                       # Add edge to G
-                       pass
+              for pidx in remaining_packages: 
+                  current_handler_of_package = get_current_handler_of_package(pidx)
+
+                  if current_handler_of_package != didx and not(drone_locked_p[didx]):
+
+                          plabel = packagelabel(pidx)
+                          target = targets[pidx]
            
-                    elif udro > upkg: # It is critical that the zero testing for upkg 
-                                      # has been done for time_target_to_solo to be 
-                                      # computed safely
-                       time_to_target_solo = np.linalg.norm((target-pkg))/ upkg
-                       tI                  = get_interception_time(pkg, upkg, dro, udro, 
-                                                                   target, wav['clock_time'])
-                       if tI < time_to_target_solo:
-                             # Add edge to G
-                             pass
-                    else:
-                        continue
+                          pkg  = get_current_position_of_package(pidx)
+                          upkg = get_current_speed_of_package(pidx)
               
-          sys.exit()
+                          wav  = get_last_wavelet_of_drone(didx)
+                          dro  = wav['wavelet_center']
+                          udro = drone_speeds[didx]
+                          zerotol = 1e-7
+
+                          if upkg < zerotol :
+                                weight = np.linalg.norm(pkg-dro)/udro +\
+                                         np.linalg.norm(target-pkg)/udro
+                                G.add_edge(dlabel, plabel)
+                                G.edges[dlabel, plabel]['weight'] = weight
+
+                          elif udro > upkg and abs(upkg-udro) > zerotol:
+
+                               time_to_target_solo = np.linalg.norm(target-pkg)/upkg
+                               tI, x = get_interception_time_and_x(pkg, upkg, dro, udro, 
+                                                                   target, wav['clock_time'])
+                               if tI < time_to_target_solo:
+                                    pthat = (target-pkg)/np.linalg.norm(target-pkg)
+                                    interception_pt = pkg + x * pthat
+
+                                    weight = tI + (target-interception_pt)/udro
+                                    G.add_edge(dlabel,plabel)
+                                    G.edges[dlabel, plabel]['weight'] = weight
+
+                  elif current_handler_of_package == didx and drone_locked_p[didx]:
+                         assert abs(udro-upkg) < zerotol , "udro should be equal to upkg"
+                         weight = (target-pkg)/udro
+                         G.add_edge(dlabel,plabel)
+                         G.edges[dlabel,plabel]['weight'] = weight 
+
+                  elif current_handler_of_package != didx and drone_locked_p[didx]:
+                         pass  # "Nothing to do here, didx is busy!"
+                  else : 
+                         assert (current_handler_of_package == didx and not(drone_locked_p[didx])) ,
+                                 "This else branch should not be executed. This means didx is \
+                                  handling a package and is NOT locked"
+
+          print "\nEdges are "
+          utils_algo.print_list(G.edges.data())
           
           # Get a bottleneck matching on $G$
           
@@ -622,14 +656,14 @@ def multiple_pho_run_handler():
                     # Select algorithm to execute
                     algo_str = raw_input(Fore.YELLOW                                             +\
                             "Enter algorithm to be used to compute the tour:\n Options are:\n"   +\
-                            " (matchmove)     Repeated bottleneck matching \n"                            +\
+                            " (mm)     Match-and-move \n"                            +\
                             Style.RESET_ALL)
 
                     algo_str = algo_str.lstrip()
                      
                     # Incase there are patches present from the previous clustering, just clear them
                     clearAxPolygonPatches(ax)
-                    if   algo_str == 'matchmove':
+                    if   algo_str == 'mm':
                           tour = run.get_tour( algo_matchmove, plot_tour_p=True )
                     else:
                           print "Unknown option. No horsefly for you! ;-D "
