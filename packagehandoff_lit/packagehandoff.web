@@ -500,7 +500,8 @@ pointing to the right, and $S=(0,0)$ as in \autoref{fig:getinterceptiontimeandx}
 Rearranging the terms, we get a quadratic equation in $x$ that we can solve solve using standard 
 non-linear solvers \footnote{Using the exact formula for solving the quadratic equation is unstable
 in computer arithmetic as is well known from numerical analysis. To avoid such tricky issues, it is best
-to use the standard \texttt{roots} solver for polynomials available from numpy \url{https://docs.scipy.org/doc/numpy/reference/generated/numpy.roots.html}}. 
+to use the standard \texttt{roots} solver for polynomials available in NumPy 
+\url{https://docs.scipy.org/doc/numpy/reference/generated/numpy.roots.html}}. 
 
 \begin{IEEEeqnarray}{rCl}
 x^2 \left( \frac{1}{u_S^2} - \frac{1}{u_P^2}\right)   + x\left( \frac{2t_0}{u_S} + \frac{2\alpha}{u_P^2}\right)
@@ -522,14 +523,15 @@ def get_interception_time_and_x(s, us, p, up, t, t0) :
                         t0**2 - alpha**2/up**2 - beta**2/up**2])
 
     # The quadratic should always have a root. 
-    qroots = np.real(qroots) # in case the imaginary parts
-    qroots.sort()            # of the roots are really small
+    qroots = np.real(qroots) # in case the imaginary parts are really small
+    qroots.sort()            
 
     x = None
     for root in qroots:
         if root > 0.0:
            x = root
            break
+
     assert abs(x/us+t0 - np.sqrt((x-alpha)**2 + beta**2)/up) <= 1e-6 , \
            "Quadratic not solved perfectly"
 
@@ -680,14 +682,6 @@ if plot_tour_p:
 %{/python-mode}%
 
 
-
-
-
-
-
-
-
-
 \chapter{Multiple Package Handoff}
 
 % \begin{figure}[H]
@@ -695,20 +689,16 @@ if plot_tour_p:
 % \includegraphics[width=10cm]{asy2d/example.eps}
 % \end{figure}
 
-
-
 What's more fun than delivering a single package? Delivering multiple packages! The moment, we generalize 
 from a single to multiple packages the problem becomes enormously more interesting along with several 
 possible generlizations to the statement of the problem. Each section is dedicated to one such generalization
 along with a description of algorithms and heuristics to solve them. 
-
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=6cm]{example-grid-100x100pt}
 \end{figure}
 \label{fig:multiplepho-assignment}
-
 
 \section{Problem: Drone Assignment To Packages}
 We are given as input the initial locations $P_i$ of $n$  agents in $\mathbb{R}^2$ 
@@ -852,8 +842,35 @@ main \texttt{while} loop of the algorithm.
 \end{description}
 
 
+We will also need a slightly generalized version of \verb|get_interception_time_and_x| that takes into
+account when a wavelet started expanding in order to calculate $x$ and the time $t_I$ on the global clock
+when the wavelets will meet. 
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=10cm]{docs/get_interception_time_and_x_generalized.pdf}
+\caption{Without loss of generality (by changing the coordinate system) we can assume 
+         the line $\vec{ST}$ to be horizontal. We would like to compute the time $t_I$
+         on the global clock when the two wavelets meet. The package wavelet starts expanding at 
+         time $c$ which is the same as the global clock time at the moment the function is called 
+         and the dronw wavelet at time $\kappa$.}
+\end{figure}
+
+
+
 %{python-mode}%
-@d Basic setup @{ 
+@d Algorithms @{ 
+def get_interception_time_and_x_generalized(s, us, p, up, target, c, k) :
+    assert 1==2, "Unimplemented error"
+    return tI, x
+@| @}
+%{/python-mode}%
+
+
+
+%{python-mode}%
+@D Basic setup @{ 
 sources             = [np.asarray(source) for source in sources] 
 targets             = [np.asarray(target) for target in targets] 
 
@@ -951,8 +968,9 @@ built inside the code, one column at a time. }
 
 %{python-mode}%
 @d Construct bipartite graph $G$ on drone wavelets and package wavelets @{  
-infty    = np.inf 
-G_mat = np.full((len(remaining_packages),len(drone_pool)), infty)
+infty       = np.inf 
+G_mat       = np.full((len(remaining_packages),len(drone_pool)), infty)
+lbend_edges = []
 
 for didx in drone_pool:
     dlabel = dronelabel(didx)
@@ -960,9 +978,7 @@ for didx in drone_pool:
     for pidx in remaining_packages: 
         current_handler_of_package = get_current_handler_of_package(pidx)
 
-        # CASE 1
-        if current_handler_of_package != didx and \
-           not(drone_locked_p[didx]):
+        if current_handler_of_package != didx and not(drone_locked_p[didx]):
 
                 plabel = packagelabel(pidx)
                 target = targets[pidx]
@@ -976,35 +992,39 @@ for didx in drone_pool:
                 zerotol = 1e-7
 
                 if upkg < zerotol :
-                      weight = np.linalg.norm(pkg-dro)/udro +\
-                               np.linalg.norm(target-pkg)/udro
 
-                      G_mat[pidx, didx] = weight
+                      G_mat[pidx, didx] = np.linalg.norm(pkg-dro)/udro +\
+                                          np.linalg.norm(target-pkg)/udro
+                      lbend_edges.append({'edge_pair': (pidx,didx), 
+                                          'y'        : np.linalg.norm(pkg-dro)/udro }) 
 
                 elif udro > upkg and abs(upkg-udro) > zerotol:
 
                      time_to_target_solo = np.linalg.norm(target-pkg)/upkg
-                     tI, x = get_interception_time_and_x(pkg, upkg, dro, udro, 
-                                                         target, wav['clock_time'])
-                     if tI < time_to_target_solo:
-                          pthat = (target-pkg)/np.linalg.norm(target-pkg)
-                          interception_pt = pkg + x * pthat
+                     tI, x               = get_interception_time_and_x_generalized(pkg, upkg, dro, udro, target, 
+                                                                                   global_clock_time, wav['clock_time'])
+                     if x is not None: 
+                        assert tI is not None, "tI and x should be None simultaneously"
+                        if tI < global_clock_time + time_to_target_solo:
 
-                          weight = tI + np.linalg.norm((target-interception_pt))/udro
-                          G_mat[pidx, didx] = weight
-        # CASE 2
-        elif current_handler_of_package == didx and \
-             drone_locked_p[didx]:
+                          pthat             = (target-pkg)/np.linalg.norm(target-pkg)
+                          interception_pt   = pkg + x * pthat
+                          G_mat[pidx, didx] = tI + np.linalg.norm((target-interception_pt))/udro
+                          lbend_edges.append( (pidx,didx) ) 
+
+                          lbend_edges.append({'edge_pair': (pidx,didx), 
+                                               'y'       : np.linalg.norm(interception_pt-dro)/udro }) 
+
+        elif current_handler_of_package == didx and drone_locked_p[didx]:
+
                assert abs(udro-upkg) < zerotol , "udro should be equal to upkg"
-               weight = np.linalg.norm((target-pkg))/udro
-               G_mat[pidx, didx] = weight
+               G_mat[pidx, didx] = np.linalg.norm((target-pkg))/udro
     
-        # CASE 3
-        elif current_handler_of_package != didx and \
-             drone_locked_p[didx]:
-               G_mat[pidx, didx] = infty # effectively saying there is not edge between the two
+        elif current_handler_of_package != didx and drone_locked_p[didx]:
+               pass # drone locked, so it cant help
         else : 
-               # the outer not negates the inner condition which is true if this branch is executed
+               # The outer not negates the inner condition which 
+               # is true if this branch is executed
                assert not(current_handler_of_package == didx and \
                            not(drone_locked_p[didx])) ,\
                        "This else branch should not be executed. This\
@@ -1013,27 +1033,42 @@ for didx in drone_pool:
 %{/python-mode}%
 
 Since NetworkX does not have a native bottleneck matching solver, we use a minimum-weight matching solver
-\footnote{by negating the edgeweights and using the maximum weighted matching solver described in 
-\url{https://networkx.github.io/documentation/stable/reference/algorithms/matching.html} or \url{http://bit.ly/2MAWHPn}.  } as a replacement
-/approximation to bottleneck matching. 
-
-
-There are exactly two types of (mutually exclusive) 
-events in this algorithm. 
-
-\begin{description}
-\item[Type \rnum{1}:] A package gets delivered to its assigned destination. 
-\item[Type \rnum{2}:] A wavelet corresponding to a drone (not handling a package) meets up with 
-   a drone currently handling a package. 
-\end{description}
-
+already present in SciPy documented at \url{http://bit.ly/2MAWHPn}. 
 
 %{python-mode}%
 @d Get a bottleneck matching on $G$ @{
 from scipy.optimize import linear_sum_assignment
 pkg_ind, dro_ind = linear_sum_assignment(G_mat)
+
+print "Lbend edges"
+print lbend_edges
+return 
 @| @}
 %{/python-mode}%
+
+There are exactly two types of (mutually exclusive) events in this algorithm. 
+
+\begin{description}
+\item[Type \rnum{1}:] A package wavelet reaches its target. 
+\item[Type \rnum{2}:] A wavelet corresponding to a drone (not handling a package) 
+                      meets up with a package wavelet.
+\end{description}
+
+To detect these, we keep track of a so-called list of ``$L$ bend'' edges as shown in the figure below 
+(see the variable \verb|lbend_edges| in the previous chunk that keeps track of this quantity).  
+
+
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=18cm]{docs/lbend.pdf}
+\caption{If a package drone pair is represented in the graph matrix as a finite weight edge, we first 
+check if it is an $L$-bend edge that corresponds to one of the two situations above. A drone catches
+up with another drone carrying the package (right) or a drone picks up a stationary package and moves
+towards the target (left)}
+\end{figure}
+
 
 %{python-mode}%
 @d Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected @{   

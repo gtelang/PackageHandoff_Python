@@ -184,14 +184,15 @@ def get_interception_time_and_x(s, us, p, up, t, t0) :
                         t0**2 - alpha**2/up**2 - beta**2/up**2])
 
     # The quadratic should always have a root. 
-    qroots = np.real(qroots) # in case the imaginary parts
-    qroots.sort()            # of the roots are really small
+    qroots = np.real(qroots) # in case the imaginary parts are really small
+    qroots.sort()            
 
     x = None
     for root in qroots:
         if root > 0.0:
            x = root
            break
+
     assert abs(x/us+t0 - np.sqrt((x-alpha)**2 + beta**2)/up) <= 1e-6 , \
            "Quadratic not solved perfectly"
 
@@ -294,8 +295,9 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
      while not all(package_delivered_p):
           # Construct bipartite graph $G$ on drone wavelets and package wavelets
             
-          infty    = np.inf 
-          G_mat = np.full((len(remaining_packages),len(drone_pool)), infty)
+          infty       = np.inf 
+          G_mat       = np.full((len(remaining_packages),len(drone_pool)), infty)
+          lbend_edges = []
 
           for didx in drone_pool:
               dlabel = dronelabel(didx)
@@ -303,9 +305,7 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
               for pidx in remaining_packages: 
                   current_handler_of_package = get_current_handler_of_package(pidx)
 
-                  # CASE 1
-                  if current_handler_of_package != didx and \
-                     not(drone_locked_p[didx]):
+                  if current_handler_of_package != didx and not(drone_locked_p[didx]):
 
                           plabel = packagelabel(pidx)
                           target = targets[pidx]
@@ -319,35 +319,38 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                           zerotol = 1e-7
 
                           if upkg < zerotol :
-                                weight = np.linalg.norm(pkg-dro)/udro +\
-                                         np.linalg.norm(target-pkg)/udro
 
-                                G_mat[pidx, didx] = weight
+                                G_mat[pidx, didx] = np.linalg.norm(pkg-dro)/udro +\
+                                                    np.linalg.norm(target-pkg)/udro
+                                lbend_edges.append({'edge_pair': (pidx,didx), 
+                                                    'y'        : np.linalg.norm(pkg-dro)/udro }) 
 
                           elif udro > upkg and abs(upkg-udro) > zerotol:
 
                                time_to_target_solo = np.linalg.norm(target-pkg)/upkg
-                               tI, x = get_interception_time_and_x(pkg, upkg, dro, udro, 
-                                                                   target, wav['clock_time'])
-                               if tI < time_to_target_solo:
-                                    pthat = (target-pkg)/np.linalg.norm(target-pkg)
-                                    interception_pt = pkg + x * pthat
+                               tI, x               = get_interception_time_and_x(pkg, upkg, dro, udro, 
+                                                                                 target, wav['clock_time'])
+                               if tI < wav['clock_time'] + time_to_target_solo:
 
-                                    weight = tI + np.linalg.norm((target-interception_pt))/udro
-                                    G_mat[pidx, didx] = weight
-                  # CASE 2
-                  elif current_handler_of_package == didx and \
-                       drone_locked_p[didx]:
+                                    pthat             = (target-pkg)/np.linalg.norm(target-pkg)
+                                    interception_pt   = pkg + x * pthat
+                                    G_mat[pidx, didx] = tI + np.linalg.norm((target-interception_pt))/udro
+                                    lbend_edges.append( (pidx,didx) ) 
+
+                                    lbend_edges.append({'edge_pair': (pidx,didx), 
+                                                         'y'       : np.linalg.norm(interception_pt-dro)/udro }) 
+
+                  elif current_handler_of_package == didx and drone_locked_p[didx]:
+
                          assert abs(udro-upkg) < zerotol , "udro should be equal to upkg"
-                         weight = np.linalg.norm((target-pkg))/udro
-                         G_mat[pidx, didx] = weight
+                         G_mat[pidx, didx] = np.linalg.norm((target-pkg))/udro
               
-                  # CASE 3
-                  elif current_handler_of_package != didx and \
-                       drone_locked_p[didx]:
-                         G_mat[pidx, didx] = infty # effectively saying there is not edge between the two
+                  elif current_handler_of_package != didx and drone_locked_p[didx]:
+
+                         G_mat[pidx, didx] = infty 
                   else : 
-                         # the outer not negates the inner condition which is true if this branch is executed
+                         # The outer not negates the inner condition which 
+                         # is true if this branch is executed
                          assert not(current_handler_of_package == didx and \
                                      not(drone_locked_p[didx])) ,\
                                  "This else branch should not be executed. This\
@@ -358,10 +361,9 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
           from scipy.optimize import linear_sum_assignment
           pkg_ind, dro_ind = linear_sum_assignment(G_mat)
 
-          print Fore.RED, "G_mat is \n", G_mat, Style.RESET_ALL
-          utils_algo.print_list(zip(pkg_ind, dro_ind))
-          print Fore.GREEN, G_mat[pkg_ind, dro_ind], Style.RESET_ALL
-          sys.exit()
+          print "Lbend edges"
+          print lbend_edges
+          return 
           
           # Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected
              
