@@ -319,7 +319,6 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                           zerotol = 1e-7
 
                           if upkg < zerotol :
-
                                 G_mat[pidx, didx] = np.linalg.norm(pkg-dro)/udro +\
                                                     np.linalg.norm(target-pkg)/udro
                                 lbend_edges.append({'edge_pair': (pidx,didx), 
@@ -328,15 +327,15 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                           elif udro > upkg and abs(upkg-udro) > zerotol:
 
                                time_to_target_solo = np.linalg.norm(target-pkg)/upkg
-                               tI, x               = get_interception_time_and_x(pkg, upkg, dro, udro, 
-                                                                                 target, wav['clock_time'])
-                               if tI < wav['clock_time'] + time_to_target_solo:
+                               tI, x  = get_interception_time_and_x_generalized(pkg, upkg, dro, udro, target, 
+                                                                               global_clock_time, wav['clock_time'])
+                               if x is not None: 
+                                  assert tI is not None, "tI and x should be None or not None simultaneously"
+                                  if tI < global_clock_time + time_to_target_solo:
 
                                     pthat             = (target-pkg)/np.linalg.norm(target-pkg)
                                     interception_pt   = pkg + x * pthat
                                     G_mat[pidx, didx] = tI + np.linalg.norm((target-interception_pt))/udro
-                                    lbend_edges.append( (pidx,didx) ) 
-
                                     lbend_edges.append({'edge_pair': (pidx,didx), 
                                                          'y'       : np.linalg.norm(interception_pt-dro)/udro }) 
 
@@ -346,8 +345,7 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                          G_mat[pidx, didx] = np.linalg.norm((target-pkg))/udro
               
                   elif current_handler_of_package != didx and drone_locked_p[didx]:
-
-                         G_mat[pidx, didx] = infty 
+                         pass # drone locked, so it cant help
                   else : 
                          # The outer not negates the inner condition which 
                          # is true if this branch is executed
@@ -383,6 +381,34 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
      pass
       
      #return pass pass pass pass pass 
+ 
+def get_interception_time_and_x_generalized(s, us, p, up, t, c, k) :
+    
+    # Change coordinates 
+    t_m = t - s # the _m subscript stands for modify
+    t_m = t_m / np.linalg.norm(t_m) # normalize to unit
+
+    # For rotating a vector clockwise by theta, 
+    # to get the vector t_m into alignment with (1,0)
+    costh = t_m[0]/np.sqrt(t_m[0]**2 + t_m[1]**2)
+    sinth = t_m[1]/np.sqrt(t_m[0]**2 + t_m[1]**2)
+
+    rotmat = np.asarray([[costh, sinth],
+                         [-sinth, costh]])
+
+    assert np.linalg.norm((rotmat.dot(t_m) - np.asarray([1,0]))) <= 1e-6,\
+       "Rotation matrix did not work properly. t_m should get rotated\
+        onto [1,0] after this transformation"
+
+    p_shift  = p - s
+    p_rot    = rotmat.dot(p_shift)
+    [alpha, beta] = p_rot
+
+    # Solve quadratic equation as documented in main text
+    qroots = np.roots([ , , ])
+
+    assert 1==2, "Unimplemented error"
+    return tI, x
 
 # Run Handlers
 
