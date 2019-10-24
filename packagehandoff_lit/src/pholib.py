@@ -332,7 +332,7 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                                      interception_pt   = pkg + x * pthat
                                      G_mat[pidx, didx] = tI + np.linalg.norm((target-interception_pt))/udro
                                      lbend_edges.append({'edge_pair': (pidx,didx), 
-                                                                               'y'       : np.linalg.norm(interception_pt-dro)/udro }) 
+                                                         'y'       : np.linalg.norm(interception_pt-dro)/udro }) 
                                 
 
                   elif current_handler_of_package == didx and drone_locked_p[didx]:
@@ -375,43 +375,61 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
           
           # Check if there is an lbend edge in the matching which has a $y\leq ewmin$. If so, find the one with the one with the lowest such $y$
              
-          ymin       = np.inf
-          umin, vmin = None, None
+          ymin         = np.inf
+          plmin, dlmin = None, None
 
           for ledge in lbend_edges_of_matching:
-              (u,v) = ledge['edge_pair']
-              y     = ledge['y']
+              (pl,dl) = ledge['edge_pair']
+              y       = ledge['y']
               
               if y < ymin:
-                  ymin, umin, vmin = y, u, v
+                  ymin, plmin, dlmin = y, pl, dl
           
 
           if ymin > ewmin:  # TYPE I EVENT (package reaches target)
 
               assert (pmin,dmin) not in [ d['edge_pair']  for d in lbend_edges_of_matching ], " "
-              time_till_event = ewmin
+              time_till_event    = ewmin
+              global_clock_time += time_till_event
+
+              package_delivered_p[pmin] = True
+              drone_locked_p[dmin]      = False
+
+              remaining_packages.remove(pmin)
+              drone_pool.remove(dmin)
+
               # Process lbend edges in the matching for type \rnum{1} event
                  
-              for edge in lbend_edges_of_matching:
-                      pass
 
+              for ledge in lbend_edges_of_matching:
+                  (pl,dl) = ledge['edge_pair']
+                  wav     = get_last_wavelet_of_drone(dl)     
+                  wav['matched_package_ids'].append(pl)
+                  
               
               # Process straight edges in the matching for type \rnum{1} event
                  
-              for edge in straight_edges_of_matching:
-                    pass
+              for sedge in straight_edges_of_matching:
+                    (ps, ds) = sedge
+                    assert abs(get_current_speed_of_package(ps) - drone_speeds[ds]) < zerotol , "speeds should match"
+                    
+                    package_trail_info[ps].append({'current_position'  : get_current_position_of_package(ps) +\
+                                                                          time_till_event * drone_speeds[ds],
+                                                   'clock_time'        : global_clock_time, # has already been updated
+                                                   'current_handler_id': ds}) 
+                    wav = get_last_wavelet_of_drone(ds)     
+                    wav['matched_package_ids'].append(ps)
               
               
           else:# TYPE II EVENT (a wavelet corresponding to a drone not handling 
                # a package reaches a package that might be stationary or being moved by another drone.)
 
-              assert (umin is not None and vmin is not None), ""
+              assert (plmin is not None and dlmin is not None), ""
               time_till_event = ymin
               # Process lbend edges in the matching for type \rnum{2} event
                  
               for edge in lbend_edges_of_matching:
                       pass
-
               
               # Process straight edges in the matching for type \rnum{2} event
                  

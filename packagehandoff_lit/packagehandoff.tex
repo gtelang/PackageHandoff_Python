@@ -157,8 +157,8 @@ The \verb|pholib.py| file looks like
 \mbox{}\verb@import utils_algo, utils_graphics@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@@\hbox{$\langle\,${\itshape Algorithms}\nobreak\ {\footnotesize \NWlink{nuweb6}{6}, \ldots\ }$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb30}{30}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting}\nobreak\ {\footnotesize \NWlink{nuweb37}{37}, \ldots\ }$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize \NWlink{nuweb31}{31}}$\,\rangle$}\verb@@\\
+\mbox{}\verb@@\hbox{$\langle\,${\itshape Plotting}\nobreak\ {\footnotesize \NWlink{nuweb38}{38}, \ldots\ }$\,\rangle$}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -465,7 +465,7 @@ description below.
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb6}{6}\NWlink{nuweb7}{, 7}\NWlink{nuweb10a}{, 10a}\NWlink{nuweb12a}{, 12a}\NWlink{nuweb14a}{, 14a}\NWlink{nuweb16}{, 16}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb30}{30}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@algo_odw@\nobreak\ \NWlink{nuweb31}{31}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -838,7 +838,7 @@ numpy arrays at the start of the function).
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb6}{6}\NWlink{nuweb7}{, 7}\NWlink{nuweb10a}{, 10a}\NWlink{nuweb12a}{, 12a}\NWlink{nuweb14a}{, 14a}\NWlink{nuweb16}{, 16}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@extract_coordinates@\nobreak\ \NWlink{nuweb37}{37}\NWlink{nuweb40}{, 40}, \verb@makespan,@\nobreak\ \NWtxtIdentsNotUsed, \verb@time_of_travel@\nobreak\ \NWlink{nuweb8a}{8a}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@extract_coordinates@\nobreak\ \NWlink{nuweb38}{38}\NWlink{nuweb41}{, 41}, \verb@makespan,@\nobreak\ \NWtxtIdentsNotUsed, \verb@time_of_travel@\nobreak\ \NWlink{nuweb8a}{8a}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -951,7 +951,7 @@ fleshed out in subsequent subsections.
 \mbox{}\verb@          @\hbox{$\langle\,${\itshape Get a bottleneck matching on $G$}\nobreak\ {\footnotesize \NWlink{nuweb20b}{20b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@          @\hbox{$\langle\,${\itshape Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected}\nobreak\ {\footnotesize \NWlink{nuweb21a}{21a}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@     @\hbox{$\langle\,${\itshape Plot movement of packages and drones if \verb|plot_tour_p == True |}\nobreak\ {\footnotesize \NWlink{nuweb22f}{22f}}$\,\rangle$}\verb@ @\\
+\mbox{}\verb@     @\hbox{$\langle\,${\itshape Plot movement of packages and drones if \verb|plot_tour_p == True |}\nobreak\ {\footnotesize \NWlink{nuweb23}{23}}$\,\rangle$}\verb@ @\\
 \mbox{}\verb@     #return pass pass pass pass pass @\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
@@ -960,7 +960,7 @@ fleshed out in subsequent subsections.
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
 \item \NWtxtMacroDefBy\ \NWlink{nuweb6}{6}\NWlink{nuweb7}{, 7}\NWlink{nuweb10a}{, 10a}\NWlink{nuweb12a}{, 12a}\NWlink{nuweb14a}{, 14a}\NWlink{nuweb16}{, 16}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
-\item \NWtxtIdentsDefed\nobreak\  \verb@algo_matchmove@\nobreak\ \NWlink{nuweb30}{30}.
+\item \NWtxtIdentsDefed\nobreak\  \verb@algo_matchmove@\nobreak\ \NWlink{nuweb31}{31}.
 \item{}
 \end{list}
 \end{minipage}\vspace{4ex}
@@ -1326,7 +1326,7 @@ built inside the code, one column at a time. }
 \mbox{}\verb@     interception_pt   = pkg + x * pthat@\\
 \mbox{}\verb@     G_mat[pidx, didx] = tI + np.linalg.norm((target-interception_pt))/udro@\\
 \mbox{}\verb@     lbend_edges.append({'edge_pair': (pidx,didx), @\\
-\mbox{}\verb@                                               'y'       : np.linalg.norm(interception_pt-dro)/udro }) @\\
+\mbox{}\verb@                         'y'       : np.linalg.norm(interception_pt-dro)/udro }) @\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -1405,14 +1405,22 @@ towards the target (left)}
 \mbox{}\verb@if ymin > ewmin:  # TYPE I EVENT (package reaches target)@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    assert (pmin,dmin) not in [ d['edge_pair']  for d in lbend_edges_of_matching ], " "@\\
-\mbox{}\verb@    time_till_event = ewmin@\\
+\mbox{}\verb@    time_till_event    = ewmin@\\
+\mbox{}\verb@    global_clock_time += time_till_event@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    package_delivered_p[pmin] = True@\\
+\mbox{}\verb@    drone_locked_p[dmin]      = False@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    remaining_packages.remove(pmin)@\\
+\mbox{}\verb@    drone_pool.remove(dmin)@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@    @\hbox{$\langle\,${\itshape Process lbend edges in the matching for type \rnum{1} event}\nobreak\ {\footnotesize \NWlink{nuweb22b}{22b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@    @\hbox{$\langle\,${\itshape Process straight edges in the matching for type \rnum{1} event}\nobreak\ {\footnotesize \NWlink{nuweb22c}{22c}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@    @\\
 \mbox{}\verb@else:# TYPE II EVENT (a wavelet corresponding to a drone not handling @\\
 \mbox{}\verb@     # a package reaches a package that might be stationary or being moved by another drone.)@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@    assert (umin is not None and vmin is not None), ""@\\
+\mbox{}\verb@    assert (plmin is not None and dlmin is not None), ""@\\
 \mbox{}\verb@    time_till_event = ymin@\\
 \mbox{}\verb@    @\hbox{$\langle\,${\itshape Process lbend edges in the matching for type \rnum{2} event}\nobreak\ {\footnotesize \NWlink{nuweb22d}{22d}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@    @\hbox{$\langle\,${\itshape Process straight edges in the matching for type \rnum{2} event}\nobreak\ {\footnotesize \NWlink{nuweb22e}{22e}}$\,\rangle$}\verb@@\\
@@ -1494,15 +1502,15 @@ towards the target (left)}
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
-\mbox{}\verb@ymin       = np.inf@\\
-\mbox{}\verb@umin, vmin = None, None@\\
+\mbox{}\verb@ymin         = np.inf@\\
+\mbox{}\verb@plmin, dlmin = None, None@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@for ledge in lbend_edges_of_matching:@\\
-\mbox{}\verb@    (u,v) = ledge['edge_pair']@\\
-\mbox{}\verb@    y     = ledge['y']@\\
+\mbox{}\verb@    (pl,dl) = ledge['edge_pair']@\\
+\mbox{}\verb@    y       = ledge['y']@\\
 \mbox{}\verb@    @\\
 \mbox{}\verb@    if y < ymin:@\\
-\mbox{}\verb@        ymin, umin, vmin = y, u, v@\\
+\mbox{}\verb@        ymin, plmin, dlmin = y, pl, dl@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -1524,9 +1532,12 @@ towards the target (left)}
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
-\mbox{}\verb@for edge in lbend_edges_of_matching:@\\
-\mbox{}\verb@        pass@\\
 \mbox{}\verb@@\\
+\mbox{}\verb@for ledge in lbend_edges_of_matching:@\\
+\mbox{}\verb@    (pl,dl) = ledge['edge_pair']@\\
+\mbox{}\verb@    wav     = get_last_wavelet_of_drone(dl)     @\\
+\mbox{}\verb@    wav['matched_package_ids'].append(pl)@\\
+\mbox{}\verb@    @\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -1548,8 +1559,16 @@ towards the target (left)}
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
-\mbox{}\verb@for edge in straight_edges_of_matching:@\\
-\mbox{}\verb@      pass@\\
+\mbox{}\verb@for sedge in straight_edges_of_matching:@\\
+\mbox{}\verb@      (ps, ds) = sedge@\\
+\mbox{}\verb@      assert abs(get_current_speed_of_package(ps) - drone_speeds[ds]) < zerotol , "speeds should match"@\\
+\mbox{}\verb@      @\\
+\mbox{}\verb@      package_trail_info[ps].append({'current_position'  : get_current_position_of_package(ps) +\@\\
+\mbox{}\verb@                                                            time_till_event * drone_speeds[ds],@\\
+\mbox{}\verb@                                     'clock_time'        : global_clock_time, # has already been updated@\\
+\mbox{}\verb@                                     'current_handler_id': ds}) @\\
+\mbox{}\verb@      wav = get_last_wavelet_of_drone(ds)     @\\
+\mbox{}\verb@      wav['matched_package_ids'].append(ps)@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -1572,7 +1591,6 @@ towards the target (left)}
 \mbox{}\verb@   @\\
 \mbox{}\verb@for edge in lbend_edges_of_matching:@\\
 \mbox{}\verb@        pass@\\
-\mbox{}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -1613,7 +1631,7 @@ towards the target (left)}
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap29}\raggedright\small
-\NWtarget{nuweb22f}{} $\langle\,${\itshape Plot movement of packages and drones if \verb|plot_tour_p == True |}\nobreak\ {\footnotesize {22f}}$\,\rangle\equiv$
+\NWtarget{nuweb23}{} $\langle\,${\itshape Plot movement of packages and drones if \verb|plot_tour_p == True |}\nobreak\ {\footnotesize {23}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -1713,7 +1731,7 @@ This \verb|README| file can be read more clearly alongside its appropriate forma
 \url{https://github.com/gtelang/PackageHandoff_Python/tree/master/packagehandoff_lit}
 
 \begin{flushleft} \small\label{scrap30}\raggedright\small
-\NWtarget{nuweb26}{} \verb@"README.md"@\nobreak\ {\footnotesize {26}}$\equiv$
+\NWtarget{nuweb27}{} \verb@"README.md"@\nobreak\ {\footnotesize {27}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
@@ -1759,7 +1777,7 @@ This \verb|README| file can be read more clearly alongside its appropriate forma
 This file contains useful functions for visualization and plotting functions described in the previous chapters.
 %{python-mode}%
 \begin{flushleft} \small\label{scrap31}\raggedright\small
-\NWtarget{nuweb27}{} \verb@"src/utils_graphics.py"@\nobreak\ {\footnotesize {27}}$\equiv$
+\NWtarget{nuweb28}{} \verb@"src/utils_graphics.py"@\nobreak\ {\footnotesize {28}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@    @\\
@@ -1813,7 +1831,7 @@ This file contains useful functions for writing algorithms described in the prev
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap32}\raggedright\small
-\NWtarget{nuweb28}{} \verb@"src/utils_algo.py"@\nobreak\ {\footnotesize {28}}$\equiv$
+\NWtarget{nuweb29}{} \verb@"src/utils_algo.py"@\nobreak\ {\footnotesize {29}}$\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -1914,7 +1932,7 @@ This chunk contains code required for the interactive input of sites and agents 
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap33}\raggedright\small
-\NWtarget{nuweb30}{} $\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize {30}}$\,\rangle\equiv$
+\NWtarget{nuweb31}{} $\langle\,${\itshape Run Handlers}\nobreak\ {\footnotesize {31}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -2291,7 +2309,7 @@ An example output from the \verb|plot_tour| function is shown below.
 
 %{python-mode}%
 \begin{flushleft} \small\label{scrap34}\raggedright\small
-\NWtarget{nuweb37}{} $\langle\,${\itshape Plotting}\nobreak\ {\footnotesize {37}}$\,\rangle\equiv$
+\NWtarget{nuweb38}{} $\langle\,${\itshape Plotting}\nobreak\ {\footnotesize {38}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
@@ -2389,7 +2407,7 @@ An example output from the \verb|plot_tour| function is shown below.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb37}{37}\NWlink{nuweb40}{, 40}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb38}{38}\NWlink{nuweb41}{, 41}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
 \item \NWtxtIdentsUsed\nobreak\  \verb@extract_coordinates@\nobreak\ \NWlink{nuweb12a}{12a}.
 \item{}
@@ -2404,7 +2422,7 @@ An example output from the \verb|plot_tour| function is shown below.
 %{python-mode}%
 \begin{flushleft} \small
 \begin{minipage}{\linewidth}\label{scrap35}\raggedright\small
-\NWtarget{nuweb40}{} $\langle\,${\itshape Plotting}\nobreak\ {\footnotesize {40}}$\,\rangle\equiv$
+\NWtarget{nuweb41}{} $\langle\,${\itshape Plotting}\nobreak\ {\footnotesize {41}}$\,\rangle\equiv$
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@   @\\
@@ -2463,7 +2481,7 @@ An example output from the \verb|plot_tour| function is shown below.
 \vspace{-1.5ex}
 \footnotesize
 \begin{list}{}{\setlength{\itemsep}{-\parsep}\setlength{\itemindent}{-\leftmargin}}
-\item \NWtxtMacroDefBy\ \NWlink{nuweb37}{37}\NWlink{nuweb40}{, 40}.
+\item \NWtxtMacroDefBy\ \NWlink{nuweb38}{38}\NWlink{nuweb41}{, 41}.
 \item \NWtxtMacroRefIn\ \NWlink{nuweb3}{3}.
 \item \NWtxtIdentsUsed\nobreak\  \verb@extract_coordinates@\nobreak\ \NWlink{nuweb12a}{12a}.
 \item{}
