@@ -750,9 +750,7 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
           @< Construct bipartite graph $G$ on drone wavelets and package wavelets @>
           @< Get a bottleneck matching on $G$ @>
           @< Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected @>
-          @< Update drone pool and package states@>
 
-     @< Run convex optimization solver to get improved tours for drones and packages @>
      @< Plot movement of packages and drones if \verb|plot_tour_p == True | @> 
      #return pass pass pass pass pass 
 @| algo_matchmove @}
@@ -798,7 +796,7 @@ main \texttt{while} loop of the algorithm.
      the \verb|while| loop.  
 
 \item[C. \texttt{drone\_wavelet\_info}] is a list of list of dictionaries. Each outer list 
-     corresponds to a list of wavelets corresponding to each drone. Every wavelet is represented
+     corresponds to a list of wavelets of to each drone. Every wavelet is represented
      by a dictionary, with three attributes
      
 \begin{description}
@@ -862,39 +860,24 @@ when the wavelets will meet.
 %{python-mode}%
 @d Algorithms @{ 
 def get_interception_time_and_x_generalized(s, us, p, up, t, c, k) :
-    
-    # Change coordinates 
-    t_m = t - s # the _m subscript stands for modify
-    t_m = t_m / np.linalg.norm(t_m) # normalize to unit
 
-    # For rotating a vector clockwise by theta, 
-    # to get the vector t_m into alignment with (1,0)
-    costh = t_m[0]/np.sqrt(t_m[0]**2 + t_m[1]**2)
-    sinth = t_m[1]/np.sqrt(t_m[0]**2 + t_m[1]**2)
+    assert c-k>=0 , "c, global clock time should be greater than k,\
+                    time when wavelet started expanding"
 
-    rotmat = np.asarray([[costh, sinth],
-                         [-sinth, costh]])
+    _ , x = get_interception_time_and_x(s,us,p,up,t,c-k)
+ 
+    #### TODO! an assertion statement that makes sure that 
+    #### c+x/us == k + |PM|/up where M is the meeting point 
+    #### of the wavelets
 
-    assert np.linalg.norm((rotmat.dot(t_m) - np.asarray([1,0]))) <= 1e-6,\
-       "Rotation matrix did not work properly. t_m should get rotated\
-        onto [1,0] after this transformation"
-
-    p_shift  = p - s
-    p_rot    = rotmat.dot(p_shift)
-    [alpha, beta] = p_rot
-
-    # Solve quadratic equation as documented in main text
-    qroots = np.roots([ , , ])
-
-    assert 1==2, "Unimplemented error"
-    return tI, x
+    return c+x/us, x
 @| @}
 %{/python-mode}%
 
 
 
 %{python-mode}%
-@D Basic setup @{ 
+@d Basic setup @{ 
 sources             = [np.asarray(source) for source in sources] 
 targets             = [np.asarray(target) for target in targets] 
 
@@ -904,25 +887,24 @@ drone_speeds        = [ speed                for (_,    speed) in drone_info ]
 numpackages         = len(sources) 
 numdrones           = len(drone_info)
 
+# State variables that change during the main loop
 package_delivered_p = [ False for _ in range(numpackages) ] 
 drone_locked_p      = [ False for _ in range(numdrones)   ]
-
 drone_pool          = range(numdrones)
 remaining_packages  = range(numpackages)
 global_clock_time   = 0.0
-#.............................................................................
 drone_wavelets_info = [ [{'wavelet_center'        : posn,
                           'clock_time'            : 0.0,
                           'matched_package_ids'   : []}] 
                         for posn in drone_initposns ]
-
-def get_last_wavelet_of_drone(i):
-         return drone_wavelets_info[i][-1]
-#.............................................................................
 package_trail_info  = [ [{'current_position'   : source, 
                           'clock_time'         : 0.0,
                           'current_handler_id' : None }] 
                         for source in sources ]
+
+# Useful functions for extracting information from state variables above
+def get_last_wavelet_of_drone(i):
+         return drone_wavelets_info[i][-1]
 
 def get_current_position_of_package(i):
          return package_trail_info[i][-1]['current_position']
@@ -943,7 +925,6 @@ def dronelabel(idx):
 
 def packagelabel(idx):
     return 'package_' + str(idx)
-
 @| get_last_wavelet_of_drone, get_current_position_of_package, 
    get_current_speed_of_package, dronelabel, packagelabel @}
 %{/python-mode}%
@@ -995,6 +976,7 @@ built inside the code, one column at a time. }
 infty       = np.inf 
 G_mat       = np.full((len(remaining_packages),len(drone_pool)), infty)
 lbend_edges = []
+zerotol = 1e-7
 
 for didx in drone_pool:
     dlabel = dronelabel(didx)
@@ -1003,55 +985,63 @@ for didx in drone_pool:
         current_handler_of_package = get_current_handler_of_package(pidx)
 
         if current_handler_of_package != didx and not(drone_locked_p[didx]):
-
-                plabel = packagelabel(pidx)
-                target = targets[pidx]
- 
-                pkg  = get_current_position_of_package(pidx)
-                upkg = get_current_speed_of_package(pidx)
-    
-                wav  = get_last_wavelet_of_drone(didx)
-                dro  = wav['wavelet_center']
-                udro = drone_speeds[didx]
-                zerotol = 1e-7
+                plabel, target = packagelabel(pidx)                   , targets[pidx]
+                pkg   , upkg   = get_current_position_of_package(pidx), get_current_speed_of_package(pidx)
+                wav            = get_last_wavelet_of_drone(didx)
+                dro   , udro   = wav['wavelet_center']                , drone_speeds[didx]
 
                 if upkg < zerotol :
-                      G_mat[pidx, didx] = np.linalg.norm(pkg-dro)/udro +\
-                                          np.linalg.norm(target-pkg)/udro
-                      lbend_edges.append({'edge_pair': (pidx,didx), 
-                                          'y'        : np.linalg.norm(pkg-dro)/udro }) 
-
+                      @< Insert edge incident to stationary package and a drone @>                      
                 elif udro > upkg and abs(upkg-udro) > zerotol:
-
-                     time_to_target_solo = np.linalg.norm(target-pkg)/upkg
-                     tI, x  = get_interception_time_and_x_generalized(pkg, upkg, dro, udro, target, 
-                                                                     global_clock_time, wav['clock_time'])
-                     if x is not None: 
-                        assert tI is not None, "tI and x should be None or not None simultaneously"
-                        if tI < global_clock_time + time_to_target_solo:
-
-                          pthat             = (target-pkg)/np.linalg.norm(target-pkg)
-                          interception_pt   = pkg + x * pthat
-                          G_mat[pidx, didx] = tI + np.linalg.norm((target-interception_pt))/udro
-                          lbend_edges.append({'edge_pair': (pidx,didx), 
-                                               'y'       : np.linalg.norm(interception_pt-dro)/udro }) 
+                      @< Insert edge incident to a moving package and a faster unlocked drone  @>
 
         elif current_handler_of_package == didx and drone_locked_p[didx]:
-
                assert abs(udro-upkg) < zerotol , "udro should be equal to upkg"
                G_mat[pidx, didx] = np.linalg.norm((target-pkg))/udro
     
         elif current_handler_of_package != didx and drone_locked_p[didx]:
-               pass # drone locked, so it cant help
+               pass # drone locked, so it cant help, keep the edge weight infinite
         else : 
-               # The outer not negates the inner condition which 
-               # is true if this branch is executed
-               assert not(current_handler_of_package == didx and \
-                           not(drone_locked_p[didx])) ,\
-                       "This else branch should not be executed. This\
-                        means didx is handling a package and is NOT locked"
+               # The outer not negates the inner condition which is true if this branch is executed
+               assert not(current_handler_of_package == didx and not(drone_locked_p[didx])) ,\
+            "This else branch should not be executed. This means didx is handling a package and is NOT locked"
 @| @}
 %{/python-mode}%
+
+
+%{python-mode}%
+@d Insert edge incident to stationary package and a drone @{   
+G_mat[pidx, didx] = np.linalg.norm(pkg-dro)/udro +\
+                    np.linalg.norm(target-pkg)/udro
+lbend_edges.append({'edge_pair': (pidx,didx), 
+                    'y'        : np.linalg.norm(pkg-dro)/udro }) 
+@| @}
+%{/python-mode}%
+
+
+
+
+
+%{python-mode}%
+@d Insert edge incident to a moving package and a faster unlocked drone @{   
+time_to_target_solo = np.linalg.norm(target-pkg)/upkg
+tI, x  = get_interception_time_and_x_generalized(pkg, upkg, dro, udro, target, 
+                                                global_clock_time, wav['clock_time'])
+if x is not None: 
+   assert tI is not None, "tI and x should be None or not None simultaneously"
+   if tI < global_clock_time + time_to_target_solo:
+
+     pthat             = (target-pkg)/np.linalg.norm(target-pkg)
+     interception_pt   = pkg + x * pthat
+     G_mat[pidx, didx] = tI + np.linalg.norm((target-interception_pt))/udro
+     lbend_edges.append({'edge_pair': (pidx,didx), 
+                                               'y'       : np.linalg.norm(interception_pt-dro)/udro }) 
+@| @}
+%{/python-mode}%
+
+
+
+
 
 Since NetworkX does not have a native bottleneck matching solver, we use a minimum-weight matching solver
 already present in SciPy documented at \url{http://bit.ly/2MAWHPn}. 
@@ -1060,10 +1050,7 @@ already present in SciPy documented at \url{http://bit.ly/2MAWHPn}.
 @d Get a bottleneck matching on $G$ @{
 from scipy.optimize import linear_sum_assignment
 pkg_ind, dro_ind = linear_sum_assignment(G_mat)
-
-print "Lbend edges"
-print lbend_edges
-return 
+assert len(pkg_ind) == len(dro_ind), "Lengths of the index arrays should be the same"
 @| @}
 %{/python-mode}%
 
@@ -1078,9 +1065,6 @@ There are exactly two types of (mutually exclusive) events in this algorithm.
 To detect these, we keep track of a so-called list of ``$L$ bend'' edges as shown in the figure below 
 (see the variable \verb|lbend_edges| in the previous chunk that keeps track of this quantity).  
 
-
-
-
 \begin{figure}[H]
 \centering
 \includegraphics[width=18cm]{docs/lbend.pdf}
@@ -1093,27 +1077,113 @@ towards the target (left)}
 
 %{python-mode}%
 @d Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected @{   
-pass
+@< Classify edges according to whether they are straight edges or lbend edges @>
+@< Get lowest weight edge (with its weight denoted emin) in the computed matching @>
+@< Check if there is an lbend edge in the matching which has a $y\leq ewmin$. If so, find the one with the one with the lowest such $y$  @>
+
+if ymin > ewmin:  # TYPE I EVENT (package reaches target)
+
+    assert (pmin,dmin) not in [ d['edge_pair']  for d in lbend_edges_of_matching ], " "
+    time_till_event = ewmin
+    @< Process lbend edges in the matching for type \rnum{1} event @>
+    @< Process straight edges in the matching for type \rnum{1} event @>
+    
+else:# TYPE II EVENT (a wavelet corresponding to a drone not handling 
+     # a package reaches a package that might be stationary or being moved by another drone.)
+
+    assert (umin is not None and vmin is not None), ""
+    time_till_event = ymin
+    @< Process lbend edges in the matching for type \rnum{2} event @>
+    @< Process straight edges in the matching for type \rnum{2} event @>
+return
+@| @}
+%{/python-mode}%
+
+
+%{python-mode}%
+@d Classify edges according to whether they are straight edges or lbend edges  @{ 
+lbend_edges_of_matching    = [ d for d in lbend_edges if d['edge_pair'] in zip(pkg_ind, dro_ind) ] 
+straight_edges_of_matching = list(  set(zip(pkg_ind,dro_ind)).difference(\
+                                                set([d['edge_pair'] for d in lbend_edges_of_matching]))   )
+ 
+@| @}
+%{/python-mode}%
+
+
+%{python-mode}%
+@d  Get lowest weight edge (with its weight denoted emin) in the computed matching @{
+imin  = 0
+ewmin = np.inf
+for pidx, didx, i in zip(pkg_ind, dro_ind, range(len(pkg_ind))):
+    edgewt = G_mat[pidx, didx]
+    if edgewt < ewmin :
+          imin, ewmin  = i, edgewt
+          
+pmin, dmin = pkg_ind[imin], dro_ind[imin]
+  
+@| @}
+%{/python-mode}%
+
+
+
+%{python-mode}%
+@d Check if there is an lbend edge in the matching which has a $y\leq ewmin$. If so, find the one with the one with the lowest such $y$  @{   
+ymin       = np.inf
+umin, vmin = None, None
+
+for ledge in lbend_edges_of_matching:
+    (u,v) = ledge['edge_pair']
+    y     = ledge['y']
+    
+    if y < ymin:
+        ymin, umin, vmin = y, u, v
+@| @}
+%{/python-mode}%
+
+
+%{python-mode}%
+@d Process lbend edges in the matching for type \rnum{1} event @{   
+for ledge in lbend_edges_of_matching:
+    (u,v) = ledge['edge_pair']
+ 
+    
+    
+    
+
+@| @}
+%{/python-mode}%
+
+
+%{python-mode}%
+@d Process straight edges in the matching for type \rnum{1} event @{   
+for edge in straight_edges_of_matching:
+      pass
 @| @}
 %{/python-mode}%
 
 %{python-mode}%
-@d Update drone pool and package states @{   
-pass
+@d Process lbend edges in the matching for type \rnum{2} event @{   
+for edge in lbend_edges_of_matching:
+        pass
+
 @| @}
 %{/python-mode}%
 
 
 %{python-mode}%
-@d Run convex optimization solver to get improved tours for drones and packages @{   
-pass
+@d Process straight edges in the matching for type \rnum{2} event @{   
+for edge in straight_edges_of_matching:
+      pass
 @| @}
 %{/python-mode}%
 
 
 %{python-mode}%
 @d Plot movement of packages and drones if \verb|plot_tour_p == True | @{   
-pass
+fig, ax = plt.subplots()
+plot_tour_multiple_packages (fig0, ax0, "Multiple Package Handoff", sources, targets, drone_initposns, drone_speeds,
+          drone_wavelet_info, package_trail_info)
+
 @| @}
 %{/python-mode}%
 
@@ -1576,6 +1646,14 @@ class Multiple_PHO_Input:
           self.targets = []
 
 
+# distinct colors, obtained from https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/
+cols = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', 
+        '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', 
+        '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', 
+        '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080'] 
+
+
+numrobscanvas = 0
 
 def multiple_pho_run_handler():
     import random
@@ -1591,40 +1669,36 @@ def multiple_pho_run_handler():
                  newPoint = (event.xdata, event.ydata)
                  speed    = np.random.uniform() # float(raw_input('What speed do you want for the drone at '+str(newPoint)))
                  run.drone_info.append( (newPoint, speed) ) 
-                 patchSize  = (xlim[1]-xlim[0])/40.0
+                 patchSize  = (xlim[1]-xlim[0])/20.0
                  print Style.RESET_ALL
                  
+                 global numrobscanvas
                  ax.add_patch( mpl.patches.Circle( newPoint, radius = patchSize,
                                                    facecolor='#EBEBEB', edgecolor='black'  ))
 
-                 ax.text( newPoint[0], newPoint[1], "{:.2f}".format(speed), fontsize=10, 
+                 ax.text( newPoint[0], newPoint[1], "{:.2f}".format(speed) + "\n" + str(numrobscanvas) , fontsize=10, 
                           horizontalalignment='center', verticalalignment='center' )
 
+                 numrobscanvas += 1    
                  ax.set_title('Number of drones inserted: ' +\
                               str(len(run.drone_info)), fontdict={'fontsize':25})
                  
              elif event.button == 3:  
-                 # distinct colors, obtained from https://sashat.me/2017/01/11/list-of-20-simple-distinct-colors/
-                 cols = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', 
-                 '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', 
-                 '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', 
-                 '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080'] 
-
                  # Insert big colored circles representing the source and target points
 
-                 patchSize  = (xlim[1]-xlim[0])/50.0
+                 patchSize  = (xlim[1]-xlim[0])/30.0
                  if (len(run.sources) + len(run.targets)) % 2 == 0 : 
                         run.sources.append((event.xdata, event.ydata))
                         ax.add_patch( mpl.patches.Circle( run.sources[-1], radius = patchSize, 
                                                    facecolor= cols[len(run.sources) % len(cols)], edgecolor='black', lw=1.0 ))
-                        ax.text( run.sources[-1][0], run.sources[-1][1], 'S'+str(len(run.sources)), fontsize=15, 
+                        ax.text( run.sources[-1][0], run.sources[-1][1], 'S'+str(len(run.sources)-1), fontsize=15, 
                                  horizontalalignment='center', verticalalignment='center' )
 
                  else :
                       run.targets.append((event.xdata, event.ydata))
                       ax.add_patch( mpl.patches.Circle( run.targets[-1], radius = patchSize, 
                                                        facecolor= cols[len(run.sources)%len(cols)], edgecolor='black', lw=1.0 ))
-                      ax.text( run.targets[-1][0], run.targets[-1][1], 'T'+str(len(run.targets)), fontsize=15, 
+                      ax.text( run.targets[-1][0], run.targets[-1][1], 'T'+str(len(run.targets)-1), fontsize=15, 
                                horizontalalignment='center', verticalalignment='center' )
 
              # Clear polygon patches and set up last minute \verb|ax| tweaks
@@ -1666,6 +1740,9 @@ def multiple_pho_run_handler():
                     ax.set_yticks([])
                                      
                     fig.texts = []
+
+                    global numrobscanvas
+                    numrobscanvas = 0
                     fig.canvas.draw()
            return _keyPressHandler
     
@@ -1697,8 +1774,6 @@ def multiple_pho_run_handler():
     fig.canvas.mpl_connect('key_press_event', keyPress   )
     
     plt.show()
-
-
 
 @| @}
 %{/python-mode}%
@@ -1814,6 +1889,63 @@ def plot_tour(fig, ax, figtitle, source, target,
 
 
 
+
+%{python-mode}%
+@d Plotting @{   
+
+def plot_tour_multiple_packages (fig, ax, figtitle, sources, targets, 
+          drone_initposns, drone_speeds,
+          drone_wavelet_info, 
+          package_trail_info,
+          xlims = [0,1],
+          ylims = [0,1],
+          aspect_ratio=1.0,
+          speedfontsize=10,
+          speedmarkersize=20,
+          stmarkerfontsize=15,
+          stmarkersize=20):
+    
+    import matplotlib.ticker as ticker
+    ax.set_aspect(aspect_ratio)
+    ax.set_xlim(xlims)
+    ax.set_ylim(ylims)
+    plt.rc('font', family='serif')
+    ax.tick_params(which='both', top ='off', left='off',right='off', bottom ='off') 
+    
+    # Customize the major grid
+    ax.grid(which='major', linestyle='-', linewidth='0.1', color='red')
+    ax.grid(which='minor', linestyle=':', linewidth='0.1', color='black')
+
+    stpatchSize  = (xlim[1]-xlim[0])/40.0
+    drpatchSize  = 0.8 * stpatchSize
+
+    # Draw the source, target, and initial positions of the robots as bold dots
+    for source, target, stidx in zip(sources, targets, range(len(sources))):
+         xs,ys = extract_coordinates([source, target])
+         ax.plot(xs,ys, 'k--', alpha=0.6 ) # light line connecting source and target
+
+         ax.add_patch( mpl.patches.Circle( source, radius = stpatchSize, facecolor= cols[i], edgecolor='black', lw=1.0 ))
+         ax.add_patch( mpl.patches.Circle( target, radius = stpatchSize, facecolor= cols[i], edgecolor='black', lw=1.0 ))
+
+         ax.text(source[0], source[1], 'S'+str(stidx), fontsize =stmarkerfontsize, 
+                 horizontalalignment ='center', verticalalignment   ='center')
+
+         ax.text(target[0], target[1], 'T'+str(stidx), fontsize=stmarkerfontsize,\
+                 horizontalalignment ='center', verticalalignment   ='center')
+
+    # Draw speed labels on top of initial positions of the drones
+    for idx in range(len(drone_initposns)):
+         ax.add_patch( mpl.patches.Circle( source, radius = drpatchSize, facecolor = 'gray', edgecolor = 'gray', lw=1.0 ))
+
+         ax.text( drone_initposns[idx][0], drone_initposns[idx][1], format(drone_speeds[idx],'.2f'),
+                  fontsize = speedfontsize, horizontalalignment = 'center', verticalalignment   = 'center' )
+
+    # Plot the trails of the packages (one color correponding to each package as in cols)
+    # Plot the paths of the drones (all drone paths have the same color, make them thickish and transparent)
+@| @}
+%{/python-mode}%
+
+                 
 
 
 \end{appendices}

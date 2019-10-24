@@ -20,7 +20,5 @@ import time
 import utils_algo
 import utils_graphics
 
-
-
 if __name__=="__main__":
-     pho.single_pho_run_handler()
+     pho.multiple_pho_run_handler()
