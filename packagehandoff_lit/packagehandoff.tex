@@ -945,8 +945,11 @@ fleshed out in subsequent subsections.
 \mbox{}\verb@@\\
 \mbox{}\verb@     @\hbox{$\langle\,${\itshape Sanity checks on input for \verb|algo_matchmove|}\nobreak\ {\footnotesize \NWlink{nuweb14b}{14b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@     @\hbox{$\langle\,${\itshape Basic setup}\nobreak\ {\footnotesize \NWlink{nuweb17}{17}}$\,\rangle$}\verb@@\\
-\mbox{}\verb@    @\\
+\mbox{}\verb@     @\\
+\mbox{}\verb@     inum = 0@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@     while not all(package_delivered_p):@\\
+\mbox{}\verb@          print Fore.GREEN, "inum = ", inum, Style.RESET_ALL; inum += 1 @\\
 \mbox{}\verb@          @\hbox{$\langle\,${\itshape Construct bipartite graph $G$ on drone wavelets and package wavelets}\nobreak\ {\footnotesize \NWlink{nuweb19a}{19a}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@          @\hbox{$\langle\,${\itshape Get a bottleneck matching on $G$}\nobreak\ {\footnotesize \NWlink{nuweb20b}{20b}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@          @\hbox{$\langle\,${\itshape Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected}\nobreak\ {\footnotesize \NWlink{nuweb21a}{21a}}$\,\rangle$}\verb@@\\
@@ -1054,7 +1057,7 @@ main \texttt{while} loop of the algorithm.
 \label{fig:wavelet_dict}
 
 
-\item[D. \texttt{package\_trail\_info}]  is a list of list of dictionaries, similar to \verb|drone_wavelet_info|.  
+\item[D. \texttt{package\_trail\_info}]  is a list of list of dictionaries, similar to \verb|drone_wavelets_info|.  
      The \verb|i|\tss{th} element of the outer list corresponds to the trail of a package. In each trail (itself a list), we 
      record the positions of a package as well as the time on the clock $t$ at which that position was recorded. 
      We also note the id of the last drone known to have handled the package at time $t - \varepsilon$ for 
@@ -1189,7 +1192,7 @@ when the wavelets will meet.
  The \verb|get_wavelet_of_drone| function defined at the end of the above chunk is a convenience function 
  for returning the center of the last wavelet and the associated clock time recorded at that center
  for an arbitrary drone.  \textbf{Note:} The result of calling this function depends on the time at which it 
- is called because \verb|drone_wavelet_info| list is mutated during the main while loop.
+ is called because \verb|drone_wavelets_info| list is mutated during the main while loop.
 
 \subsubsection{Main Loop}
 \label{ssec:mainloopmatchmove}
@@ -1235,7 +1238,7 @@ built inside the code, one column at a time. }
 \vspace{-1ex}
 \begin{list}{}{} \item
 \mbox{}\verb@  @\\
-\mbox{}\verb@infty       = np.inf @\\
+\mbox{}\verb@infty       = 1e7 @\\
 \mbox{}\verb@G_mat       = np.full((len(remaining_packages),len(drone_pool)), infty)@\\
 \mbox{}\verb@lbend_edges = []@\\
 \mbox{}\verb@zerotol = 1e-7@\\
@@ -1257,16 +1260,20 @@ built inside the code, one column at a time. }
 \mbox{}\verb@                elif udro > upkg and abs(upkg-udro) > zerotol:@\\
 \mbox{}\verb@                      @\hbox{$\langle\,${\itshape Insert edge incident to a moving package and a faster unlocked drone}\nobreak\ {\footnotesize \NWlink{nuweb20a}{20a}}$\,\rangle$}\verb@@\\
 \mbox{}\verb@@\\
+\mbox{}\verb@        elif  ((current_handler_of_package is None)  or current_handler_of_package != didx)     and drone_locked_p[didx]:@\\
+\mbox{}\verb@               pass # drone locked, so it cant help, keep the edge weight infinite@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@        elif current_handler_of_package == didx and drone_locked_p[didx]:@\\
 \mbox{}\verb@               assert abs(udro-upkg) < zerotol , "udro should be equal to upkg"@\\
 \mbox{}\verb@               G_mat[pidx, didx] = np.linalg.norm((target-pkg))/udro@\\
-\mbox{}\verb@    @\\
-\mbox{}\verb@        elif  ((current_handler_of_package is None)  or current_handler_of_package != didx)     and drone_locked_p[didx]:@\\
-\mbox{}\verb@               pass # drone locked, so it cant help, keep the edge weight infinite@\\
 \mbox{}\verb@        else : @\\
-\mbox{}\verb@               # The outer not negates the inner condition which is true if this branch is executed@\\
-\mbox{}\verb@               assert not(current_handler_of_package == didx and not(drone_locked_p[didx])) ,\@\\
-\mbox{}\verb@            "This else branch should not be executed. This means didx is handling a package and is NOT locked"@\\
+\mbox{}\verb@               print didx, current_handler_of_package, drone_locked_p[didx]@\\
+\mbox{}\verb@               assert not(current_handler_of_package == didx and not(drone_locked_p[didx])),\@\\
+\mbox{}\verb@                  "This else branch should not be executed. This means didx is handling a package and is NOT locked"@\\
+\mbox{}\verb@               drone_locked_p[didx]= True #### tmp hacky fix@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@print G_mat@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -1667,8 +1674,8 @@ No packages are delivered along lbend edges during a type 1 event.
 \begin{list}{}{} \item
 \mbox{}\verb@@\\
 \mbox{}\verb@fig, ax = plt.subplots()@\\
-\mbox{}\verb@plot_tour_multiple_packages (fig0, ax0, "Multiple Package Handoff", @\\
-\mbox{}\verb@          sources, targets, drone_initposns, drone_speeds, drone_wavelet_info, package_trail_info)@\\
+\mbox{}\verb@plot_tour_multiple_packages (fig, ax, "Multiple Package Handoff", @\\
+\mbox{}\verb@          sources, targets, drone_initposns, drone_speeds, drone_wavelets_info, package_trail_info)@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}
@@ -2459,7 +2466,7 @@ An example output from the \verb|plot_tour| function is shown below.
 \mbox{}\verb@@\\
 \mbox{}\verb@def plot_tour_multiple_packages (fig, ax, figtitle, sources, targets, @\\
 \mbox{}\verb@          drone_initposns, drone_speeds,@\\
-\mbox{}\verb@          drone_wavelet_info, @\\
+\mbox{}\verb@          drone_wavelets_info, @\\
 \mbox{}\verb@          package_trail_info,@\\
 \mbox{}\verb@          xlims = [0,1],@\\
 \mbox{}\verb@          ylims = [0,1],@\\
@@ -2481,15 +2488,15 @@ An example output from the \verb|plot_tour| function is shown below.
 \mbox{}\verb@    ax.grid(which='minor', linestyle=':', linewidth='0.1', color='black')@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    stpatchSize  = (xlim[1]-xlim[0])/40.0@\\
-\mbox{}\verb@    drpatchSize  = 0.8 * stpatchSize@\\
+\mbox{}\verb@    drpatchSize  = 1.0 * stpatchSize@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Draw the source, target, and initial positions of the robots as bold dots@\\
 \mbox{}\verb@    for source, target, stidx in zip(sources, targets, range(len(sources))):@\\
 \mbox{}\verb@         xs,ys = extract_coordinates([source, target])@\\
-\mbox{}\verb@         ax.plot(xs,ys, 'k--', alpha=0.6 ) # light line connecting source and target@\\
+\mbox{}\verb@         ax.plot(xs,ys, 'k--', alpha=0.3 ) # light line connecting source and target@\\
 \mbox{}\verb@@\\
-\mbox{}\verb@         ax.add_patch( mpl.patches.Circle( source, radius = stpatchSize, facecolor= cols[i], edgecolor='black', lw=1.0 ))@\\
-\mbox{}\verb@         ax.add_patch( mpl.patches.Circle( target, radius = stpatchSize, facecolor= cols[i], edgecolor='black', lw=1.0 ))@\\
+\mbox{}\verb@         ax.add_patch( mpl.patches.Circle( source, radius = stpatchSize, facecolor= cols[stidx], edgecolor='black', lw=1.0, **{'alpha': 0.4}  ))@\\
+\mbox{}\verb@         ax.add_patch( mpl.patches.Circle( target, radius = stpatchSize, facecolor= cols[stidx], edgecolor='black', lw=1.0, **{'alpha': 0.4} ))@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@         ax.text(source[0], source[1], 'S'+str(stidx), fontsize =stmarkerfontsize, @\\
 \mbox{}\verb@                 horizontalalignment ='center', verticalalignment   ='center')@\\
@@ -2499,13 +2506,29 @@ An example output from the \verb|plot_tour| function is shown below.
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Draw speed labels on top of initial positions of the drones@\\
 \mbox{}\verb@    for idx in range(len(drone_initposns)):@\\
-\mbox{}\verb@         ax.add_patch( mpl.patches.Circle( source, radius = drpatchSize, facecolor = 'gray', edgecolor = 'gray', lw=1.0 ))@\\
+\mbox{}\verb@         ax.add_patch( mpl.patches.Circle( (drone_initposns[idx][0], drone_initposns[idx][1]), @\\
+\mbox{}\verb@                                           radius = drpatchSize, facecolor = 'gray', edgecolor = 'gray', lw=1.0,\@\\
+\mbox{}\verb@                                          **{'alpha': 0.4} ))@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@         ax.text( drone_initposns[idx][0], drone_initposns[idx][1], format(drone_speeds[idx],'.2f'),@\\
 \mbox{}\verb@                  fontsize = speedfontsize, horizontalalignment = 'center', verticalalignment   = 'center' )@\\
 \mbox{}\verb@@\\
 \mbox{}\verb@    # Plot the trails of the packages (one color correponding to each package as in cols)@\\
+\mbox{}\verb@    for trail in package_trail_info:@\\
+\mbox{}\verb@         xs, ys = extract_coordinates([d['current_position'] for d in trail])@\\
+\mbox{}\verb@         print Fore.CYAN, "Printing Trail for package ", Style.RESET_ALL@\\
+\mbox{}\verb@         utils_algo.print_list(zip(xs,ys))@\\
+\mbox{}\verb@         plt.plot(xs,ys,'ro-')@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@@\\
 \mbox{}\verb@    # Plot the paths of the drones (all drone paths have the same color, make them thickish and transparent)@\\
+\mbox{}\verb@    for dpath in drone_wavelets_info:@\\
+\mbox{}\verb@         xs, ys = extract_coordinates([ d['wavelet_center'] for d in dpath ])            @\\
+\mbox{}\verb@         print Fore.YELLOW, "Printing path of drone ", Style.RESET_ALL@\\
+\mbox{}\verb@         utils_algo.print_list(zip(xs,ys))@\\
+\mbox{}\verb@         plt.plot(xs,ys,'o-')@\\
+\mbox{}\verb@@\\
+\mbox{}\verb@    plt.show()@\\
 \mbox{}\verb@@{\NWsep}
 \end{list}
 \vspace{-1.5ex}

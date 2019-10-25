@@ -78,3 +78,9 @@ def write_to_yaml_file(data, dir_name, file_name):
    import yaml
    with open(dir_name + '/' + file_name, 'w') as outfile:
      yaml.dump( data, outfile, default_flow_style = False)
+
+
+
+def normalize(vec):
+    vec = np.asarray(vec)
+    return vec/np.linalg.norm(vec)
