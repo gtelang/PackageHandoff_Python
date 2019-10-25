@@ -289,11 +289,14 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
      def packagelabel(idx):
          return 'package_' + str(idx)
      
-    
+     
+     inum = 0
+
      while not all(package_delivered_p):
+          print Fore.GREEN, "inum = ", inum, Style.RESET_ALL; inum += 1 
           # Construct bipartite graph $G$ on drone wavelets and package wavelets
             
-          infty       = np.inf 
+          infty       = 1e7 
           G_mat       = np.full((len(remaining_packages),len(drone_pool)), infty)
           lbend_edges = []
           zerotol = 1e-7
@@ -304,7 +307,7 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
               for pidx in remaining_packages: 
                   current_handler_of_package = get_current_handler_of_package(pidx)
 
-                  if current_handler_of_package != didx and not(drone_locked_p[didx]):
+                  if  ((current_handler_of_package is None)  or current_handler_of_package != didx) and not(drone_locked_p[didx]):
                           plabel, target = packagelabel(pidx)                   , targets[pidx]
                           pkg   , upkg   = get_current_position_of_package(pidx), get_current_speed_of_package(pidx)
                           wav            = get_last_wavelet_of_drone(didx)
@@ -335,16 +338,20 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                                                          'y'       : np.linalg.norm(interception_pt-dro)/udro }) 
                                 
 
-                  elif current_handler_of_package == didx and drone_locked_p[didx]:
-                         assert abs(udro-upkg) < zerotol , "udro should be equal to upkg"
-                         G_mat[pidx, didx] = np.linalg.norm((target-pkg))/udro
-              
-                  elif current_handler_of_package != didx and drone_locked_p[didx]:
+                  elif  ((current_handler_of_package is None)  or current_handler_of_package != didx)     and drone_locked_p[didx]:
                          pass # drone locked, so it cant help, keep the edge weight infinite
+
+                  elif current_handler_of_package == didx and drone_locked_p[didx]:
+                         #assert abs(udro-upkg) < zerotol , "udro should be equal to upkg"
+                         G_mat[pidx, didx] = np.linalg.norm((target-pkg))/udro
                   else : 
-                         # The outer not negates the inner condition which is true if this branch is executed
-                         assert not(current_handler_of_package == didx and not(drone_locked_p[didx])) ,\
-                      "This else branch should not be executed. This means didx is handling a package and is NOT locked"
+                         print didx, current_handler_of_package, drone_locked_p[didx]
+                         #assert not(current_handler_of_package == didx and not(drone_locked_p[didx])),\
+                         #   "This else branch should not be executed. This means didx is handling a package and is NOT locked"
+                         drone_locked_p[didx]= True #### tmp hacky fix
+
+          print G_mat
+
           
           # Get a bottleneck matching on $G$
           
@@ -359,7 +366,6 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
           lbend_edges_of_matching    = [ d for d in lbend_edges if d['edge_pair'] in zip(pkg_ind, dro_ind) ] 
           straight_edges_of_matching = list(  set(zip(pkg_ind,dro_ind)).difference(\
                                                           set([d['edge_pair'] for d in lbend_edges_of_matching]))   )
-           
           
           # Get lowest weight edge (with its weight denoted emin) in the computed matching
 
@@ -371,7 +377,6 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                     imin, ewmin  = i, edgewt
                     
           pmin, dmin = pkg_ind[imin], dro_ind[imin]
-            
           
           # Check if there is an lbend edge in the matching which has a $y\leq ewmin$. If so, find the one with the one with the lowest such $y$
              
@@ -392,60 +397,90 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
               time_till_event    = ewmin
               global_clock_time += time_till_event
 
-              package_delivered_p[pmin] = True
-              drone_locked_p[dmin]      = False
-
-              remaining_packages.remove(pmin)
-              drone_pool.remove(dmin)
-
               # Process lbend edges in the matching for type \rnum{1} event
                  
-
               for ledge in lbend_edges_of_matching:
                   (pl,dl) = ledge['edge_pair']
                   wav     = get_last_wavelet_of_drone(dl)     
                   wav['matched_package_ids'].append(pl)
-                  
               
               # Process straight edges in the matching for type \rnum{1} event
                  
+              package_delivered_p[pmin] = True
+              drone_locked_p[dmin]      = False
+              remaining_packages.remove(pmin)
+              drone_pool.remove(dmin)
+
               for sedge in straight_edges_of_matching:
                     (ps, ds) = sedge
-                    assert abs(get_current_speed_of_package(ps) - drone_speeds[ds]) < zerotol , "speeds should match"
+                    #assert abs(get_current_speed_of_package(ps) - drone_speeds[ds]) < zerotol , "speeds should match"
                     
                     package_trail_info[ps].append({'current_position'  : get_current_position_of_package(ps) +\
-                                                                          time_till_event * drone_speeds[ds],
-                                                   'clock_time'        : global_clock_time, # has already been updated
+                                                                          time_till_event * get_current_speed_of_package(ps),\
+                                                   'clock_time'        : global_clock_time,\
                                                    'current_handler_id': ds}) 
                     wav = get_last_wavelet_of_drone(ds)     
                     wav['matched_package_ids'].append(ps)
               
               
           else:# TYPE II EVENT (a wavelet corresponding to a drone not handling 
-               # a package reaches a package that might be stationary or being moved by another drone.)
+               # a package reaches a package that might be stationary or being 
+               # moved by another drone.)
 
               assert (plmin is not None and dlmin is not None), ""
-              time_till_event = ymin
+              time_till_event    = ymin
+              global_clock_time += time_till_event
+
               # Process lbend edges in the matching for type \rnum{2} event
                  
-              for edge in lbend_edges_of_matching:
-                      pass
+              for ledge in lbend_edges_of_matching:
+                  (pl,dl) = ledge['edge_pair']
+                  
+                  newposn = get_current_position_of_package(pl) + time_till_event * get_current_speed_of_package(pl)
+                  package_trail_info[pl].append({'current_position'   : newposn,\
+                                                  'clock_time'        : global_clock_time, \
+                                                  'current_handler_id': get_current_handler_of_package(pl)   }) 
+                  
+                  wav     = get_last_wavelet_of_drone(dl)     
+                  wav['matched_package_ids'].append(pl)
+
+                  if pl == plmin and dl == dlmin:
+
+                        if get_current_handler_of_package(plmin) is not None:         
+                            drone_locked_p[ get_current_handler_of_package(plmin)  ] = False
+                            drone_locked_p[dlmin]                                    = True 
+                            drone_pool.remove(get_current_handler_of_package(plmin))
+
+                        package_trail_info[pl][-1]['current_handler_id'] = dlmin
+
+                        drone_wavelets_info[dlmin].append( {'wavelet_center'      : newposn,\
+                                                            'clock_time'          : global_clock_time,\
+                                                            'matched_package_ids' : []}) 
+
               
               # Process straight edges in the matching for type \rnum{2} event
                  
-              for edge in straight_edges_of_matching:
-                    pass
+              for sedge in straight_edges_of_matching:
+                    (ps,ds) = sedge
+                   
+                    assert (ps != plmin and ds != dlmin), ""
+                    package_trail_info[ps].append({'current_position'  : get_current_position_of_package(ps) +\
+                                                                            time_till_event * get_current_speed_of_package(ps),\
+                                                   'clock_time'        : global_clock_time,\
+                                                   'current_handler_id': get_current_handler_of_package(ps)   }) 
+                    wav = get_last_wavelet_of_drone(ds)     
+                    wav['matched_package_ids'].append(ps)
               
-          return
+
           
 
      # Plot movement of packages and drones if \verb|plot_tour_p == True |
-        
+     
      fig, ax = plt.subplots()
-     plot_tour_multiple_packages (fig0, ax0, "Multiple Package Handoff", sources, targets, drone_initposns, drone_speeds,
-               drone_wavelet_info, package_trail_info)
-
+     plot_tour_multiple_packages (fig, ax, "Multiple Package Handoff", 
+               sources, targets, drone_initposns, drone_speeds, drone_wavelets_info, package_trail_info)
       
+     return 
      #return pass pass pass pass pass 
  
 def get_interception_time_and_x_generalized(s, us, p, up, t, c, k) :
@@ -902,7 +937,7 @@ def plot_tour(fig, ax, figtitle, source, target,
 
 def plot_tour_multiple_packages (fig, ax, figtitle, sources, targets, 
           drone_initposns, drone_speeds,
-          drone_wavelet_info, 
+          drone_wavelets_info, 
           package_trail_info,
           xlims = [0,1],
           ylims = [0,1],
@@ -924,15 +959,15 @@ def plot_tour_multiple_packages (fig, ax, figtitle, sources, targets,
     ax.grid(which='minor', linestyle=':', linewidth='0.1', color='black')
 
     stpatchSize  = (xlim[1]-xlim[0])/40.0
-    drpatchSize  = 0.8 * stpatchSize
+    drpatchSize  = 1.0 * stpatchSize
 
     # Draw the source, target, and initial positions of the robots as bold dots
     for source, target, stidx in zip(sources, targets, range(len(sources))):
          xs,ys = extract_coordinates([source, target])
-         ax.plot(xs,ys, 'k--', alpha=0.6 ) # light line connecting source and target
+         ax.plot(xs,ys, 'k--', alpha=0.3 ) # light line connecting source and target
 
-         ax.add_patch( mpl.patches.Circle( source, radius = stpatchSize, facecolor= cols[i], edgecolor='black', lw=1.0 ))
-         ax.add_patch( mpl.patches.Circle( target, radius = stpatchSize, facecolor= cols[i], edgecolor='black', lw=1.0 ))
+         ax.add_patch( mpl.patches.Circle( source, radius = stpatchSize, facecolor= cols[stidx], edgecolor='black', lw=1.0, **{'alpha': 0.4}  ))
+         ax.add_patch( mpl.patches.Circle( target, radius = stpatchSize, facecolor= cols[stidx], edgecolor='black', lw=1.0, **{'alpha': 0.4} ))
 
          ax.text(source[0], source[1], 'S'+str(stidx), fontsize =stmarkerfontsize, 
                  horizontalalignment ='center', verticalalignment   ='center')
@@ -942,11 +977,27 @@ def plot_tour_multiple_packages (fig, ax, figtitle, sources, targets,
 
     # Draw speed labels on top of initial positions of the drones
     for idx in range(len(drone_initposns)):
-         ax.add_patch( mpl.patches.Circle( source, radius = drpatchSize, facecolor = 'gray', edgecolor = 'gray', lw=1.0 ))
+         ax.add_patch( mpl.patches.Circle( (drone_initposns[idx][0], drone_initposns[idx][1]), 
+                                           radius = drpatchSize, facecolor = 'gray', edgecolor = 'gray', lw=1.0,\
+                                          **{'alpha': 0.4} ))
 
          ax.text( drone_initposns[idx][0], drone_initposns[idx][1], format(drone_speeds[idx],'.2f'),
                   fontsize = speedfontsize, horizontalalignment = 'center', verticalalignment   = 'center' )
 
     # Plot the trails of the packages (one color correponding to each package as in cols)
+    for trail in package_trail_info:
+         xs, ys = extract_coordinates([d['current_position'] for d in trail])
+         print Fore.CYAN, "Printing Trail for package ", Style.RESET_ALL
+         utils_algo.print_list(zip(xs,ys))
+         plt.plot(xs,ys,'ro-')
+
+
     # Plot the paths of the drones (all drone paths have the same color, make them thickish and transparent)
+    for dpath in drone_wavelets_info:
+         xs, ys = extract_coordinates([ d['wavelet_center'] for d in dpath ])            
+         print Fore.YELLOW, "Printing path of drone ", Style.RESET_ALL
+         utils_algo.print_list(zip(xs,ys))
+         plt.plot(xs,ys,'o-')
+
+    plt.show()
 
