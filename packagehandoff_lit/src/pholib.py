@@ -374,11 +374,9 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                          assert not(current_handler_of_package == didx and not(drone_locked_p[D[didx]])),\
                             "This else branch should not be executed. This means didx is handling a package and is NOT locked"
 
-
-          print G_mat               
-
+          print "G_mat\n ", G_mat
+                         
           # Get a bottleneck matching on $G$
-          
           from scipy.optimize import linear_sum_assignment
           pkg_ind, dro_ind = linear_sum_assignment(G_mat)
           assert len(pkg_ind) == len(dro_ind), "Lengths of the index arrays should be the same"
@@ -401,7 +399,8 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                     
           pmin, dmin = pkg_ind[imin], dro_ind[imin]
           
-          # Check if there is an lbend edge in the matching which has a $y\leq ewmin$. If so, find the one with the one with the lowest such $y$
+          # Check if there is an lbend edge in the matching which has a $y\leq ewmin$. If so, 
+          # find the one with the one with the lowest such $y$
           ymin         = np.inf
           plmin, dlmin = None, None
 
@@ -411,10 +410,50 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
               
               if y < ymin:
                   ymin, plmin, dlmin = y, pl, dl
-          
+ 
+          #-----------------------------------------------------------------------------------------------------------------        
+          # Find the least time it takes for a non-matched drone (if one exists at this point) to reach some package.
+          # such a non-matched package can only aid in the delivery time.
+          non_matched_drones = list(set(range(len(drone_pool))).difference(set([ ID(d) for d in range(len(dro_ind))])))
+          nonm_tmin = np.inf
+          nonm_dmin = None
+          nonm_pmin = None
+          if non_matched_drones:
+              for d in non_matched_drones:
+                  wav = get_last_wavelet_of_drone(d)
+                  # get drone speed
+                  pass
+                  # get point of wavelet expansion
+                  pass
+                  # get the time when wavelet started expanding from there
+                  pass
+                  for p in remaining_packages:
+                      # get package speed
+                      pass
+                      # get its current location
+                      pass
+                      tI, _ = get_interception_time_and_x_generalized(pass)
+                      if tI < nonm_tmin:
+                          nonm_tmin = tI
+                          nonm_dmin = d
+                          nonm_pmin = p
+          #-----------------------------------------------------------------------------------------------------------------        
 
-          if ymin > ewmin:  # TYPE I EVENT (package reaches target)
-              assert (pmin,dmin) not in [ d['edge_pair']  for d in lbend_edges_of_matching ], " "
+          if nonm_tmin < min(ymin,ewmin):                # TYPE 0 EVENT (a non-matched drone catches upto a package)  
+              print "TYPE 0 event detected"
+              assert nonm_dmin is not None and nonm_tmin is not None, ""
+              if  : # update the state of the drone only if the drone reaches 
+                  
+                  pass
+                  
+
+          sys.exit() 
+              
+          #-----------------------------------------------------------------------------------------------------------------        
+
+          elif ewmin < min (ymin, nonm_tmin):  # TYPE I EVENT (package reaches target)
+              print "TYPE I event detected"
+              #assert (pmin,dmin) not in [ d['edge_pair']  for d in lbend_edges_of_matching ], " "
               time_till_event    = ewmin
               global_clock_time += time_till_event
 
@@ -448,13 +487,16 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
           else:# TYPE II EVENT (a wavelet corresponding to a drone not handling 
                # a package reaches a package that might be stationary or being 
                # moved by another drone.)
-
-              assert (plmin is not None and dlmin is not None), ""
+              print "Type II event detected"
+              #assert (plmin is not None and dlmin is not None), ""
+              assert ymin < min(ewmin, nonm_tmin), ""
               time_till_event    = ymin
               global_clock_time += time_till_event
 
               # Process lbend edges in the matching for type \rnum{2} event
-                 
+              print "lbend edges of matching ", lbend_edges_of_matching
+              print "straight edges of matching ", straight_edges_of_matching
+
               for ledge in lbend_edges_of_matching:
                   (pl,dl) = ledge['edge_pair']
                   
