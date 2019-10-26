@@ -428,14 +428,15 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
 
                     for p in remaining_packages:
                         packspeed = get_current_speed_of_package(p)
-                        packloc   = get_current_position_of_package(p)
-                        tI, _     = get_interception_time_and_x_generalized(packloc, packspeed, 
-                                                                            wavcen, drspeed,
-                                                                            targets[p], global_clock_time, expstarttime)
-                        if tI < nonm_tmin:
-                            nonm_tmin = tI
-                            nonm_dmin = d
-                            nonm_pmin = p
+                        if packspeed < drspeed: # handoffs only happen to faster guys
+                             packloc   = get_current_position_of_package(p)
+                             tI, _     = get_interception_time_and_x_generalized(packloc, packspeed, 
+                                                                                 wavcen, drspeed,
+                                                                                 targets[p], global_clock_time, expstarttime)
+                             if tI < nonm_tmin:
+                                 nonm_tmin = tI
+                                 nonm_dmin = d
+                                 nonm_pmin = p
 
           #print Fore.CYAN, "non-matched drones are ", non_matched_drones, Style.RESET_ALL
           print Fore.CYAN, "nonm_tmin: ", nonm_tmin, " ymin: ", ymin, " ewmin: ", ewmin, Style.RESET_ALL
