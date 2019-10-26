@@ -374,7 +374,7 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                          assert not(current_handler_of_package == didx and not(drone_locked_p[D[didx]])),\
                             "This else branch should not be executed. This means didx is handling a package and is NOT locked"
 
-          print "G_mat\n ", G_mat
+          #print "G_mat\n ", G_mat
                          
           # Get a bottleneck matching on $G$
           from scipy.optimize import linear_sum_assignment
@@ -414,44 +414,71 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
           #-----------------------------------------------------------------------------------------------------------------        
           # Find the least time it takes for a non-matched drone (if one exists at this point) to reach some package.
           # such a non-matched package can only aid in the delivery time.
-          non_matched_drones = list(set(range(len(drone_pool))).difference(set([ ID(d) for d in range(len(dro_ind))])))
-          nonm_tmin = np.inf
-          nonm_dmin = None
-          nonm_pmin = None
+          non_matched_drones = list(set(drone_pool).difference(set([D[d] for d in dro_ind])))
+          nonm_tmin          = np.inf
+          nonm_dmin          = None
+          nonm_pmin          = None
           if non_matched_drones:
-              for d in non_matched_drones:
-                  wav = get_last_wavelet_of_drone(d)
-                  # get drone speed
-                  pass
-                  # get point of wavelet expansion
-                  pass
-                  # get the time when wavelet started expanding from there
-                  pass
-                  for p in remaining_packages:
-                      # get package speed
-                      pass
-                      # get its current location
-                      pass
-                      tI, _ = get_interception_time_and_x_generalized(pass)
-                      if tI < nonm_tmin:
-                          nonm_tmin = tI
-                          nonm_dmin = d
-                          nonm_pmin = p
+               for d in non_matched_drones:
+                  if drone_locked_p[d] == False: # only look at unlocked non-matched drones 
+                    wav     = get_last_wavelet_of_drone(d)
+                    drspeed = drone_speeds[d]
+                    wavcen  = wav['wavelet_center']
+                    expstarttime = wav['clock_time'] 
+
+                    for p in remaining_packages:
+                        packspeed = get_current_speed_of_package(p)
+                        packloc   = get_current_position_of_package(p)
+                        tI, _     = get_interception_time_and_x_generalized(packloc, packspeed, 
+                                                                            wavcen, drspeed,
+                                                                            targets[p], global_clock_time, expstarttime)
+                        if tI < nonm_tmin:
+                            nonm_tmin = tI
+                            nonm_dmin = d
+                            nonm_pmin = p
+
+          #print Fore.CYAN, "non-matched drones are ", non_matched_drones, Style.RESET_ALL
+          print Fore.CYAN, "nonm_tmin: ", nonm_tmin, " ymin: ", ymin, " ewmin: ", ewmin, Style.RESET_ALL
           #-----------------------------------------------------------------------------------------------------------------        
+          if nonm_tmin < min(ymin, ewmin) : # TYPE 0 EVENT (some nonmatched drone reaches package)
+               print "TYPE 0 event detected"
+               assert nonm_tmin >= global_clock_time, ""
+               assert drone_locked_p[nonm_dmin] == False, ""
+               time_till_event    = nonm_tmin - global_clock_time
+               global_clock_time += time_till_event
+               
+               # update the states of all the packages
+               for p in remaining_packages:
 
-          if nonm_tmin < min(ymin,ewmin):                # TYPE 0 EVENT (a non-matched drone catches upto a package)  
-              print "TYPE 0 event detected"
-              assert nonm_dmin is not None and nonm_tmin is not None, ""
-              if  : # update the state of the drone only if the drone reaches 
-                  
-                  pass
-                  
+                    sthat   = normalize(targets[p]-sources[p])
+                    newposn = get_current_position_of_package(p) + time_till_event * get_current_speed_of_package(p)*sthat
 
-          sys.exit() 
+                    if p != nonm_pmin:
+                          old_handler = get_current_handler_of_package(p)
+                          new_handler = old_handler
+                    else :
+                          print "old_handler: ",  
+                          old_handler                 = get_current_handler_of_package(p)
+                          new_handler                 = nonm_dmin
+                          drone_locked_p[new_handler] = True
+
+                          if old_handler is not None:
+                              drone_pool.remove(old_handler)
+
+                          drone_wavelets_info[new_handler].append( {'wavelet_center'      : newposn,          \
+                                                                    'clock_time'          : global_clock_time,\
+                                                                    'matched_package_ids' : []}) 
+
+
+                    package_trail_info[p].append({'current_position'  : newposn,\
+                                                  'clock_time'        : global_clock_time,\
+                                                  'current_handler_id': new_handler}) 
+
+               
+
               
           #-----------------------------------------------------------------------------------------------------------------        
-
-          elif ewmin < min (ymin, nonm_tmin):  # TYPE I EVENT (package reaches target)
+          elif ewmin < ymin:  # TYPE I EVENT (package reaches target)
               print "TYPE I event detected"
               #assert (pmin,dmin) not in [ d['edge_pair']  for d in lbend_edges_of_matching ], " "
               time_till_event    = ewmin
@@ -489,7 +516,7 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                # moved by another drone.)
               print "Type II event detected"
               #assert (plmin is not None and dlmin is not None), ""
-              assert ymin < min(ewmin, nonm_tmin), ""
+              assert ymin < ewmin, ""
               time_till_event    = ymin
               global_clock_time += time_till_event
 
@@ -517,21 +544,19 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
 
                         drone_locked_p[D[dlmin]] = True 
                         package_trail_info[P[pl]][-1]['current_handler_id'] = D[dlmin]
-                        drone_wavelets_info[D[dlmin]].append( {'wavelet_center'   : newposn,\
-                                                            'clock_time'          : global_clock_time,\
-                                                            'matched_package_ids' : []}) 
-
+                        drone_wavelets_info[D[dlmin]].append( {'wavelet_center'      : newposn,          \
+                                                               'clock_time'          : global_clock_time,\
+                                                               'matched_package_ids' : []}) 
               
               # Process straight edges in the matching for type \rnum{2} event
-                 
               for sedge in straight_edges_of_matching:
                     (ps,ds) = sedge
                     assert (ps != plmin and ds != dlmin), ""
                     sthat   = normalize(targets[P[ps]]-sources[P[ps]])
                     package_trail_info[P[ps]].append({'current_position'  : get_current_position_of_package(P[ps]) +\
                                                                             time_till_event * get_current_speed_of_package(P[ps]) * sthat,\
-                                                   'clock_time'        : global_clock_time,\
-                                                   'current_handler_id': get_current_handler_of_package(P[ps])   }) 
+                                                      'clock_time'        : global_clock_time,\
+                                                      'current_handler_id': get_current_handler_of_package(P[ps])   }) 
                     wav = get_last_wavelet_of_drone(D[ds])     
                     wav['matched_package_ids'].append(P[ps])
               
@@ -549,6 +574,16 @@ def get_interception_time_and_x_generalized(s, us, p, up, t, c, k) :
 
     assert c-k>=0 , "c, global clock time should be greater than k,\
                     time when wavelet started expanding"
+
+    zerotol = 1e-7
+    if us < zerotol:
+        l = np.linalg.norm(s-p)
+        r = (c-k) * up
+        if l >= r:
+            return c + (l-r)/up, 0.0
+        else:
+            return c, np.inf
+
 
     _ , x = get_interception_time_and_x(s,us,p,up,t,c-k)
  
