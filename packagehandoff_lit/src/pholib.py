@@ -194,13 +194,20 @@ def get_interception_time_and_x(s, us, p, up, t, t0) :
            x = root
            break
 
-    print Fore.RED, "Input:", s, us, p, up, t, t0 , Style.RESET_ALL
-    print Fore.RED, "Qroots: ",  qroots, Style.RESET_ALL
-    print Fore.RED, x/us+t0, np.sqrt((x-alpha)**2 + beta**2)/up, Style.RESET_ALL
-    assert abs(x/us+t0 - np.sqrt((x-alpha)**2 + beta**2)/up) <= 1e-6 , \
-           "Quadratic not solved perfectly"
 
-    tI = x/us + t0
+    #print Fore.GREEN, "speed of package: ", us
+    #print Fore.GREEN, "wavelet center: ", p_rot , " wavelet speed: ", up, " t0: ", t0 
+
+
+    #print Fore.RED, "Input:", s, us, p, up, t, t0 , Style.RESET_ALL
+    #print Fore.RED, "Qroots: ",  qroots, Style.RESET_ALL
+    #print Fore.RED, x/us+t0, np.sqrt((x-alpha)**2 + beta**2)/up, Style.RESET_ALL
+    if x is not None:
+          assert abs(x/us+t0 - np.sqrt((x-alpha)**2 + beta**2)/up) <= 1e-6 , "Quadratic not solved perfectly"
+          tI = x/us + t0
+    else:
+          tI = np.inf
+    
     return tI, x
 
 def time_of_travel(start, stop, speed):
@@ -309,7 +316,12 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                          "  wavelet_center: "     , wav['wavelet_center'],\
                          "  matched_package_ids: ", wav['matched_package_ids']    
 
-     
+ 
+          # put an assert which says that the drones handling the packages are all distinct and don't intersect
+          # TODO!!!!!!!!!!!!!!!!!!!!
+
+
+    
           print Style.RESET_ALL
           print "Remaining Packages:", remaining_packages
           print  "Drone Pool        :", drone_pool
@@ -331,6 +343,11 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
 
           for didx in range(len(drone_pool)):
               for pidx in range(len(remaining_packages)): 
+                  print "==========>", Fore.YELLOW ,\
+                         "\npidx                                   : ", pidx,\
+                         "\nP                                      : ", P,\
+                         "\nget_current_handler_pf_pacakge(P[pidx]): ", get_current_handler_of_package(P[pidx]) ,\
+                         "\nID                                     : ", ID, Style.RESET_ALL
                   current_handler_of_package = ID[get_current_handler_of_package(P[pidx])] if get_current_handler_of_package(P[pidx]) is not None else None
                   target                     = targets[P[pidx]]
                   pkg   , upkg               = get_current_position_of_package(P[pidx]), get_current_speed_of_package(P[pidx])
@@ -434,7 +451,7 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                                                                                  wavcen, drspeed,
                                                                                  targets[p], global_clock_time, expstarttime)
                              if tI < nonm_tmin:
-                                 nonm_tmin = tI
+                                 nonm_tmin = tI - global_clock_time
                                  nonm_dmin = d
                                  nonm_pmin = p
 
@@ -443,9 +460,8 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
           #-----------------------------------------------------------------------------------------------------------------        
           if nonm_tmin < min(ymin, ewmin) : # TYPE 0 EVENT (some nonmatched drone reaches package)
                print "TYPE 0 event detected"
-               assert nonm_tmin >= global_clock_time, ""
                assert drone_locked_p[nonm_dmin] == False, ""
-               time_till_event    = nonm_tmin - global_clock_time
+               time_till_event    = nonm_tmin
                global_clock_time += time_till_event
                
                # update the states of all the packages
@@ -465,6 +481,7 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
 
                           if old_handler is not None:
                               drone_pool.remove(old_handler)
+                              
 
                           drone_wavelets_info[new_handler].append( {'wavelet_center'      : newposn,          \
                                                                     'clock_time'          : global_clock_time,\
@@ -475,9 +492,6 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                                                   'clock_time'        : global_clock_time,\
                                                   'current_handler_id': new_handler}) 
 
-               
-
-              
           #-----------------------------------------------------------------------------------------------------------------        
           elif ewmin < ymin:  # TYPE I EVENT (package reaches target)
               print "TYPE I event detected"
@@ -486,14 +500,12 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
               global_clock_time += time_till_event
 
               # Process lbend edges in the matching for type \rnum{1} event
-                 
               for ledge in lbend_edges_of_matching:
                   (pl,dl) = ledge['edge_pair']
                   wav     = get_last_wavelet_of_drone(D[dl])     
                   wav['matched_package_ids'].append(P[pl])
               
               # Process straight edges in the matching for type \rnum{1} event
-                 
               package_delivered_p[P[pmin]] = True
               drone_locked_p[D[dmin]]      = False
               remaining_packages.remove(P[pmin])
@@ -583,7 +595,7 @@ def get_interception_time_and_x_generalized(s, us, p, up, t, c, k) :
         if l >= r:
             return c + (l-r)/up, 0.0
         else:
-            return c, np.inf
+            return np.inf, np.inf
 
 
     _ , x = get_interception_time_and_x(s,us,p,up,t,c-k)
@@ -591,8 +603,11 @@ def get_interception_time_and_x_generalized(s, us, p, up, t, c, k) :
     #### TODO! an assertion statement that makes sure that 
     #### c+x/us == k + |PM|/up where M is the meeting point 
     #### of the wavelets
-
-    return c+x/us, x
+    
+    if x is not None:
+         return c+x/us, x
+    else:
+         return np.inf, None
 
 # Run Handlers
 
