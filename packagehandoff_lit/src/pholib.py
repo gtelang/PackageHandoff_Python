@@ -194,6 +194,9 @@ def get_interception_time_and_x(s, us, p, up, t, t0) :
            x = root
            break
 
+    print Fore.RED, "Input:", s, us, p, up, t, t0 , Style.RESET_ALL
+    print Fore.RED, "Qroots: ",  qroots, Style.RESET_ALL
+    print Fore.RED, x/us+t0, np.sqrt((x-alpha)**2 + beta**2)/up, Style.RESET_ALL
     assert abs(x/us+t0 - np.sqrt((x-alpha)**2 + beta**2)/up) <= 1e-6 , \
            "Quadratic not solved perfectly"
 
@@ -318,21 +321,26 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
           G_mat       = np.full((len(remaining_packages),len(drone_pool)), infty)
           lbend_edges = []
 
+          # dictionary mapping serial numbers into 
+          D = {ctr: dr for ctr, dr in zip(range(len(drone_pool))        , drone_pool        )}
+          P = {ctr: pa for ctr, pa in zip(range(len(remaining_packages)), remaining_packages)}
 
+          # the inverted version of the dictionaries above
+          ID = {dr : ctr for ctr, dr in D.iteritems()}
+          IP = {pa : ctr for ctr, pa in P.iteritems()}
 
-          for didx in drone_pool:
-              for pidx in remaining_packages: 
-                  current_handler_of_package = get_current_handler_of_package(pidx)
-                  target                     = targets[pidx]
-                  pkg   , upkg               = get_current_position_of_package(pidx), get_current_speed_of_package(pidx)
-                  wav                        = get_last_wavelet_of_drone(didx)
-                  dro   , udro               = wav['wavelet_center']                , drone_speeds[didx]
+          for didx in range(len(drone_pool)):
+              for pidx in range(len(remaining_packages)): 
+                  current_handler_of_package = ID[get_current_handler_of_package(P[pidx])] if get_current_handler_of_package(P[pidx]) is not None else None
+                  target                     = targets[P[pidx]]
+                  pkg   , upkg               = get_current_position_of_package(P[pidx]), get_current_speed_of_package(P[pidx])
+                  wav                        = get_last_wavelet_of_drone(D[didx])
+                  dro   , udro               = wav['wavelet_center']                , drone_speeds[D[didx]]
 
-                  if  ((current_handler_of_package is None)  or current_handler_of_package != didx) and not(drone_locked_p[didx]):
+                  if  ((current_handler_of_package is None)  or current_handler_of_package != didx) and not(drone_locked_p[D[didx]]):
 
                           if upkg < zerotol :
-                                # Insert edge incident to stationary package and a drone ...                #---------------->
-                                   
+                                # Insert edge incident to stationary package and a drone ...                
                                 G_mat[pidx, didx] = np.linalg.norm(pkg-dro)/udro +\
                                                     np.linalg.norm(target-pkg)/udro
                                 lbend_edges.append({'edge_pair': (pidx,didx), 
@@ -350,30 +358,30 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
 
                                      pthat             = (target-pkg)/np.linalg.norm(target-pkg)
                                      interception_pt   = pkg + x * pthat
-                                     G_mat[pidx, didx] = tI + np.linalg.norm((target-interception_pt))/udro  #---------------->
+                                     G_mat[pidx, didx] = tI + np.linalg.norm((target-interception_pt))/udro 
                                      lbend_edges.append({'edge_pair': (pidx,didx), 
                                                          'y'       : np.linalg.norm(interception_pt-dro)/udro }) 
                                 
 
-                  elif  ((current_handler_of_package is None)  or current_handler_of_package != didx)     and drone_locked_p[didx]:
+                  elif  ((current_handler_of_package is None)  or current_handler_of_package != didx) and drone_locked_p[D[didx]]:
                          pass # drone locked, so it cant help, keep the edge weight infinite
 
-                  elif current_handler_of_package == didx and drone_locked_p[didx]:
+                  elif current_handler_of_package == didx and drone_locked_p[D[didx]]:
                          assert abs(udro-upkg) < zerotol , "udro should be equal to upkg"
-                         G_mat[pidx, didx] = np.linalg.norm((target-pkg))/udro                               #---------------->
+                         G_mat[pidx, didx] = np.linalg.norm((target-pkg))/udro                               
                   else : 
-                         print didx, current_handler_of_package, drone_locked_p[didx]
-                         assert not(current_handler_of_package == didx and not(drone_locked_p[didx])),\
+                         print didx, current_handler_of_package, drone_locked_p[D[didx]]
+                         assert not(current_handler_of_package == didx and not(drone_locked_p[D[didx]])),\
                             "This else branch should not be executed. This means didx is handling a package and is NOT locked"
+
+
+          print G_mat               
 
           # Get a bottleneck matching on $G$
           
           from scipy.optimize import linear_sum_assignment
           pkg_ind, dro_ind = linear_sum_assignment(G_mat)
           assert len(pkg_ind) == len(dro_ind), "Lengths of the index arrays should be the same"
-          
-
-                                                                                                             #<----------------
 
           # Expand drone wavelets till an event of either Type \rnum{1} or Type \rnum{2} is detected
              
@@ -414,27 +422,27 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
                  
               for ledge in lbend_edges_of_matching:
                   (pl,dl) = ledge['edge_pair']
-                  wav     = get_last_wavelet_of_drone(dl)     
-                  wav['matched_package_ids'].append(pl)
+                  wav     = get_last_wavelet_of_drone(D[dl])     
+                  wav['matched_package_ids'].append(P[pl])
               
               # Process straight edges in the matching for type \rnum{1} event
                  
-              package_delivered_p[pmin] = True
-              drone_locked_p[dmin]      = False
-              remaining_packages.remove(pmin)
-              drone_pool.remove(dmin)
+              package_delivered_p[P[pmin]] = True
+              drone_locked_p[D[dmin]]      = False
+              remaining_packages.remove(P[pmin])
+              drone_pool.remove(D[dmin])
 
               for sedge in straight_edges_of_matching:
                     (ps, ds) = sedge
-                    assert abs(get_current_speed_of_package(ps) - drone_speeds[ds]) < zerotol , "speeds should match"
+                    assert abs(get_current_speed_of_package(P[ps]) - drone_speeds[D[ds]]) < zerotol , "speeds should match"
                    
-                    sthat = normalize(targets[ps]-sources[ps])
-                    package_trail_info[ps].append({'current_position'  : get_current_position_of_package(ps) +\
-                                                                          time_till_event * get_current_speed_of_package(ps) * sthat,\
-                                                   'clock_time'        : global_clock_time,\
-                                                   'current_handler_id': ds}) 
-                    wav = get_last_wavelet_of_drone(ds)     
-                    wav['matched_package_ids'].append(ps)
+                    sthat = normalize(targets[P[ps]]-sources[P[ps]])
+                    package_trail_info[P[ps]].append({'current_position'  : get_current_position_of_package(P[ps]) +\
+                                                                          time_till_event * get_current_speed_of_package(P[ps]) * sthat,\
+                                                   'clock_time'           : global_clock_time,\
+                                                   'current_handler_id'   : ds}) 
+                    wav = get_last_wavelet_of_drone(D[ds])     
+                    wav['matched_package_ids'].append(P[ps])
               
               
           else:# TYPE II EVENT (a wavelet corresponding to a drone not handling 
@@ -450,24 +458,24 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
               for ledge in lbend_edges_of_matching:
                   (pl,dl) = ledge['edge_pair']
                   
-                  sthat   = normalize(targets[pl]-sources[pl])
-                  newposn = get_current_position_of_package(pl) + time_till_event * get_current_speed_of_package(pl) * sthat
-                  package_trail_info[pl].append({'current_position'   : newposn,\
-                                                 'clock_time'        : global_clock_time, \
-                                                 'current_handler_id': get_current_handler_of_package(pl)   }) 
+                  sthat   = normalize(targets[P[pl]]-sources[P[pl]])
+                  newposn = get_current_position_of_package(P[pl]) + time_till_event * get_current_speed_of_package(P[pl]) * sthat
+                  package_trail_info[P[pl]].append({'current_position'   : newposn,\
+                                                    'clock_time'         : global_clock_time, \
+                                                    'current_handler_id' : get_current_handler_of_package(P[pl])   }) 
                   
-                  wav     = get_last_wavelet_of_drone(dl)     
-                  wav['matched_package_ids'].append(pl)
+                  wav     = get_last_wavelet_of_drone(D[dl])     
+                  wav['matched_package_ids'].append(P[pl])
 
                   if pl == plmin and dl == dlmin:
 
-                        if get_current_handler_of_package(plmin) is not None:         
-                            drone_locked_p[ get_current_handler_of_package(plmin)  ] = False
-                            drone_pool.remove(get_current_handler_of_package(plmin))
+                        if get_current_handler_of_package(P[plmin]) is not None:         
+                            drone_locked_p[ get_current_handler_of_package(P[plmin])  ] = False
+                            drone_pool.remove(get_current_handler_of_package(P[plmin]))
 
-                        drone_locked_p[dlmin] = True 
-                        package_trail_info[pl][-1]['current_handler_id'] = dlmin
-                        drone_wavelets_info[dlmin].append( {'wavelet_center'      : newposn,\
+                        drone_locked_p[D[dlmin]] = True 
+                        package_trail_info[P[pl]][-1]['current_handler_id'] = D[dlmin]
+                        drone_wavelets_info[D[dlmin]].append( {'wavelet_center'   : newposn,\
                                                             'clock_time'          : global_clock_time,\
                                                             'matched_package_ids' : []}) 
 
@@ -477,13 +485,13 @@ def algo_matchmove(drone_info, sources, targets, plot_tour_p = False):
               for sedge in straight_edges_of_matching:
                     (ps,ds) = sedge
                     assert (ps != plmin and ds != dlmin), ""
-                    sthat   = normalize(targets[ps]-sources[ps])
-                    package_trail_info[ps].append({'current_position'  : get_current_position_of_package(ps) +\
-                                                                            time_till_event * get_current_speed_of_package(ps) * sthat,\
+                    sthat   = normalize(targets[P[ps]]-sources[P[ps]])
+                    package_trail_info[P[ps]].append({'current_position'  : get_current_position_of_package(P[ps]) +\
+                                                                            time_till_event * get_current_speed_of_package(P[ps]) * sthat,\
                                                    'clock_time'        : global_clock_time,\
-                                                   'current_handler_id': get_current_handler_of_package(ps)   }) 
-                    wav = get_last_wavelet_of_drone(ds)     
-                    wav['matched_package_ids'].append(ps)
+                                                   'current_handler_id': get_current_handler_of_package(P[ps])   }) 
+                    wav = get_last_wavelet_of_drone(D[ds])     
+                    wav['matched_package_ids'].append(P[ps])
               
 
      # Plot movement of packages and drones if \verb|plot_tour_p == True |
@@ -732,9 +740,11 @@ cols = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231',
 
 
 numrobscanvas = 0
+basespeed = 0.1
 
 def multiple_pho_run_handler():
     import random
+
     def wrapperEnterRunPoints(fig, ax, run):
       def _enterPoints(event):
         if event.name      == 'button_press_event'          and \
@@ -745,8 +755,10 @@ def multiple_pho_run_handler():
                  # Insert circle representing the initial position of a drone
                  print Fore.GREEN
                  newPoint = (event.xdata, event.ydata)
-                 speed    = np.random.uniform() # float(raw_input('What speed do you want for the drone at '+str(newPoint)))
-                 run.drone_info.append( (newPoint, speed) ) 
+                 #speed    = np.random.uniform() # float(raw_input('What speed do you want for the drone at '+str(newPoint)))
+
+                 global basespeed
+                 run.drone_info.append( (newPoint, basespeed) ) 
                  patchSize  = (xlim[1]-xlim[0])/20.0
                  print Style.RESET_ALL
                  
@@ -754,13 +766,14 @@ def multiple_pho_run_handler():
                  ax.add_patch( mpl.patches.Circle( newPoint, radius = patchSize,
                                                    facecolor='#EBEBEB', edgecolor='black'  ))
 
-                 ax.text( newPoint[0], newPoint[1], "{:.2f}".format(speed) + "\n" + str(numrobscanvas) , fontsize=10, 
+                 ax.text( newPoint[0], newPoint[1], "{:.2f}".format(basespeed) + "\n" + str(numrobscanvas) , fontsize=10, 
                           horizontalalignment='center', verticalalignment='center' )
 
                  numrobscanvas += 1    
                  ax.set_title('Number of drones inserted: ' +\
                               str(len(run.drone_info)), fontdict={'fontsize':25})
-                 
+                 basespeed += 0.1
+
              elif event.button == 3:  
                  # Insert big colored circles representing the source and target points
 
@@ -822,6 +835,9 @@ def multiple_pho_run_handler():
                     global numrobscanvas
                     numrobscanvas = 0
                     fig.canvas.draw()
+
+                    global basespeed
+                    basespeed = 0.1
            return _keyPressHandler
     
     # Set up interactive canvas
